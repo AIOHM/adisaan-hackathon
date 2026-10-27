@@ -81,12 +81,24 @@ final class MetaClient
         $limit = (int) round((float) config('tbwim.meta.monthly_limit_usd', 0) * 1000000);
         $reservation = MetaApiBudget::reservationForAudio($model);
         $period = $this->budget->reserve($limit, $reservation);
+        // Hand-built multipart: the API rejects Guzzle's part shape
+        // (Content-Disposition last, per-part Content-Length). This matches
+        // the documented curl call field for field.
+        $boundary = '------------------------'.bin2hex(random_bytes(16));
+        $body = "--{$boundary}\r\n"
+            ."Content-Disposition: form-data; name=\"request\"\r\n"
+            ."Content-Type: application/json\r\n\r\n"
+            .(string) json_encode(['model' => $model, 'audioEncoding' => 'WAV', 'mode' => 'PUSH_TO_TALK'])."\r\n"
+            ."--{$boundary}\r\n"
+            ."Content-Disposition: form-data; name=\"audio\"; filename=\"clip.wav\"\r\n"
+            ."Content-Type: audio/wav\r\n\r\n"
+            .(string) file_get_contents($wavPath)."\r\n"
+            ."--{$boundary}--\r\n";
         $started = microtime(true);
         $response = Http::withToken($apiKey)
             ->acceptJson()
             ->timeout(300)
-            ->attach('request', (string) json_encode(['model' => $model, 'audioEncoding' => 'WAV', 'mode' => 'PUSH_TO_TALK']), null, ['Content-Type' => 'application/json'])
-            ->attach('audio', (string) file_get_contents($wavPath), 'clip.wav', ['Content-Type' => 'audio/wav'])
+            ->withBody($body, 'multipart/form-data; boundary='.$boundary)
             ->post(config('tbwim.meta.url').'/asr/transcribe');
         if ($response->status() === 401) {
             $this->budget->release($period, $reservation);

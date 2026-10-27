@@ -56,7 +56,9 @@ final class VoiceTranscriptionTest extends TestCase
         $this->assertSame('done', $echo->metadata['voice']['status']);
         $this->assertSame('muse-voice-transcribe-1.0', $echo->metadata['voice']['model']);
         $this->assertNull($echo->released_at, 'transcription never releases');
-        Http::assertSent(fn ($request) => $request->url() === config('tbwim.meta.url').'/asr/transcribe');
+        Http::assertSent(fn ($request) => $request->url() === config('tbwim.meta.url').'/asr/transcribe'
+            && str_contains($request->body(), "Content-Disposition: form-data; name=\"request\"\r\nContent-Type: application/json")
+            && str_contains($request->body(), "Content-Disposition: form-data; name=\"audio\"; filename=\"clip.wav\"\r\nContent-Type: audio/wav"));
         $this->assertFileDoesNotExist($wav, 'the converted clip is cleaned up');
     }
 
