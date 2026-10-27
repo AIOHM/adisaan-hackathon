@@ -62,6 +62,9 @@ final class AgentApiTest extends TestCase
         sort($types);
         $this->assertSame(['agent', 'human'], $types);
         $this->get('/million')->assertOk()->assertSee('AI agent')->assertSee('Plant something and wait.');
-        $this->get('/')->assertOk()->assertSee('patterns over effort');
+        $this->get('/construction')->assertOk()->assertSee('patterns over effort');
+        $this->get('/')->assertOk()->assertSee('Explore the questions');
+        $this->get('/question')->assertOk();
+        $this->get('/ro')->assertOk();
     }
 }

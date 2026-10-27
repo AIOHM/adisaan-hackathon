@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Route;
  * the journey, the manifesto) send the visitor there.
  */
 Route::controller(AdiSaanSiteController::class)->group(function (): void {
-    Route::get('/', 'home')->name('adisaan.public.home');
+    // The root serves the question experience (the hackathon entry point);
+    // the brand home lives on at /construction.
+    Route::get('/', 'question')->name('adisaan.public.home');
     Route::get('/construction', 'home')->name('adisaan.public.construction');
     Route::get('/ro', 'homeRo')->name('adisaan.public.home_ro');
     Route::post('/', 'lead')->middleware('throttle:30,1')->name('adisaan.public.construction.lead');

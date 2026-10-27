@@ -34,7 +34,7 @@ final class HumanIntakeTest extends TestCase
         $this->assertSame('human', $echo->metadata['respondent_type']);
         $this->assertNotNull($echo->client_ip_hash);
         $this->assertStringNotContainsString('127.0.0.1', json_encode($echo->toArray()));
-        $this->get('/')->assertOk()->assertDontSee('keep it running quietly');
+        $this->get('/construction')->assertOk()->assertDontSee('keep it running quietly');
     }
 
     public function test_missing_proof_and_honeypot_are_refused_and_links_are_quarantined(): void
