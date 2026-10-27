@@ -13,53 +13,21 @@
   const digits = ['hours', 'minutes', 'seconds'].map((part) => clock.querySelector(`[data-countdown-${part}]`));
   if (digits.some((digit) => !digit)) return;
   const content = clock.querySelector('.question-answer-clock__content');
-  const videoUrl = clock.dataset.answerVideo;
   const serverAtLoad = serverNow;
   const elapsed = () => performance.now();
   const startedAt = elapsed();
-  let opening = false;
+  let reloading = false;
 
-  const openAnswer = () => {
-    if (opening || !content || !videoUrl) return;
-    opening = true;
-    const note = content.querySelector('.question-answer-clock__note');
-    if (note) note.textContent = 'Opening AdiSaan’s answer…';
-
-    const video = document.createElement('video');
-    video.className = 'question-answer-clock__video';
-    video.controls = true;
-    video.playsInline = true;
-    video.preload = 'metadata';
-    video.append('Your browser does not support video playback.');
-
-    const onReady = () => {
-      video.removeEventListener('error', onError);
-      clock.classList.add('is-revealing');
-      window.setTimeout(() => {
-        const title = document.createElement('p');
-        title.className = 'question-answer-clock__eyebrow';
-        title.textContent = 'ADISAAN’S ANSWER';
-        content.replaceChildren(title, video);
-        clock.classList.remove('is-revealing');
-        clock.classList.add('is-revealed');
-      }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240);
-    };
-    const onError = () => {
-      video.removeEventListener('loadedmetadata', onReady);
-      opening = false;
-      if (!note) return;
-      note.replaceChildren('The video could not load. ');
-      const retry = document.createElement('button');
-      retry.type = 'button';
-      retry.className = 'question-answer-clock__retry';
-      retry.textContent = 'Try again';
-      retry.addEventListener('click', openAnswer, { once: true });
-      note.append(retry);
-    };
-    video.addEventListener('loadedmetadata', onReady, { once: true });
-    video.addEventListener('error', onError, { once: true });
-    video.src = videoUrl;
-    video.load();
+  // Zero means reveal: the page reloads into the freshest released
+  // answers, the same one-reload pattern the film countdown below uses.
+  // The released answers are server-rendered, so markup from before the
+  // moment cannot show them without a fresh page.
+  const revealAnswers = () => {
+    if (reloading) return;
+    reloading = true;
+    const note = content ? content.querySelector('.question-answer-clock__note') : null;
+    if (note) note.textContent = 'Revealing the latest answers…';
+    window.setTimeout(() => window.location.reload(), 1500);
   };
 
   const render = () => {
@@ -76,7 +44,7 @@
     digits[2].textContent = String(seconds).padStart(2, '0');
     if (remaining === 0) {
       clearInterval(tick);
-      openAnswer(); // The private video route still enforces the shared release time.
+      revealAnswers();
     }
   };
   const tick = setInterval(render, 1000);

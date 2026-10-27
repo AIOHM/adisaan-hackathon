@@ -162,11 +162,16 @@
                                             @endif
                                         </div>
                                     </div>
-                                @elseif($slideRevealAt && $slideRevealAt->isFuture())
-                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}" data-deadline="{{ $slideRevealAt->toIso8601String() }}" data-server-now="{{ now()->toIso8601String() }}" data-answer-video="{{ $story['answer_video'] ?? '' }}">
+                                {{-- A rolling sixty seconds that ends in the
+                                     freshest released answers, not a fixed
+                                     embargo date that goes stale. The featured
+                                     card always counts; later cards only while
+                                     their scheduled date is still future. --}}
+                                @elseif($i === 0 || ($slideRevealAt && $slideRevealAt->isFuture()))
+                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}" data-deadline="{{ now()->addMinute()->toIso8601String() }}" data-server-now="{{ now()->toIso8601String() }}" data-answer-video="{{ $story['answer_video'] ?? '' }}">
                                         <div class="question-answer-clock__content" aria-live="polite">
                                             <div class="qreel__head">
-                                                <p class="question-answer-clock__eyebrow">ADISAAN’S ANSWER IN</p>
+                                                <p class="question-answer-clock__eyebrow">FRESH ANSWERS IN</p>
                                                 <span class="qreel__head-no" aria-label="Question {{ $slideNo }}">{{ $slideNo }}</span>
                                             </div>
                                             <div class="question-answer-clock__digits" role="timer" aria-label="Time until AdiSaan's answer window">
@@ -178,7 +183,7 @@
                                                 <span class="question-answer-clock__colon" aria-hidden="true">:</span>
                                                 <span><strong data-countdown-seconds>00</strong><small>seconds</small></span>
                                             </div>
-                                            <p class="question-answer-clock__note">Your answer can go first. Mine opens when the clock reaches zero.</p>
+                                            <p class="question-answer-clock__note">Your answer can go first. Fresh answers land when the clock reaches zero.</p>
                                         </div>
                                     </div>
                                 @elseif(!empty($story['film_released']))
@@ -348,7 +353,7 @@
         </section>
     </div>
 </section>
-<script src="/assets/adisaan/site/question-answer-countdown.js?v=20261025-launch2" defer></script>
+<script src="/assets/adisaan/site/question-answer-countdown.js?v=20261027-countdown1" defer></script>
 {{-- After site.js, which publishes the stage selector the reel turns. --}}
 <script src="/assets/adisaan/site/question-reel.js?v=20261024-reel" defer></script>
 @endsection
