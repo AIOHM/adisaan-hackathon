@@ -27,7 +27,7 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::post('/answer/received', 'storeReceived')->middleware('throttle:30,1')->name('adisaan.public.received.store');
     Route::get('/million', 'million')->name('adisaan.public.million');
     Route::get('/privacy', 'privacy')->name('adisaan.public.privacy');
-    Route::get('/api/journey/scoreboard', 'board')->middleware('throttle:60,1')->name('adisaan.public.board');
+    Route::get('/api/journey/scoreboard', 'boardJson')->middleware('throttle:60,1')->name('adisaan.public.board');
     Route::post('/cookie-consent/log', 'cookieConsent')->middleware('throttle:30,1')->name('cookie-consent.log');
     Route::post('/api/ask-muse', 'askMuse')->withoutMiddleware([ValidateCsrfToken::class])->middleware('throttle:30,1')->name('adisaan.public.ask-muse');
     Route::post('/api/ask-muse/follow-up', 'askMuseFollowUp')->withoutMiddleware([ValidateCsrfToken::class])->name('adisaan.public.ask-muse.follow-up');

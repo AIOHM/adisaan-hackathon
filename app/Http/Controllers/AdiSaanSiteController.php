@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -408,10 +409,100 @@ final class AdiSaanSiteController extends Controller
         return view('adisaan-site.privacy', $this->shared(''));
     }
 
-    /** The follower board the header script polls. There is no social feed here, so it is empty. */
-    public function board(): JsonResponse
+    /** The follower board the header script polls: the brand site's measured count, read-only. */
+    public function boardJson(): JsonResponse
     {
-        return response()->json(self::EMPTY_BOARD + ['write' => false]);
+        return response()->json($this->board() + ['write' => false]);
+    }
+
+    /**
+     * The measured follower board. AIOHM Social counts the accounts and the
+     * brand site publishes the result at /api/journey/scoreboard; this reads
+     * that public feed and keeps it for ten minutes. When the feed is not
+     * reachable the templates show "no measured count yet", never a guess.
+     */
+    private function board(): array
+    {
+        $url = $this->brandUrl('/api/journey/scoreboard');
+
+        return Cache::remember('adisaan.board', now()->addMinutes(10), function () use ($url): array {
+            try {
+                $response = Http::acceptJson()->timeout(6)->get($url);
+                $data = $response->ok() ? $response->json() : null;
+            } catch (\Throwable $e) {
+                Log::info('Follower board unavailable', ['error' => $e->getMessage()]);
+                $data = null;
+            }
+            if (! is_array($data) || ! array_key_exists('total_followers', $data)) {
+                return self::EMPTY_BOARD;
+            }
+
+            return [
+                'total_followers' => $data['total_followers'],
+                'last_synced_at' => $data['last_synced_at'] ?? null,
+                'accounts' => is_array($data['accounts'] ?? null) ? $data['accounts'] : [],
+                'measured_count' => (int) ($data['measured_count'] ?? 0),
+                'total_gain' => (int) ($data['total_gain'] ?? 0),
+                'goal' => (int) ($data['goal'] ?? config('adisaan_public.answer_goal', 1000000)),
+            ];
+        });
+    }
+
+    private function buildTop10Virality(array $accounts, array $channelVoiceCounts = []): array
+    {
+        $scored = array_map(function (array $account) use ($channelVoiceCounts): array {
+            $handleClean = ltrim((string) ($account['handle'] ?? ''), '@');
+            $platform = strtolower((string) ($account['platform'] ?? ''));
+            $profileKey = $platform.':'.$handleClean;
+            $sanctuaryVoices = (int) ($channelVoiceCounts[$profileKey] ?? 0);
+            $measured = (bool) ($account['measured'] ?? false);
+            $followers = (int) ($account['followers'] ?? 0);
+            $gain = is_int($account['gain'] ?? null) ? (int) $account['gain'] : 0;
+            $series = is_array($account['series'] ?? null) ? $account['series'] : [];
+            $voiceBoost = min(28, $sanctuaryVoices * 4);
+            if ($measured) {
+                $viralityScore = min(99, max(18, max(0, $gain) * 18 + min(20, count($series) * 2) + min(58, (int) round(sqrt(max(1, $followers)) * 2.15)) + $voiceBoost));
+                $viralityBadge = $gain > 0 ? '🔥 +'.$gain.' VELOCITY · '.$viralityScore.' VIRALITY' : '⚡ '.$viralityScore.' VIRALITY INDEX';
+            } else {
+                $viralityScore = $voiceBoost;
+                $viralityBadge = $sanctuaryVoices > 0 ? '✨ '.$sanctuaryVoices.' SANCTUARY '.($sanctuaryVoices === 1 ? 'VOICE' : 'VOICES') : '⏳ AWAITING API SIGNAL';
+            }
+
+            return $account + [
+                'profile_key' => $profileKey,
+                'profile_url' => self::SOCIAL_PROFILES[$profileKey] ?? null,
+                'sanctuary_voices' => $sanctuaryVoices,
+                'unlock_via_channel_url' => route('adisaan.public.members', ['mode' => 'make_a_wish', 'utm_source' => $profileKey]),
+                'virality_score' => $viralityScore,
+                'virality_badge' => $viralityBadge,
+            ];
+        }, $accounts);
+
+        usort($scored, static function (array $a, array $b): int {
+            if (($a['measured'] ?? false) !== ($b['measured'] ?? false)) {
+                return ($b['measured'] ?? false) <=> ($a['measured'] ?? false);
+            }
+            if ($b['virality_score'] !== $a['virality_score']) {
+                return $b['virality_score'] <=> $a['virality_score'];
+            }
+            if (($b['sanctuary_voices'] ?? 0) !== ($a['sanctuary_voices'] ?? 0)) {
+                return ($b['sanctuary_voices'] ?? 0) <=> ($a['sanctuary_voices'] ?? 0);
+            }
+            $gainA = is_int($a['gain'] ?? null) ? $a['gain'] : -999999;
+            $gainB = is_int($b['gain'] ?? null) ? $b['gain'] : -999999;
+            if ($gainB !== $gainA) {
+                return $gainB <=> $gainA;
+            }
+
+            return ((int) ($b['followers'] ?? 0)) <=> ((int) ($a['followers'] ?? 0));
+        });
+
+        $top10 = array_slice($scored, 0, 10);
+        foreach ($top10 as $index => &$entry) {
+            $entry['position'] = $index + 1;
+        }
+
+        return $top10;
     }
 
     /** The home page's "one email when a new episode is out" form. */
@@ -496,10 +587,11 @@ final class AdiSaanSiteController extends Controller
         $req = request();
         $stories = $this->stories();
         $channelVoiceCounts = $this->loadChannelVoiceCounts();
+        $board = $this->board();
 
         return [
             'active' => $active,
-            'board' => self::EMPTY_BOARD,
+            'board' => $board,
             'memberUnlocked' => false,
             'memberPass' => null,
             'detectedChannel' => $this->resolveSourceChannel($req),
@@ -511,7 +603,7 @@ final class AdiSaanSiteController extends Controller
             'storyboardBanner' => config('adisaan_public.storyboard_partner_banner', []),
             'podcastsPreview' => array_slice((array) config('adisaan_public.podcasts', []), 0, 3),
             'originAnchor' => config('adisaan_public.origin_anchor', []),
-            'top10Virality' => [],
+            'top10Virality' => $this->buildTop10Virality($board['accounts'] ?? [], $channelVoiceCounts),
             'gameState' => [],
             'publicPerspectives' => $this->loadPublicPerspectives(),
             'totalEchoesCount' => EchoSubmission::query()->countable()->count(),
