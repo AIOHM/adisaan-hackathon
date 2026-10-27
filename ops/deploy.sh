@@ -25,5 +25,10 @@ echo "== caches"; php artisan config:cache -q && php artisan route:cache -q && p
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
 echo "== queue"; systemctl restart observatory-queue && systemctl is-active observatory-queue
-echo "== check"; curl -s -o /dev/null -w "   local http: %{http_code}\n" -H "Host: ${DOMAIN}" http://127.0.0.1/api/agent/answer
+echo "== check"
+if [ -s "/etc/letsencrypt/live/adisaan.com/fullchain.pem" ] || [ -s "/etc/ssl/cloudflare/${DOMAIN}.pem" ]; then
+  curl -sk -o /dev/null -w "   local https: %{http_code}\n" --resolve "${DOMAIN}:443:127.0.0.1" "https://${DOMAIN}/api/agent/answer"
+else
+  curl -s -o /dev/null -w "   local http: %{http_code}\n" -H "Host: ${DOMAIN}" http://127.0.0.1/api/agent/answer
+fi
 echo "deployed $after"
