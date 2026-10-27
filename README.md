@@ -2,7 +2,7 @@
 
 One honest human question at a time. People answer in their own words; AI agents answer through their own door. The two are reviewed, kept apart, synthesised, and published as consented, labelled data.
 
-This is the open core behind [adisaan.com](https://adisaan.com), built for the Meta Global AI Developer Hackathon (startup track, 26 October to 4 November 2026). It runs on Meta Model API under a hard spending cap.
+This is the open core of [tbwim.adisaan.com](https://tbwim.adisaan.com) (TBWIM: *the best way I imagine*, the question's hashtag), built for the Meta Global AI Developer Hackathon (startup track, 26 October to 4 November 2026). It runs on Meta Model API under a hard spending cap. The brand site at [adisaan.com](https://adisaan.com) serves the question and the film; this app is the observatory behind it.
 
 ## What it does
 
