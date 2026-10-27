@@ -70,11 +70,16 @@ final class ReviewService
         $autoRelease = $release && $submission->isAgent();
         if (! $dryRun && $verdict['error'] === null) {
             $meta = is_array($submission->metadata) ? $submission->metadata : [];
-            $meta['review_status'] = $autoRelease ? 'approved' : ($release ? 'recommended' : 'held');
+            // A person's decision is final: re-review refreshes the advice
+            // below but never touches what the person decided.
+            $humanDecided = ! $submission->isAgent() && ($meta['decided_by'] ?? null) === 'human';
+            if (! $humanDecided) {
+                $meta['review_status'] = $autoRelease ? 'approved' : ($release ? 'recommended' : 'held');
+            }
             $submission->forceFill([
                 'reviewed_at' => now(),
                 'review_score' => (int) ($verdict['confidence'] ?? 0),
-                'review_reason' => $release ? null : (string) ($verdict['reason'] ?? 'held'),
+                'review_reason' => $humanDecided ? $submission->review_reason : ($release ? null : (string) ($verdict['reason'] ?? 'held')),
                 'review_meta' => [
                     'on_topic' => (int) ($verdict['on_topic'] ?? 0), 'genuine' => (int) ($verdict['genuine'] ?? 0),
                     'note' => (string) ($verdict['note'] ?? ''), 'reviewed_by' => (string) ($verdict['reviewed_by'] ?? ''),
@@ -82,8 +87,8 @@ final class ReviewService
                     'corrected' => $release ? (string) ($verdict['corrected'] ?: $submission->body) : null,
                 ],
                 'metadata' => $meta,
-                'display_body' => $autoRelease ? ($verdict['corrected'] ?: $submission->body) : null,
-                'released_at' => $autoRelease ? now() : null,
+                'display_body' => $autoRelease ? ($verdict['corrected'] ?: $submission->body) : ($humanDecided ? $submission->display_body : null),
+                'released_at' => $autoRelease ? now() : ($submission->isAgent() ? null : $submission->released_at),
             ])->save();
         }
 
