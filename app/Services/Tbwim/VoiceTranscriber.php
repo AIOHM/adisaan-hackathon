@@ -68,7 +68,7 @@ final class VoiceTranscriber
             @unlink($wav);
         }
         if ($result['transcript'] === '') {
-            return $this->mark($echo, 'empty', 'the clip holds no speech');
+            return $this->mark($echo, 'empty', 'the clip holds no speech', ['model' => $result['model'], 'audio_ms' => $result['audio_ms']]);
         }
         $echo->transcript = $result['transcript'];
         $metadata = $echo->metadata ?? [];
@@ -80,10 +80,10 @@ final class VoiceTranscriber
     }
 
     /** @return array{status: string, reason: string} */
-    private function mark(EchoSubmission $echo, string $status, string $reason): array
+    private function mark(EchoSubmission $echo, string $status, string $reason, array $extra = []): array
     {
         $metadata = $echo->metadata ?? [];
-        $metadata['voice'] = ['status' => $status, 'reason' => $reason];
+        $metadata['voice'] = ['status' => $status, 'reason' => $reason] + $extra;
         $echo->metadata = $metadata;
         $echo->save();
 

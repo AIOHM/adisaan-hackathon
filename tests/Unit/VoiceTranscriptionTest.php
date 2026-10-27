@@ -83,6 +83,23 @@ final class VoiceTranscriptionTest extends TestCase
         Http::assertSentCount(0);
     }
 
+    public function test_empty_transcript_keeps_the_audio_facts(): void
+    {
+        config()->set('tbwim.meta.api_key', 'test-key');
+        config()->set('tbwim.meta.monthly_limit_usd', 5);
+        Http::fake(['api.meta.ai/*' => Http::response(['sessionId' => 's1', 'transcript' => '', 'audioDurationMs' => 3000, 'turns' => []])]);
+        Process::fake();
+        Storage::fake('local');
+        Storage::disk('local')->put('echo-media/clip.mp3', 'fake-audio');
+        $wav = tempnam(sys_get_temp_dir(), 'tbwim-test-');
+        file_put_contents($wav, 'RIFFfake');
+
+        $echo = $this->mediaAnswer();
+        $this->assertSame('empty', (new VoiceTranscriber(app(MetaClient::class), fn (string $in): ?string => $wav))->transcribe($echo)['status']);
+        $this->assertSame(3000, $echo->fresh()->metadata['voice']['audio_ms']);
+        $this->assertSame('muse-voice-transcribe-1.0', $echo->fresh()->metadata['voice']['model']);
+    }
+
     public function test_transcriber_refuses_clips_over_ten_minutes(): void
     {
         config()->set('tbwim.meta.api_key', 'test-key');
