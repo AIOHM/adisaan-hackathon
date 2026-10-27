@@ -7,7 +7,7 @@ AIOHM platform until the record is switched; nothing is deleted there.
 ## 1. The server (Ubuntu 24.04, one hour)
 
 ```bash
-apt update && apt install -y nginx mysql-server php8.4-fpm php8.4-cli php8.4-mysql php8.4-sqlite3 \
+apt update && apt install -y nginx mariadb-server php8.4-fpm php8.4-cli php8.4-mysql php8.4-sqlite3 \
   php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-bcmath git unzip composer
 mysql -e "CREATE DATABASE observatory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
   CREATE USER 'observatory'@'localhost' IDENTIFIED BY '<strong password>'; \
@@ -21,12 +21,26 @@ php artisan migrate --force && php artisan config:cache && php artisan route:cac
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
+Or, from the checkout on your Mac, `bash ops/provision-vps.sh <ssh host> adisaan.com`
+does all of the above idempotently (it uses `mariadb-server`, never
+`mysql-server`, which would replace an existing MariaDB). Ports 80 and 443
+must be free on the host first: stop any Caddy or other reverse proxy that
+holds them.
+
 nginx: a standard Laravel server block for `adisaan.com` with root
 `/var/www/adisaan.com/public`, `try_files $uri /index.php?$query_string`, and
-`fastcgi_pass unix:/run/php/php8.4-fpm.sock`. Use a Cloudflare origin
-certificate (SSL/TLS mode "Full (strict)") so the edge still terminates TLS.
-Set `real_ip_header CF-Connecting-IP` with Cloudflare's ranges so rate limits
-see visitors, not the edge.
+`fastcgi_pass unix:/run/php/php8.4-fpm.sock`. Set `real_ip_header
+CF-Connecting-IP` with Cloudflare's ranges so rate limits see visitors, not
+the edge.
+
+TLS: in Cloudflare, SSL/TLS → Origin Server → Create Certificate (RSA, hosts
+`adisaan.com` and `*.adisaan.com`, 15 years). Save the certificate as
+`/etc/ssl/cloudflare/adisaan.com.pem` and the private key as
+`/etc/ssl/cloudflare/adisaan.com.key` (mode 0600) on the server, then re-run
+`ops/provision-vps.sh`: it adds the 443 server block when both files exist.
+Set the zone's SSL/TLS mode to "Full (strict)". Until the certificate is in
+place the site answers on port 80 only, which works with mode "Flexible" but
+not "Full".
 
 Queue and schedule (systemd):
 
