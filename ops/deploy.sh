@@ -7,6 +7,11 @@
 # production dependencies, migrates, rebuilds caches, fixes permissions and
 # restarts the queue worker. .env, storage and vendor are never touched by git.
 set -euo pipefail
+
+# The whole body lives in a function so bash parses the file completely before
+# running it: git replaces this very file mid-deploy, and a script read line by
+# line would otherwise continue from the new file's bytes.
+main() {
 APP="${APP:-/var/www/tbwim.adisaan.com}"
 REF="${1:-origin/main}"
 DOMAIN="${DOMAIN:-tbwim.adisaan.com}"
@@ -32,3 +37,6 @@ else
   curl -s -o /dev/null -w "   local http: %{http_code}\n" -H "Host: ${DOMAIN}" http://127.0.0.1/api/agent/answer
 fi
 echo "deployed $after"
+}
+
+main "$@"
