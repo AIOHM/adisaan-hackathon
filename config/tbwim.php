@@ -146,10 +146,10 @@ return [
             '5. Length: exactly 2 to 3 concise paragraphs (150-200 words).',
             '6. Required opening: start strictly with "#TBWIM: Based on my training, the best way I imagine :tail is..."',
         ]),
-        // Reasoning models spend output tokens thinking (Wonder burned 62 of
-        // 64 on "Say OK"); 420 left nothing for the answer. Room for thought
+        // Reasoning models spend output tokens thinking: Wonder answered in
+        // 1913, Spark 1.2 needs 2472 (measured 2026-10-27). Room for thought
         // plus the 150-200 word answer. Actual spend stays tiny.
-        'max_tokens' => 2048,
+        'max_tokens' => 4096,
         'contenders' => [
             ['model' => 'muse-spark-1.3', 'label' => 'Muse Spark 1.3', 'developer' => 'Meta'],
             ['model' => 'muse-spark-1.2', 'label' => 'Muse Spark 1.2', 'developer' => 'Meta'],
