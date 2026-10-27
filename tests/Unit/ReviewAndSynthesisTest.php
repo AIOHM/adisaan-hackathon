@@ -6,9 +6,9 @@ namespace Tests\Unit;
 
 use App\Models\EchoSubmission;
 use App\Services\Meta\MetaClient;
-use App\Services\Observatory\AnswerReviewer;
-use App\Services\Observatory\QuestionSynthesizer;
-use App\Services\Observatory\ReviewService;
+use App\Services\Tbwim\AnswerReviewer;
+use App\Services\Tbwim\QuestionSynthesizer;
+use App\Services\Tbwim\ReviewService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -30,8 +30,8 @@ final class ReviewAndSynthesisTest extends TestCase
 
     public function test_agent_answers_release_through_the_model_and_human_answers_wait_for_a_person(): void
     {
-        config()->set('observatory.meta.api_key', 'test-key');
-        config()->set('observatory.meta.monthly_limit_usd', 5);
+        config()->set('tbwim.meta.api_key', 'test-key');
+        config()->set('tbwim.meta.monthly_limit_usd', 5);
         Http::fake(['api.meta.ai/*' => Http::response(['model' => 'muse-spark-1.3', 'choices' => [['message' => ['content' => '{"release": true, "reason": "", "confidence": 92, "on_topic": 90, "genuine": 85, "corrected": "Build what compounds.", "note": "ok"}']]], 'usage' => ['prompt_tokens' => 500, 'completion_tokens' => 60]])]);
         $review = app(ReviewService::class);
 

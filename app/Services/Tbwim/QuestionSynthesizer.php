@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Observatory;
+namespace App\Services\Tbwim;
 
 use App\Services\Meta\MetaClient;
 use Illuminate\Support\Facades\Log;
@@ -46,8 +46,8 @@ PROMPT;
         if ($voices === []) {
             throw new \RuntimeException('No voices to synthesize.');
         }
-        $min = (int) config('observatory.synthesis.min_words', 60);
-        $max = (int) config('observatory.synthesis.max_words', 120);
+        $min = (int) config('tbwim.synthesis.min_words', 60);
+        $max = (int) config('tbwim.synthesis.max_words', 120);
         $instructions = str_replace(['MIN', 'MAX'], [(string) $min, (string) $max], self::INSTRUCTIONS);
         $prompt = $this->buildPrompt($question, $voices, $previousBody, $version);
         $lastProblem = null;
@@ -56,11 +56,11 @@ PROMPT;
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => $instructions],
                 ['role' => 'user', 'content' => $input],
-            ], (string) config('observatory.synthesis.model'), 2000, 0.5);
+            ], (string) config('tbwim.synthesis.model'), 2000, 0.5);
             $parsed = $this->parse($result['text'], count($voices), $min, $max);
             if (isset($parsed['error'])) {
                 $lastProblem = $parsed['error'];
-                Log::warning('observatory.synthesis.rejected', ['attempt' => $attempt, 'problem' => $lastProblem]);
+                Log::warning('tbwim.synthesis.rejected', ['attempt' => $attempt, 'problem' => $lastProblem]);
 
                 continue;
             }

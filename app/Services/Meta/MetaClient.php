@@ -18,7 +18,7 @@ final class MetaClient
 
     public function configured(): bool
     {
-        return trim((string) config('observatory.meta.api_key', '')) !== '';
+        return trim((string) config('tbwim.meta.api_key', '')) !== '';
     }
 
     /**
@@ -27,7 +27,7 @@ final class MetaClient
      */
     public function chat(array $messages, string $model, int $maxTokens = 1024, float $temperature = 0.3): array
     {
-        $apiKey = trim((string) config('observatory.meta.api_key', ''));
+        $apiKey = trim((string) config('tbwim.meta.api_key', ''));
         if ($apiKey === '') {
             throw new RuntimeException('META_API_KEY is not set.');
         }
@@ -36,7 +36,7 @@ final class MetaClient
             ->withToken($apiKey)
             ->acceptJson()
             ->timeout(120)
-            ->post(config('observatory.meta.url').'/chat/completions', [
+            ->post(config('tbwim.meta.url').'/chat/completions', [
                 'model' => $model,
                 'messages' => $messages,
                 'max_tokens' => max(1, min(MetaApiBudget::MAX_OUTPUT_TOKENS, $maxTokens)),

@@ -17,7 +17,7 @@ final class HumanIntakeTest extends TestCase
     private function proof(): string
     {
         Carbon::setTestNow(now()->subSeconds(10));
-        $token = app(FormProofInspector::class)->issueToken('observatory_answer');
+        $token = app(FormProofInspector::class)->issueToken('tbwim_answer');
         Carbon::setTestNow();
 
         return $token;

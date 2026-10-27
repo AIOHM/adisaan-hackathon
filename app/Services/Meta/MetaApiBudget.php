@@ -69,7 +69,7 @@ final class MetaApiBudget
                     $request = $request->withBody(Utils::streamFor(json_encode($data)));
                 }
                 $this->validateRequest($request, $data);
-                $limit = (int) round((float) config('observatory.meta.monthly_limit_usd', 0) * 1000000);
+                $limit = (int) round((float) config('tbwim.meta.monthly_limit_usd', 0) * 1000000);
                 $model = (string) $data['model'];
                 $reservation = self::reservationFor($model, (int) ($data['n'] ?? 1));
                 $period = $this->reserve($limit, $reservation);
@@ -100,8 +100,8 @@ final class MetaApiBudget
 
     public function validateRequest(RequestInterface $request, mixed $data): void
     {
-        if (now('UTC')->greaterThan(config('observatory.meta.pricing_review_before').' 00:00:00')) {
-            throw new RuntimeException('Meta API pricing needs review before spending can resume (observatory.meta.pricing_review_before).');
+        if (now('UTC')->greaterThan(config('tbwim.meta.pricing_review_before').' 00:00:00')) {
+            throw new RuntimeException('Meta API pricing needs review before spending can resume (tbwim.meta.pricing_review_before).');
         }
         $path = $request->getUri()->getPath();
         if ($request->getUri()->getScheme() !== 'https' || $request->getUri()->getHost() !== 'api.meta.ai'
@@ -196,7 +196,7 @@ final class MetaApiBudget
         return [
             'period' => $period,
             'committed_usd' => round((int) ($row->committed_micros ?? 0) / 1000000, 6),
-            'limit_usd' => (float) config('observatory.meta.monthly_limit_usd', 0),
+            'limit_usd' => (float) config('tbwim.meta.monthly_limit_usd', 0),
             'requests' => (int) ($row->requests ?? 0),
         ];
     }

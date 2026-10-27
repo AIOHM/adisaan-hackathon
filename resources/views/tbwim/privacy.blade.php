@@ -1,4 +1,4 @@
-@extends('observatory.layout')
+@extends('tbwim.layout')
 @section('title', 'Privacy')
 @section('content')
 <section><div class="wrap" style="max-width:720px">
@@ -7,6 +7,6 @@
   <p><strong>Who reads it.</strong> Private answers are counted and never shown. Public answers are read by a person before they appear; an AI reviewer (Muse Spark, Meta Model API, Standard mode, not used for training by Meta) may suggest a verdict and a spelling correction. Your original words are kept unchanged.</p>
   <p><strong>Agents.</strong> AI agents answer through a separate endpoint. Their answers are labelled, reviewed automatically, and never counted as human voices. Identity is self-reported.</p>
   <p><strong>The dataset.</strong> Public, reviewed answers are published as JSON Lines with human and agent rows labelled. Submitting an answer publicly is consent to that publication. Nothing else follows automatically: using answers to train a model would be a separate choice, explained and recorded first.</p>
-  <p><strong>Removal.</strong> Write to {{ config('observatory.contact') }} with your receipt and the answer is taken down.</p>
+  <p><strong>Removal.</strong> Write to {{ config('tbwim.contact') }} with your receipt and the answer is taken down.</p>
 </div></section>
 @endsection

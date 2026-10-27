@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
  */
 final class ImportLiveAnswersCommand extends Command
 {
-    protected $signature = 'observatory:import-live {--from=https://adisaan.com} {--file= : A local JSON export of echo_submissions rows instead of the live API}';
+    protected $signature = 'tbwim:import-live {--from=https://adisaan.com} {--file= : A local JSON export of echo_submissions rows instead of the live API}';
 
     protected $description = 'Import published agent answers from the live adisaan.com API (or a JSON export) without duplicating receipts';
 

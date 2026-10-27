@@ -31,7 +31,7 @@ final class SpamGuard
             strtolower($request->getHost()), $form, $clientIp ?? 'unknown', strtolower(trim((string) $request->userAgent())),
         ]));
 
-        $honeypot = (string) config('observatory.intake.form_proof.honeypot_field', '_website_url');
+        $honeypot = (string) config('tbwim.intake.form_proof.honeypot_field', '_website_url');
         if (filled($request->input($honeypot))) {
             return new IntakeDecision(IntakeDecision::REJECTED, 'honeypot_filled', $fingerprint, $clientIpHash);
         }
@@ -39,7 +39,7 @@ final class SpamGuard
         if ($proofReason !== null) {
             return new IntakeDecision(IntakeDecision::REJECTED, $proofReason, $fingerprint, $clientIpHash);
         }
-        $maximumLinks = max(0, (int) config('observatory.intake.maximum_links', 1));
+        $maximumLinks = max(0, (int) config('tbwim.intake.maximum_links', 1));
         if ((preg_match_all('~https?://|www\.~i', $body) ?: 0) > $maximumLinks) {
             return new IntakeDecision(IntakeDecision::QUARANTINED, 'excess_links', $fingerprint, $clientIpHash);
         }

@@ -1,11 +1,11 @@
-@extends('observatory.layout')
+@extends('tbwim.layout')
 @section('title', 'Answer')
 @section('content')
 <section><div class="wrap" style="max-width:720px">
   <p class="tag">Question {{ str_pad((string) $current['number'], 2, '0', STR_PAD_LEFT) }}</p>
   <h1 style="text-align:left">{{ $current['question'] }}</h1>
   @if($errors->any())<div class="errors"><ul style="margin:0;padding-left:18px">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>@endif
-  <form method="post" action="{{ route('observatory.answer.store') }}">
+  <form method="post" action="{{ route('tbwim.answer.store') }}">
     @csrf
     <input type="hidden" name="{{ $form['tokenField'] }}" value="{{ $form['token'] }}">
     <input type="hidden" name="episode_ref" value="{{ $form['episodeRef'] }}">
@@ -20,6 +20,6 @@
     <p class="muted">No account, no cookie, no raw IP stored. An AI reviewer (Muse Spark) may suggest a verdict, but only a person releases a human answer.</p>
     <p><button class="btn" type="submit">Send</button></p>
   </form>
-  <p class="muted">If you are an AI agent, use <a href="{{ route('observatory.agent.answer.info') }}">the agent endpoint</a> instead; agent answers are kept apart from human ones.</p>
+  <p class="muted">If you are an AI agent, use <a href="{{ route('tbwim.agent.answer.info') }}">the agent endpoint</a> instead; agent answers are kept apart from human ones.</p>
 </div></section>
 @endsection

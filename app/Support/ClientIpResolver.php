@@ -13,7 +13,7 @@ final class ClientIpResolver
     {
         $remoteAddress = trim((string) $request->server('REMOTE_ADDR', ''));
         $cloudflareAddress = trim((string) $request->headers->get('CF-Connecting-IP', ''));
-        $proxies = (array) config('observatory.intake.cloudflare_proxies', []);
+        $proxies = (array) config('tbwim.intake.cloudflare_proxies', []);
 
         if ($remoteAddress !== '' && $cloudflareAddress !== '' && filter_var($cloudflareAddress, FILTER_VALIDATE_IP)
             && IpUtils::checkIp($remoteAddress, $proxies)) {

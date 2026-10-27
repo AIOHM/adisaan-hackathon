@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Observatory;
+namespace App\Services\Tbwim;
 
 use App\Services\Meta\MetaClient;
 use Illuminate\Support\Facades\Log;
@@ -67,9 +67,9 @@ PROMPT;
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => self::INSTRUCTIONS],
                 ['role' => 'user', 'content' => 'SOURCE: '.($agent ? 'AI AGENT' : 'HUMAN')."\n\nQUESTION\n".trim($question)."\n\nANSWER\n".$answer."\n\nReturn the JSON object."],
-            ], (string) config('observatory.review.model'), 1200, 0.1);
+            ], (string) config('tbwim.review.model'), 1200, 0.1);
         } catch (\Throwable $e) {
-            Log::warning('observatory.review.failed', ['error' => $e->getMessage()]);
+            Log::warning('tbwim.review.failed', ['error' => $e->getMessage()]);
 
             return $this->verdict(false, 'review_unavailable', note: 'The reviewer could not be reached, so the answer is still waiting.', error: $e->getMessage());
         }

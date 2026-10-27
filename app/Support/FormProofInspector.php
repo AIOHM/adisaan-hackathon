@@ -28,7 +28,7 @@ final class FormProofInspector
     /** Null when valid, otherwise the rejection reason. */
     public function invalidReason(Request $request, string $form): ?string
     {
-        $config = (array) config('observatory.intake.form_proof', []);
+        $config = (array) config('tbwim.intake.form_proof', []);
         $token = trim((string) $request->input((string) ($config['token_field'] ?? '_answer_form_token'), ''));
         if ($token === '') {
             return 'missing_form_proof';

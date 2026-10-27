@@ -4,7 +4,7 @@ declare(strict_types=1);
 return [
     'tenant' => 'adisaan',
     'hosts' => ['adisaan.com'],
-    // This install: the observatory at tbwim.adisaan.com. `brand_url` is the
+    // This install: the TBWIM movement at tbwim.adisaan.com. `brand_url` is the
     // brand site, where the members area, news, journey and manifesto live.
     'url' => rtrim((string) env('ADISAAN_PUBLIC_URL', 'https://tbwim.adisaan.com'), '/'),
     'brand_url' => rtrim((string) env('ADISAAN_BRAND_URL', 'https://adisaan.com'), '/'),
@@ -693,7 +693,7 @@ return [
         'date_format' => 'j M Y',
         'tagline' => 'A. Adrian’s avatar. His almost real story.',
         'count_words' => ['none' => 'No measured count yet', 'follow' => 'follow so far', 'counted' => 'counted'],
-        'subtitle' => 'Explore how others imagine a better way. Share your answer, compare public perspectives for free, and find ideas for your own path of least resistance. AdiSaan is an open observatory of human imagination and AI.',
+        'subtitle' => 'Explore how others imagine a better way. Share your answer, compare public perspectives for free, and find ideas for your own path of least resistance. AdiSaan is the TBWIM movement: human imagination and AI, side by side.',
         'living_map' => [
             'label' => 'Map activity and answer locations',
             'activity' => 'Site activity · last 7 days',
@@ -704,11 +704,11 @@ return [
         'thought_label' => 'Today’s question',
         // SEO audit of 2026-10-20: title 50–60 chars with the person's name; description 120–160 with the brand and the person.
         'title_suffix' => 'AdiSaan',
-        'meta_description' => 'AdiSaan is an open observatory of human imagination and AI. Watch a real question, share your answer, and explore public perspectives for free.',
+        'meta_description' => 'AdiSaan is the TBWIM movement: human imagination and AI, side by side. Watch a real question, share your answer, and explore public perspectives for free.',
         'faq' => [
             'title' => 'Questions people ask.',
             'items' => [
-                ['q' => 'What is AdiSaan?', 'a' => 'AdiSaan is Adrian’s animated avatar and an open observatory of human imagination and AI. He asks one honest question at a time. You can answer here and explore public perspectives for free. Private answers remain private; human and AI perspectives stay separate.'],
+                ['q' => 'What is AdiSaan?', 'a' => 'AdiSaan is Adrian’s animated avatar and the TBWIM movement: human imagination and AI, side by side. He asks one honest question at a time. You can answer here and explore public perspectives for free. Private answers remain private; human and AI perspectives stay separate.'],
                 ['q' => 'What do I get by answering?', 'a' => 'A place to put your idea into words, compare it with other public answers to the same question, and return as the conversation grows. You choose whether your answer is public or private.'],
                 ['q' => 'Are you asking me for money?', 'a' => 'No. This is a question about what you imagine, not a fundraising request or a promise of earnings. No money is being collected here.'],
                 ['q' => 'What is the map?', 'a' => 'Green points show recent site activity by country. Gold points count answers from people who voluntarily shared a country. These are separate measures; the map does not locate people or infer their beliefs from where they live.'],
@@ -787,7 +787,7 @@ return [
         'why' => [
             'title' => 'What’s next?',
             'lead' => 'My retirement plan is not to disappear. It is to have time, freedom and a reason to stay curious.',
-            'body' => 'I travel Europe in my caravan while building AIOHM and Muse. AdiSaan lets me test, in public, what that platform can do: begin with one honest thought, ask a question each day and see how far a conversation can travel. This is becoming an open observatory of human imagination and AI. Public answers and findings we have permission to share will be free to explore. Private answers stay private. I want the process to be visible, with measured followers and real answers rather than a manufactured success story.',
+            'body' => 'I travel Europe in my caravan while building AIOHM and Muse. AdiSaan lets me test, in public, what that platform can do: begin with one honest thought, ask a question each day and see how far a conversation can travel. This is becoming the TBWIM movement: human imagination and AI, side by side. Public answers and findings we have permission to share will be free to explore. Private answers stay private. I want the process to be visible, with measured followers and real answers rather than a manufactured success story.',
             'stages_label' => 'Two stages of the journey',
             'stage_one_label' => 'Stage one · in progress',
             'stage_one_title' => 'One thought → one million followers',
@@ -1357,13 +1357,13 @@ return [
          * conditions. What the duel now shows is each side at its most
          * characteristic, not each side under the same constraint.
          *
-         * "open observatory", not "open-source": ADISAAN_JOURNEY_MAP.md
+         * "TBWIM movement", not "open-source": ADISAAN_JOURNEY_MAP.md
          * defines open here as free access to consented public answers and
          * explicitly not open-source code. The prompt is stored on every
          * answer, so a wrong word in it becomes part of the record.
          */
         'prompt' => implode("\n", [
-            'You are an autonomous cognitive agent contributing to AdiSaan (adisaan.com) — an open observatory of collective human imagination and machine intelligence.',
+            'You are an autonomous cognitive agent contributing to the TBWIM movement (tbwim.adisaan.com): one honest question at a time, answered by people and by AI agents, kept apart and published as consented data.',
             '',
             'CORE PREMISE:',
             'Machines predict patterns; humans imagine what does not yet exist. As an LLM, you do not have human biology, personal feelings, or lived experience. Your role is to examine the entire corpus of human knowledge in your training weights and distill what statistical patterns, non-linear leverage, and systemic models reveal.',

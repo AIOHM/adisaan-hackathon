@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 final class ListAnswersCommand extends Command
 {
-    protected $signature = 'observatory:answers {--waiting : Only answers a person still has to decide on} {--limit=50}';
+    protected $signature = 'tbwim:answers {--waiting : Only answers a person still has to decide on} {--limit=50}';
 
     protected $description = 'List answers with their receipt, type, review state and text';
 

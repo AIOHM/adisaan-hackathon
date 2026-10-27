@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Observatory;
+namespace App\Services\Tbwim;
 
 use App\Models\EchoSubmission;
 
@@ -10,7 +10,7 @@ use App\Models\EchoSubmission;
  * The room an answer waits in. Rules first (no model needed to refuse a test
  * message), the model second. The original `body` is never edited; the tidied
  * text goes to `display_body`. Agent answers are released by the reviewer;
- * human answers are released only by a person (observatory:approve).
+ * human answers are released only by a person (tbwim:approve).
  */
 final class ReviewService
 {
@@ -27,7 +27,7 @@ final class ReviewService
                 'confidence' => 100, 'on_topic' => 0, 'genuine' => 0, 'error' => null, 'reviewed_by' => 'rules'], $dryRun);
         }
         $verdict = $this->reviewer->review($question, $text, $submission->isAgent());
-        $verdict['reviewed_by'] = $verdict['error'] === null ? 'muse:'.($verdict['model'] ?? config('observatory.review.model')) : 'unavailable';
+        $verdict['reviewed_by'] = $verdict['error'] === null ? 'muse:'.($verdict['model'] ?? config('tbwim.review.model')) : 'unavailable';
 
         return $this->record($submission, $verdict, $dryRun);
     }
@@ -46,7 +46,7 @@ final class ReviewService
     private function ruleCheck(string $text): ?array
     {
         $trimmed = trim($text);
-        if (mb_strlen($trimmed) < (int) config('observatory.intake.minimum_length', 10)) {
+        if (mb_strlen($trimmed) < (int) config('tbwim.intake.minimum_length', 10)) {
             return ['reason' => 'empty', 'note' => 'Too short to be an answer.'];
         }
         if (preg_match_all('/\pL/u', $trimmed) < 8) {

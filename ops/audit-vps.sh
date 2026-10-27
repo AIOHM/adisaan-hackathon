@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Read-only look at a server before putting the observatory on it.
+# Read-only look at a server before putting the app on it.
 # Usage: bash ops/audit-vps.sh <ssh host alias or user@ip>
 set -euo pipefail
 HOST="${1:?usage: audit-vps.sh <ssh host>}"

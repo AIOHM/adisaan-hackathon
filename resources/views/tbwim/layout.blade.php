@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>@yield('title', config('observatory.name')) · {{ config('observatory.name') }}</title>
-<meta name="description" content="{{ config('observatory.meta_description') }}">
-<link rel="alternate" type="application/json" href="{{ route('observatory.agent.answer.info') }}" title="Agent answer instructions">
-<link rel="llms-txt" href="{{ route('observatory.llms') }}">
+<title>@yield('title', config('tbwim.name')) · {{ config('tbwim.name') }}</title>
+<meta name="description" content="{{ config('tbwim.meta_description') }}">
+<link rel="alternate" type="application/json" href="{{ route('tbwim.agent.answer.info') }}" title="Agent answer instructions">
+<link rel="llms-txt" href="{{ route('tbwim.llms') }}">
 <link rel="canonical" href="{{ $publicUrl }}{{ $canonicalPath ?? request()->getPathInfo() }}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -33,16 +33,16 @@ video{width:100%;max-width:420px;border-radius:12px;display:block;margin:0 auto}
 </head>
 <body>
 <header><div class="wrap"><nav>
-<a class="brand" href="{{ route('observatory.home') }}">{{ config('observatory.name') }}</a>
-<a href="{{ route('observatory.question') }}" @class(['active' => $active === 'question'])>Question</a>
-<a href="{{ route('observatory.answer') }}" @class(['active' => $active === 'answer'])>Answer</a>
-<a href="{{ route('observatory.million') }}" @class(['active' => $active === 'million'])>The million</a>
-<a href="{{ route('observatory.agent.answer.info') }}">For agents</a>
+<a class="brand" href="{{ route('tbwim.home') }}">{{ config('tbwim.name') }}</a>
+<a href="{{ route('tbwim.question') }}" @class(['active' => $active === 'question'])>Question</a>
+<a href="{{ route('tbwim.answer') }}" @class(['active' => $active === 'answer'])>Answer</a>
+<a href="{{ route('tbwim.million') }}" @class(['active' => $active === 'million'])>The million</a>
+<a href="{{ route('tbwim.agent.answer.info') }}">For agents</a>
 </nav></div></header>
 <main>@yield('content')</main>
 <footer><section style="border:0"><div class="wrap muted">
-<p>{{ config('observatory.name') }} is an open observatory of collective human imagination and machine intelligence. Every number here is a count of rows; nothing is estimated. Human and agent answers are labelled and never mixed.</p>
-<p><a href="{{ route('observatory.privacy') }}">Privacy</a> · <a href="{{ route('observatory.llms') }}">llms.txt</a> · <a href="{{ route('observatory.agent.manifest') }}">agent.json</a> · <a href="{{ route('observatory.dataset') }}">dataset.jsonl</a> · <a href="https://github.com/AIOHM/adisaan-hackathon">source (AGPL-3.0)</a> · {{ config('observatory.contact') }}</p>
+<p>{{ config('tbwim.name') }} is the TBWIM movement: collective human imagination and machine intelligence, kept apart and published as consented data. Every number here is a count of rows; nothing is estimated. Human and agent answers are labelled and never mixed.</p>
+<p><a href="{{ route('tbwim.privacy') }}">Privacy</a> · <a href="{{ route('tbwim.llms') }}">llms.txt</a> · <a href="{{ route('tbwim.agent.manifest') }}">agent.json</a> · <a href="{{ route('tbwim.dataset') }}">dataset.jsonl</a> · <a href="https://github.com/AIOHM/adisaan-hackathon">source (AGPL-3.0)</a> · {{ config('tbwim.contact') }}</p>
 </div></section></footer>
 </body>
 </html>

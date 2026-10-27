@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Put the observatory on a fresh Ubuntu server, from this checkout, without
+# Put the app on a fresh Ubuntu server, from this checkout, without
 # touching DNS. Safe to re-run. Run from the repository root on your Mac:
 #
 #   bash ops/provision-vps.sh <ssh host> [domain]
@@ -10,7 +10,7 @@
 # What it does on the server: installs nginx, PHP 8.4-FPM, MariaDB and
 # composer if missing (never mysql-server: on a host that already runs
 # MariaDB that package would replace it); creates database + user (password
-# generated once and kept in /root/.observatory-db); rsyncs this checkout to
+# generated once and kept in /root/.tbwim-db); rsyncs this checkout to
 # /var/www/<domain> (no vendor, no .env, no sqlite); composer install; writes
 # .env on first run (META_API_KEY left empty for you to fill); migrates;
 # caches; installs the queue service and the scheduler cron; writes an HTTP
@@ -54,14 +54,14 @@ test -S "$PHPSOCK" || { echo "php8.4-fpm socket not found at $PHPSOCK"; exit 1; 
 
 echo "== database"
 systemctl enable --now mariadb >/dev/null
-DBFILE=/root/.observatory-db
+DBFILE=/root/.tbwim-db
 if [ ! -f "$DBFILE" ]; then
   PASS="$(openssl rand -base64 24 | tr -d '/+=' | cut -c1-28)"
-  printf 'observatory\n%s\n' "$PASS" > "$DBFILE"; chmod 600 "$DBFILE"
+  printf 'tbwim\n%s\n' "$PASS" > "$DBFILE"; chmod 600 "$DBFILE"
 fi
 DBPASS="$(sed -n 2p "$DBFILE")"
-mysql -e "CREATE DATABASE IF NOT EXISTS observatory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -e "CREATE USER IF NOT EXISTS 'observatory'@'localhost' IDENTIFIED BY '${DBPASS}'; ALTER USER 'observatory'@'localhost' IDENTIFIED BY '${DBPASS}'; GRANT ALL ON observatory.* TO 'observatory'@'localhost'; FLUSH PRIVILEGES;"
+mysql -e "CREATE DATABASE IF NOT EXISTS tbwim CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -e "CREATE USER IF NOT EXISTS 'tbwim'@'localhost' IDENTIFIED BY '${DBPASS}'; ALTER USER 'tbwim'@'localhost' IDENTIFIED BY '${DBPASS}'; GRANT ALL ON tbwim.* TO 'tbwim'@'localhost'; FLUSH PRIVILEGES;"
 
 echo "== application"
 cd "$APP"
@@ -69,7 +69,7 @@ composer install --no-dev --optimize-autoloader --no-interaction --quiet
 if [ ! -f .env ]; then
   cp .env.example .env
   sed -i "s#^APP_ENV=.*#APP_ENV=production#; s#^APP_DEBUG=.*#APP_DEBUG=false#; s#^APP_URL=.*#APP_URL=https://${DOMAIN}#" .env
-  sed -i "s#^DB_CONNECTION=.*#DB_CONNECTION=mysql#; s#^\# DB_HOST=.*#DB_HOST=127.0.0.1#; s#^\# DB_PORT=.*#DB_PORT=3306#; s#^\# DB_DATABASE=.*#DB_DATABASE=observatory#; s#^\# DB_USERNAME=.*#DB_USERNAME=observatory#; s#^\# DB_PASSWORD=.*#DB_PASSWORD=${DBPASS}#" .env
+  sed -i "s#^DB_CONNECTION=.*#DB_CONNECTION=mysql#; s#^\# DB_HOST=.*#DB_HOST=127.0.0.1#; s#^\# DB_PORT=.*#DB_PORT=3306#; s#^\# DB_DATABASE=.*#DB_DATABASE=tbwim#; s#^\# DB_USERNAME=.*#DB_USERNAME=tbwim#; s#^\# DB_PASSWORD=.*#DB_PASSWORD=${DBPASS}#" .env
   php artisan key:generate --force --quiet
   echo "   .env written. META_API_KEY is empty: fill it in ${APP}/.env"
 fi
@@ -79,9 +79,9 @@ chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
 
 echo "== queue service + scheduler"
-cat > /etc/systemd/system/observatory-queue.service <<UNIT
+cat > /etc/systemd/system/tbwim-queue.service <<UNIT
 [Unit]
-Description=Observatory queue worker
+Description=Tbwim queue worker
 After=network.target mariadb.service
 [Service]
 User=www-data
@@ -92,7 +92,7 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 UNIT
-systemctl daemon-reload && systemctl enable --now observatory-queue >/dev/null && systemctl restart observatory-queue
+systemctl daemon-reload && systemctl enable --now tbwim-queue >/dev/null && systemctl restart tbwim-queue
 ( crontab -u www-data -l 2>/dev/null | grep -v "${APP}/artisan schedule:run" || true; echo "* * * * * php ${APP}/artisan schedule:run >> /dev/null 2>&1" ) | crontab -u www-data -
 
 echo "== nginx"
@@ -115,7 +115,7 @@ SITE_BODY="    root ${APP}/public;
         fastcgi_param ADISAAN_PUBLIC_SITE 1;
     }
     location ~ /\.(?!well-known) { deny all; }
-    add_header X-Observatory-Origin \"${DOMAIN}\" always;"
+    add_header X-Tbwim-Origin \"${DOMAIN}\" always;"
 
 {
   cat <<NGX
@@ -139,19 +139,19 @@ server {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers off;
     ssl_session_timeout 1d;
-    ssl_session_cache shared:observatory:10m;
+    ssl_session_cache shared:tbwim:10m;
 ${SITE_BODY}
 }
 NGX
   fi
-} > /etc/nginx/sites-available/observatory.conf
+} > /etc/nginx/sites-available/tbwim.conf
 if [ -s "$CF_CERT" ] && [ -s "$CF_KEY" ]; then
   chmod 0600 "$CF_KEY"
   echo "   HTTPS vhost written from ${CF_CERT}"
 else
   echo "   HTTP only. For Cloudflare Full (strict), put the origin certificate at ${CF_CERT} and its key at ${CF_KEY}, then re-run."
 fi
-ln -sf /etc/nginx/sites-available/observatory.conf /etc/nginx/sites-enabled/observatory.conf
+ln -sf /etc/nginx/sites-available/tbwim.conf /etc/nginx/sites-enabled/tbwim.conf
 if [ -e /etc/nginx/sites-enabled/default ]; then rm -f /etc/nginx/sites-enabled/default; fi
 nginx -t && systemctl reload nginx
 

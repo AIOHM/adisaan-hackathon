@@ -23,7 +23,7 @@ final class MetaApiBudgetTest extends TestCase
 
     public function test_reservations_and_settlement(): void
     {
-        config()->set('observatory.meta.monthly_limit_usd', 2);
+        config()->set('tbwim.meta.monthly_limit_usd', 2);
         $this->assertSame(1400000, MetaApiBudget::reservationFor('muse-spark-1.3'));
         $this->assertSame(4600000, MetaApiBudget::reservationFor('muse-wonder-1.0'));
         $this->assertSame(30000, MetaApiBudget::reservationFor('muse-image-1.0', 3));
@@ -51,7 +51,7 @@ final class MetaApiBudgetTest extends TestCase
 
     public function test_failures_keep_the_reservation_and_a_rejected_key_releases_it(): void
     {
-        config()->set('observatory.meta.monthly_limit_usd', 5);
+        config()->set('tbwim.meta.monthly_limit_usd', 5);
         $budget = new MetaApiBudget;
         $handler = $budget->middleware()(fn () => Create::rejectionFor(new RuntimeException('timeout')));
         try {

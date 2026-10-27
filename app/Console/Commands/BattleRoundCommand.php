@@ -7,7 +7,7 @@ namespace App\Console\Commands;
 use App\Jobs\ReviewAgentAnswer;
 use App\Models\EchoSubmission;
 use App\Services\Meta\MetaClient;
-use App\Services\Observatory\Questions;
+use App\Services\Tbwim\Questions;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -18,14 +18,14 @@ use Illuminate\Support\Str;
  */
 final class BattleRoundCommand extends Command
 {
-    protected $signature = 'observatory:battle-round {--question= : Question id (default: the current one)} {--only= : Comma-separated model ids} {--force} {--dry-run}';
+    protected $signature = 'tbwim:battle-round {--question= : Question id (default: the current one)} {--only= : Comma-separated model ids} {--force} {--dry-run}';
 
     protected $description = 'Ask every configured Meta model the current question and store the answers as agent answers';
 
     public function handle(MetaClient $meta, Questions $questions): int
     {
         $story = $questions->find((string) $this->option('question')) ?? $questions->current();
-        $battle = (array) config('observatory.battle', []);
+        $battle = (array) config('tbwim.battle', []);
         $contenders = (array) ($battle['contenders'] ?? []);
         $only = array_filter(array_map('trim', explode(',', (string) $this->option('only'))));
         if ($only !== []) {

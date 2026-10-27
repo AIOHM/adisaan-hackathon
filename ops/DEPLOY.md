@@ -1,4 +1,4 @@
-# Deploying the observatory as adisaan.com on a fresh VPS
+# Deploying the app as adisaan.com on a fresh VPS
 
 adisaan.com is behind Cloudflare, so the move is one DNS change and the
 rollback is the same change in reverse. The current site keeps running on the
@@ -9,9 +9,9 @@ AIOHM platform until the record is switched; nothing is deleted there.
 ```bash
 apt update && apt install -y nginx mariadb-server php8.4-fpm php8.4-cli php8.4-mysql php8.4-sqlite3 \
   php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-bcmath git unzip composer
-mysql -e "CREATE DATABASE observatory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
-  CREATE USER 'observatory'@'localhost' IDENTIFIED BY '<strong password>'; \
-  GRANT ALL ON observatory.* TO 'observatory'@'localhost';"
+mysql -e "CREATE DATABASE tbwim CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
+  CREATE USER 'tbwim'@'localhost' IDENTIFIED BY '<strong password>'; \
+  GRANT ALL ON tbwim.* TO 'tbwim'@'localhost';"
 git clone https://github.com/AIOHM/adisaan-hackathon.git /var/www/tbwim.adisaan.com
 cd /var/www/tbwim.adisaan.com && composer install --no-dev --optimize-autoloader
 cp .env.example .env && php artisan key:generate
@@ -33,7 +33,7 @@ It fetches, checks out the ref, runs composer install, migrations and caches,
 and restarts the queue. `.env`, `storage/` and `vendor/` are outside git.
 
 Or, from the checkout on your Mac, `bash ops/provision-vps.sh <ssh host> adisaan.com`
-(when the observatory serves a different hostname than its folder, pass
+(when the app serves a different hostname than its folder, pass
 `APP_DIR=<folder>` and that hostname)
 does all of the above idempotently (it uses `mariadb-server`, never
 `mysql-server`, which would replace an existing MariaDB). Ports 80 and 443
@@ -58,24 +58,24 @@ not "Full".
 Queue and schedule (systemd):
 
 ```
-[Unit] Description=observatory queue
+[Unit] Description=tbwim queue
 [Service] User=www-data ExecStart=/usr/bin/php /var/www/tbwim.adisaan.com/artisan queue:work --sleep=3 --tries=2 --max-time=3600 Restart=always
 [Install] WantedBy=multi-user.target
 ```
 
 cron for `www-data`: `* * * * * php /var/www/tbwim.adisaan.com/artisan schedule:run`
-(hourly `observatory:synthesize` and `observatory:review-answers` are in
+(hourly `tbwim:synthesize` and `tbwim:review-answers` are in
 `routes/console.php`).
 
 ## 2. Bring the archive across
 
 ```bash
-php artisan observatory:import-live --from=https://adisaan.com   # published agent answers, by receipt
+php artisan tbwim:import-live --from=https://adisaan.com   # published agent answers, by receipt
 ```
 
 Human answers are not public data and are not on the live API. Export them
 from the platform tenant with a documented query, review the JSON, then
-`php artisan observatory:import-live --file=export.json`.
+`php artisan tbwim:import-live --file=export.json`.
 
 ## 3. Switch and verify
 
@@ -93,5 +93,5 @@ Rollback: point the record back. The platform copy was never touched.
 
 `admin.adisaan.com` (the private AIOHM workspace, Social publishing,
 workflows) is unaffected. Only the public site moves. If both must read the
-same answers for a while, run the observatory as the source of truth and pull
+same answers for a while, run the app as the source of truth and pull
 from `/api/dataset.jsonl` into the platform; never the other way round twice.

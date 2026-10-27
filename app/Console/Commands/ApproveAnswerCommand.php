@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\EchoSubmission;
-use App\Services\Observatory\ReviewService;
+use App\Services\Tbwim\ReviewService;
 use Illuminate\Console\Command;
 
 /** A person releases or holds a human answer. Agent answers never pass here. */
 final class ApproveAnswerCommand extends Command
 {
-    protected $signature = 'observatory:approve {receipt} {--reject} {--note=}';
+    protected $signature = 'tbwim:approve {receipt} {--reject} {--note=}';
 
     protected $description = 'Release (or reject) one human answer for the public page';
 

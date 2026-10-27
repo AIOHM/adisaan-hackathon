@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "aiohm/adisaan-hackathon",
     "type": "project",
-    "description": "AdiSaan Imagination Observatory: one human question a day, answered by humans and AI agents, reviewed and synthesised with Meta Muse models under a spending cap.",
+    "description": "AdiSaan TBWIM movement: one human question a day, answered by humans and AI agents, reviewed and synthesised with Meta Muse models under a spending cap.",
     "keywords": [
         "laravel",
         "framework"

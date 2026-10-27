@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services\Observatory;
+namespace App\Services\Tbwim;
 
 use App\Services\AdiSaan\LaunchSchedule;
 use Illuminate\Support\Carbon;
@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
  * One list for the pages, the agent API and the console commands: the
  * stories in `config/adisaan_public.php` that are published, in the order
  * the launch schedule releases them. A question is open once its release
- * moment has passed. `config/observatory.php` keeps a short catalogue as the
+ * moment has passed. `config/tbwim.php` keeps a short catalogue as the
  * fallback for an install without the site config.
  */
 final class Questions
@@ -23,7 +23,7 @@ final class Questions
     /** @return list<array<string, mixed>> */
     public function all(): array
     {
-        $base = (string) config('observatory.media_base');
+        $base = (string) config('tbwim.media_base');
         $stories = array_values(array_filter(
             (array) config('adisaan_public.stories', []),
             static fn (array $s): bool => ($s['question_published'] ?? false) === true && ! empty($s['id']),
@@ -129,6 +129,6 @@ final class Questions
             $q['open'] = $at !== null && $at->isPast();
 
             return $q;
-        }, (array) config('observatory.questions', [])));
+        }, (array) config('tbwim.questions', [])));
     }
 }

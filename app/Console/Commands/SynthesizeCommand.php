@@ -6,15 +6,15 @@ namespace App\Console\Commands;
 
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
-use App\Services\Observatory\Questions;
-use App\Services\Observatory\QuestionSynthesizer;
+use App\Services\Tbwim\Questions;
+use App\Services\Tbwim\QuestionSynthesizer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 /** The breathing answer: when new human voices arrived, write the next version from all of them in one call. */
 final class SynthesizeCommand extends Command
 {
-    protected $signature = 'observatory:synthesize {--question= : Question id (default: the current one)} {--min-voices=} {--force} {--dry-run}';
+    protected $signature = 'tbwim:synthesize {--question= : Question id (default: the current one)} {--min-voices=} {--force} {--dry-run}';
 
     protected $description = 'Compile the human voices on a question into a new version of the breathing answer';
 
@@ -23,7 +23,7 @@ final class SynthesizeCommand extends Command
         $story = $questions->find((string) $this->option('question')) ?? $questions->current();
         $ref = (string) $story['id'];
         $question = (string) $story['question'];
-        $minVoices = max(1, (int) ($this->option('min-voices') ?: config('observatory.synthesis.min_voices', 5)));
+        $minVoices = max(1, (int) ($this->option('min-voices') ?: config('tbwim.synthesis.min_voices', 5)));
 
         $site = EchoSubmission::query()->countable()->humans()->where('episode_ref', $ref)->where('consent_quote', true)
             ->orderBy('created_at')->orderBy('id')->get(['id', 'body', 'synthesized_at'])

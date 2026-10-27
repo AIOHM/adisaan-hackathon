@@ -9,7 +9,7 @@ use App\Models\QuestionSynthesis;
 use App\Services\AdiSaan\GratitudeLedger;
 use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\AdiSaan\VisitorIdentity;
-use App\Services\Observatory\Questions;
+use App\Services\Tbwim\Questions;
 use App\Support\SpamGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -26,7 +26,7 @@ use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 /**
- * The adisaan.com public site, rendered from the observatory's own tables.
+ * The adisaan.com public site, rendered from the movement's own tables.
  *
  * The templates, stylesheet, scripts and copy under `adisaan-site` are the
  * AIOHM platform's, unchanged. This controller supplies the variables they
@@ -38,7 +38,7 @@ use Illuminate\View\View;
  */
 final class AdiSaanSiteController extends Controller
 {
-    private const FORM = 'observatory_answer';
+    private const FORM = 'tbwim_answer';
 
     private const TZ = 'Europe/Bucharest';
 

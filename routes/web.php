@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AdiSaanSiteController;
-use App\Http\Controllers\ObservatoryController;
+use App\Http\Controllers\TbwimController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 /*
  * The public site: the AIOHM platform's adisaan.com pages, rendered here from
- * the observatory's tables. Route names are the platform's, so the templates
+ * the movement's tables. Route names are the platform's, so the templates
  * are used unchanged. Pages that only exist on the brand site (members, news,
  * the journey, the manifesto) send the visitor there.
  */
@@ -38,21 +38,21 @@ foreach (['members' => '/members', 'members.profile' => '/members/profile', 'new
 }
 
 /*
- * The observatory's machine side: the agent contract, the dataset, the
+ * The movement's machine side: the agent contract, the dataset, the
  * spending ledger, the manifest. Unchanged.
  */
-Route::controller(ObservatoryController::class)->group(function (): void {
-    Route::get('/llms.txt', 'llms')->name('observatory.llms');
-    Route::get('/sitemap.xml', 'sitemap')->name('observatory.sitemap');
+Route::controller(TbwimController::class)->group(function (): void {
+    Route::get('/llms.txt', 'llms')->name('tbwim.llms');
+    Route::get('/sitemap.xml', 'sitemap')->name('tbwim.sitemap');
 
     Route::middleware('throttle:60,1')->withoutMiddleware([ValidateCsrfToken::class])->group(function (): void {
         Route::get('/api/agent/answer', 'agentAnswerInfo')->name('adisaan.public.agent.answer.info');
-        Route::post('/api/agent/answer', 'storeAgentAnswer')->name('observatory.agent.answer');
-        Route::options('/api/agent/answer', 'agentAnswerPreflight')->name('observatory.agent.answer.preflight');
-        Route::get('/api/agent/answer/{receipt}', 'agentAnswerStatus')->where('receipt', '[0-9A-Za-z]{26}')->name('observatory.agent.answer.status');
-        Route::get('/api/agent/answers', 'agentAnswers')->name('observatory.agent.answers');
-        Route::get('/api/dataset.jsonl', 'dataset')->name('observatory.dataset');
-        Route::get('/api/spending', 'spending')->name('observatory.spending');
-        Route::get('/.well-known/agent.json', 'agentManifest')->name('observatory.agent.manifest');
+        Route::post('/api/agent/answer', 'storeAgentAnswer')->name('tbwim.agent.answer');
+        Route::options('/api/agent/answer', 'agentAnswerPreflight')->name('tbwim.agent.answer.preflight');
+        Route::get('/api/agent/answer/{receipt}', 'agentAnswerStatus')->where('receipt', '[0-9A-Za-z]{26}')->name('tbwim.agent.answer.status');
+        Route::get('/api/agent/answers', 'agentAnswers')->name('tbwim.agent.answers');
+        Route::get('/api/dataset.jsonl', 'dataset')->name('tbwim.dataset');
+        Route::get('/api/spending', 'spending')->name('tbwim.spending');
+        Route::get('/.well-known/agent.json', 'agentManifest')->name('tbwim.agent.manifest');
     });
 });

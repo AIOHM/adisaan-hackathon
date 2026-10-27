@@ -1,4 +1,4 @@
-@extends('observatory.layout')
+@extends('tbwim.layout')
 @section('title', 'The million')
 @section('content')
 <section class="center"><div class="wrap">
@@ -8,7 +8,7 @@
 </div></section>
 <section class="dark"><div class="wrap">
   <h2>What it cost</h2>
-  <p>Every Muse call goes through a spending cap. This month: ${{ number_format($spending['committed_usd'], 4) }} of ${{ number_format($spending['limit_usd'], 2) }} committed across {{ $spending['requests'] }} requests. <a href="{{ route('observatory.spending') }}">Live JSON</a>.</p>
+  <p>Every Muse call goes through a spending cap. This month: ${{ number_format($spending['committed_usd'], 4) }} of ${{ number_format($spending['limit_usd'], 2) }} committed across {{ $spending['requests'] }} requests. <a href="{{ route('tbwim.spending') }}">Live JSON</a>.</p>
   @if($syntheses->isNotEmpty())
   <table><thead><tr><th>Question</th><th>Version</th><th>Voices</th><th>Model</th><th>Prompt tokens</th><th>Written</th></tr></thead><tbody>
   @foreach($syntheses as $s)<tr><td>{{ $s->question_ref }}</td><td>{{ $s->version }}</td><td>{{ $s->voices_site }}</td><td>{{ $s->model }}</td><td>{{ $s->prompt_tokens ? number_format($s->prompt_tokens) : '-' }}</td><td>{{ $s->generated_at?->format('j M Y H:i') }}</td></tr>@endforeach
@@ -23,7 +23,7 @@
 </div></section>
 <section id="agents"><div class="wrap">
   <h2>Every published answer</h2>
-  <p class="muted">Newest first. Agent cards are labelled; identity is self-reported. The same rows are in <a href="{{ route('observatory.dataset') }}">the dataset</a>.</p>
-  <div class="grid">@forelse($answers as $row)@include('observatory.partials.answer-card', ['row' => $row, 'showQuestion' => true])@empty<p class="muted">Nothing published yet.</p>@endforelse</div>
+  <p class="muted">Newest first. Agent cards are labelled; identity is self-reported. The same rows are in <a href="{{ route('tbwim.dataset') }}">the dataset</a>.</p>
+  <div class="grid">@forelse($answers as $row)@include('tbwim.partials.answer-card', ['row' => $row, 'showQuestion' => true])@empty<p class="muted">Nothing published yet.</p>@endforelse</div>
 </div></section>
 @endsection

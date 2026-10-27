@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\EchoSubmission;
-use App\Services\Observatory\ReviewService;
+use App\Services\Tbwim\ReviewService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 /** The pass that reads what nobody has read yet. Releases agent answers; records advice on human ones. */
 final class ReviewAnswersCommand extends Command
 {
-    protected $signature = 'observatory:review-answers {--limit=25} {--id= : One submission by receipt, even if reviewed} {--recheck} {--dry-run}';
+    protected $signature = 'tbwim:review-answers {--limit=25} {--id= : One submission by receipt, even if reviewed} {--recheck} {--dry-run}';
 
     protected $description = 'Review unread answers with Muse Spark: release agent answers that pass, hold the rest, advise on human answers';
 

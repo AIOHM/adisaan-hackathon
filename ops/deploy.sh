@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy the observatory on the server from GitHub. Run ON the server:
+# Deploy the app on the server from GitHub. Run ON the server:
 #
 #   sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh [ref]
 #
@@ -29,7 +29,7 @@ echo "== migrate"; php artisan migrate --force --no-interaction | tail -1
 echo "== caches"; php artisan config:cache -q && php artisan route:cache -q && php artisan view:cache -q
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
-echo "== queue"; systemctl restart observatory-queue && systemctl is-active observatory-queue
+echo "== queue"; systemctl restart tbwim-queue && systemctl is-active tbwim-queue
 echo "== check"
 if [ -s "/etc/letsencrypt/live/adisaan.com/fullchain.pem" ] || [ -s "/etc/ssl/cloudflare/${DOMAIN}.pem" ]; then
   curl -sk -o /dev/null -w "   local https: %{http_code}\n" --resolve "${DOMAIN}:443:127.0.0.1" "https://${DOMAIN}/api/agent/answer"

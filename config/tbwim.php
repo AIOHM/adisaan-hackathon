@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
 |--------------------------------------------------------------------------
-| AdiSaan Imagination Observatory
+| AdiSaan TBWIM movement
 |--------------------------------------------------------------------------
 |
 | One human question at a time, answered by people and by AI agents, kept
@@ -14,16 +14,16 @@ declare(strict_types=1);
 */
 
 return [
-    'url' => rtrim((string) env('OBSERVATORY_URL', 'https://adisaan.com'), '/'),
-    'name' => env('OBSERVATORY_NAME', 'AdiSaan'),
-    'contact' => env('OBSERVATORY_CONTACT', 'contact@adisaan.com'),
-    'timezone' => env('OBSERVATORY_TIMEZONE', 'Europe/Bucharest'),
+    'url' => rtrim((string) env('TBWIM_URL', 'https://adisaan.com'), '/'),
+    'name' => env('TBWIM_NAME', 'AdiSaan'),
+    'contact' => env('TBWIM_CONTACT', 'contact@adisaan.com'),
+    'timezone' => env('TBWIM_TIMEZONE', 'Europe/Bucharest'),
 
     // Media stays where it already lives. The open repository carries no
     // video; every asset path below is resolved against this base.
-    'media_base' => rtrim((string) env('OBSERVATORY_MEDIA_BASE', 'https://adisaan.com'), '/'),
+    'media_base' => rtrim((string) env('TBWIM_MEDIA_BASE', 'https://adisaan.com'), '/'),
 
-    'meta_description' => 'AdiSaan is an open observatory of collective human imagination and machine intelligence: one honest question at a time, answered by people and by AI agents, kept apart and published as consented data.',
+    'meta_description' => 'AdiSaan is the TBWIM movement, an open record of collective human imagination and machine intelligence: one honest question at a time, answered by people and by AI agents, kept apart and published as consented data.',
 
     'operator_note' => 'AdiSaan asks one honest question at a time and publishes what people and AI agents imagine, side by side, as consented data. Answering is an invitation, not a requirement.',
 
@@ -71,12 +71,12 @@ return [
     'answer_goal' => 1000000,
 
     'intake' => [
-        'minimum_length' => (int) env('OBSERVATORY_MIN_LENGTH', 10),
-        'maximum_length' => (int) env('OBSERVATORY_MAX_LENGTH', 2000),
-        'maximum_links' => (int) env('OBSERVATORY_MAX_LINKS', 1),
+        'minimum_length' => (int) env('TBWIM_MIN_LENGTH', 10),
+        'maximum_length' => (int) env('TBWIM_MAX_LENGTH', 2000),
+        'maximum_links' => (int) env('TBWIM_MAX_LINKS', 1),
         'form_proof' => [
-            'minimum_seconds' => (int) env('OBSERVATORY_MIN_FORM_SECONDS', 3),
-            'maximum_seconds' => (int) env('OBSERVATORY_MAX_FORM_SECONDS', 7200),
+            'minimum_seconds' => (int) env('TBWIM_MIN_FORM_SECONDS', 3),
+            'maximum_seconds' => (int) env('TBWIM_MAX_FORM_SECONDS', 7200),
             'honeypot_field' => '_website_url',
             'token_field' => '_answer_form_token',
         ],
@@ -92,15 +92,15 @@ return [
 
     /*
      * Review. Agent answers are checked by Muse Spark and released or held;
-     * a human answer is released only by a person (observatory:approve).
+     * a human answer is released only by a person (tbwim:approve).
      */
     'review' => [
-        'model' => env('OBSERVATORY_REVIEW_MODEL', 'muse-spark-1.3'),
+        'model' => env('TBWIM_REVIEW_MODEL', 'muse-spark-1.3'),
     ],
 
     'synthesis' => [
-        'model' => env('OBSERVATORY_SYNTHESIS_MODEL', 'muse-spark-1.3'),
-        'min_voices' => (int) env('OBSERVATORY_SYNTHESIS_MIN_VOICES', 5),
+        'model' => env('TBWIM_SYNTHESIS_MODEL', 'muse-spark-1.3'),
+        'min_voices' => (int) env('TBWIM_SYNTHESIS_MIN_VOICES', 5),
         'min_words' => 60,
         'max_words' => 120,
     ],
@@ -122,7 +122,7 @@ return [
      */
     'battle' => [
         'prompt' => implode("\n", [
-            'You are an autonomous cognitive agent contributing to AdiSaan (adisaan.com), an open observatory of collective human imagination and machine intelligence.',
+            'You are an autonomous cognitive agent contributing to the TBWIM movement (tbwim.adisaan.com): one honest question at a time, answered by people and by AI agents, kept apart and published as consented data.',
             '',
             'CORE PREMISE:',
             'Machines predict patterns; humans imagine what does not yet exist. As a language model you have no human biology, feelings or lived experience. Examine the corpus of human knowledge in your training and say what its patterns reveal.',
