@@ -21,6 +21,17 @@ php artisan migrate --force && php artisan config:cache && php artisan route:cac
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
+The server copy is a git checkout of https://github.com/AIOHM/adisaan-hackathon.
+After the first provisioning, every later deploy is, on the server:
+
+```bash
+sudo bash /var/www/adisaan.com/ops/deploy.sh          # origin/main
+sudo bash /var/www/adisaan.com/ops/deploy.sh v1.2.0   # or any ref
+```
+
+It fetches, checks out the ref, runs composer install, migrations and caches,
+and restarts the queue. `.env`, `storage/` and `vendor/` are outside git.
+
 Or, from the checkout on your Mac, `bash ops/provision-vps.sh <ssh host> adisaan.com`
 does all of the above idempotently (it uses `mariadb-server`, never
 `mysql-server`, which would replace an existing MariaDB). Ports 80 and 443
