@@ -96,6 +96,7 @@ systemctl daemon-reload && systemctl enable --now observatory-queue >/dev/null &
 ( crontab -u www-data -l 2>/dev/null | grep -v "${APP}/artisan schedule:run" || true; echo "* * * * * php ${APP}/artisan schedule:run >> /dev/null 2>&1" ) | crontab -u www-data -
 
 echo "== nginx"
+install -d -m 0755 /var/www/letsencrypt
 CF_CERT="/etc/ssl/cloudflare/${DOMAIN}.pem"
 CF_KEY="/etc/ssl/cloudflare/${DOMAIN}.key"
 CF_RANGES='set_real_ip_from 173.245.48.0/20; set_real_ip_from 103.21.244.0/22; set_real_ip_from 103.22.200.0/22; set_real_ip_from 103.31.4.0/22;
@@ -122,6 +123,7 @@ server {
     listen 80;
     listen [::]:80;
     server_name ${DOMAIN} www.${DOMAIN} _;
+    location ^~ /.well-known/acme-challenge/ { root /var/www/letsencrypt; try_files \$uri =404; }
 ${SITE_BODY}
 }
 NGX
