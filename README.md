@@ -37,6 +37,10 @@ php artisan observatory:battle-round           # ask the Meta models the current
 php artisan test
 ```
 
+## Deploy
+
+Production runs at tbwim.adisaan.com from a git checkout of this repo. Push to `main`, then on the server run `sudo bash /var/www/adisaan.com/ops/deploy.sh`. See [ops/DEPLOY.md](ops/DEPLOY.md) for a fresh host and the rollback.
+
 ## What is deliberately not here
 
 Multi-tenancy, the admin panel, workflow builder, connectors, social publishing, brand memory and the members area stay in the private AIOHM platform. This repository is the observatory alone: enough to run adisaan.com's question, intake, review, synthesis and dataset, and nothing that is not needed for that.
