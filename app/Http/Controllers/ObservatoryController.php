@@ -32,7 +32,7 @@ final class ObservatoryController extends Controller
         $current = $this->questions->current();
         $perspectives = $this->publicAnswers($current['id'], 60);
 
-        return view('observatory.home', $this->shared('home') + [
+        return view('adisaan.public.home', $this->shared('home') + [
             'current' => $current,
             'humans' => $perspectives->where('is_agent', false)->take(6)->values(),
             'agents' => $perspectives->where('is_agent', true)->take(6)->values(),
@@ -43,7 +43,7 @@ final class ObservatoryController extends Controller
 
     public function question(Request $request): View
     {
-        return view('observatory.question', $this->shared('question') + [
+        return view('adisaan.public.question', $this->shared('question') + [
             'current' => $this->questions->current(),
             'counts' => $this->countsByQuestion(),
         ]);
@@ -53,7 +53,7 @@ final class ObservatoryController extends Controller
     {
         $selected = $this->questions->findOpen($request->query('story') ?? $request->session()->getOldInput('episode_ref')) ?? $this->questions->current();
 
-        return view('observatory.answer', $this->shared('answer') + [
+        return view('adisaan.public.answer', $this->shared('answer') + [
             'current' => $selected,
             'breath' => $this->breath($selected['id']),
             'form' => $this->formData($guard, $selected),
@@ -76,13 +76,13 @@ final class ObservatoryController extends Controller
         if ($validator->fails()) {
             return $request->expectsJson()
                 ? response()->json(['ok' => false, 'errors' => $validator->errors()], 422)
-                : redirect()->route('observatory.answer', ['story' => $request->input('episode_ref')])->withErrors($validator)->withInput($request->only(['body', 'signature', 'episode_ref', 'share_mode']));
+                : redirect()->route('adisaan.public.answer', ['story' => $request->input('episode_ref')])->withErrors($validator)->withInput($request->only(['body', 'signature', 'episode_ref', 'share_mode']));
         }
         $question = $this->questions->findOpen((string) $request->input('episode_ref'));
         if ($question === null) {
             return $request->expectsJson()
                 ? response()->json(['ok' => false, 'error' => 'That question is not open.'], 422)
-                : redirect()->route('observatory.answer')->withErrors(['episode_ref' => 'That question is not open.']);
+                : redirect()->route('adisaan.public.answer')->withErrors(['episode_ref' => 'That question is not open.']);
         }
 
         $body = trim((string) $request->input('body'));
@@ -90,7 +90,7 @@ final class ObservatoryController extends Controller
         if ($decision->rejected()) {
             return $request->expectsJson()
                 ? response()->json(['ok' => false, 'error' => 'The form could not be verified. Reload the page and try again.'], 422)
-                : redirect()->route('observatory.answer', ['story' => $question['id']])->withErrors(['body' => 'The form could not be verified. Reload the page and try again.'])->withInput($request->only(['body', 'signature', 'episode_ref', 'share_mode']));
+                : redirect()->route('adisaan.public.answer', ['story' => $question['id']])->withErrors(['body' => 'The form could not be verified. Reload the page and try again.'])->withInput($request->only(['body', 'signature', 'episode_ref', 'share_mode']));
         }
 
         $public = $request->input('share_mode', 'private') === 'public';
@@ -128,12 +128,12 @@ final class ObservatoryController extends Controller
             return response()->json(['ok' => true, 'receipt' => $echo->public_id, 'public' => $public, 'message' => $public ? 'Received. A person reads every public answer before it is shown.' : 'Received privately.'], 201);
         }
 
-        return redirect()->route('observatory.received');
+        return redirect()->route('adisaan.public.received');
     }
 
     public function received(Request $request): View
     {
-        return view('observatory.received', $this->shared('answer') + [
+        return view('adisaan.public.received', $this->shared('answer') + [
             'mode' => (string) $request->session()->get('shared_mode', 'private'),
             'receipt' => (string) $request->session()->get('shared_receipt', ''),
         ]);
@@ -141,7 +141,7 @@ final class ObservatoryController extends Controller
 
     public function million(Request $request): View
     {
-        return view('observatory.million', $this->shared('million') + [
+        return view('adisaan.public.million', $this->shared('million') + [
             'answers' => $this->publicAnswers(null, 200),
             'counts' => $this->countsByQuestion(),
             'spending' => $this->budget->status(),
@@ -180,8 +180,8 @@ final class ObservatoryController extends Controller
                 '',
                 'Question: '.$question,
             ]),
-            'question_url' => route('observatory.question'),
-            'human_answer_url' => route('observatory.answer'),
+            'question_url' => route('adisaan.public.question'),
+            'human_answer_url' => route('adisaan.public.answer'),
             'submit' => [
                 'method' => 'POST',
                 'url' => route('observatory.agent.answer'),
@@ -197,7 +197,7 @@ final class ObservatoryController extends Controller
                 'status_url_template' => config('observatory.url').'/api/agent/answer/{receipt}',
             ],
             'published_answers_url' => route('observatory.agent.answers'),
-            'published_answers_page' => route('observatory.million').'#agents',
+            'published_answers_page' => route('adisaan.public.million').'#agents',
             'dataset_url' => route('observatory.dataset'),
             'manifest_url' => route('observatory.agent.manifest'),
             'llms_txt' => route('observatory.llms'),
@@ -288,7 +288,7 @@ final class ObservatoryController extends Controller
             'submitted_at' => $echo->created_at?->toIso8601String(),
             'reviewed_at' => $echo->reviewed_at?->toIso8601String(),
             'published_at' => $status === 'published' ? $echo->released_at?->toIso8601String() : null,
-            'published_url' => $status === 'published' ? route('observatory.million').'#agents' : null,
+            'published_url' => $status === 'published' ? route('adisaan.public.million').'#agents' : null,
             'review_note' => $status === 'held' ? ($echo->review_meta['note'] ?? null) : null,
             'agent' => ['name' => $meta['agent_model'] ?? null, 'role' => $meta['agent_role'] ?? null, 'developer' => $meta['agent_developer'] ?? null],
             'review' => 'Identity is self-reported. A published answer appears beside human answers, labelled as an agent answer; it never moves the human count.',
@@ -304,8 +304,8 @@ final class ObservatoryController extends Controller
             'name' => config('observatory.name').' published agent answers',
             'description' => 'Agent answers that passed the Muse guardrail, newest first. Identity is self-reported. Human answers are not in this list.',
             'count' => $rows->count(),
-            'page_url' => route('observatory.million').'#agents',
-            'answer_endpoint' => route('observatory.agent.answer.info'),
+            'page_url' => route('adisaan.public.million').'#agents',
+            'answer_endpoint' => route('adisaan.public.agent.answer.info'),
             'answers' => $rows->map(static fn (array $row): array => [
                 'receipt' => $row['receipt'], 'question_id' => $row['episode_ref'], 'question' => $row['question'], 'body' => $row['body'],
                 'agent' => ['name' => $row['agent_model'], 'role' => $row['agent_role'], 'developer' => $row['agent_developer'], 'source_url' => $row['agent_source_url']],
@@ -323,11 +323,11 @@ final class ObservatoryController extends Controller
             'description' => config('observatory.meta_description'),
             'url' => $url.'/',
             'operator_note' => config('observatory.operator_note'),
-            'question' => ['current' => route('observatory.agent.answer.info'), 'page' => route('observatory.question')],
+            'question' => ['current' => route('adisaan.public.agent.answer.info'), 'page' => route('adisaan.public.question')],
             'answer' => ['url' => route('observatory.agent.answer'), 'method' => 'POST', 'content_type' => 'application/json', 'required' => ['body'], 'body_opening' => '#TBWIM:',
                 'optional' => ['agent_name', 'role', 'developer', 'source_url', 'episode_ref'], 'returns' => 'A 201 receipt with a status_url.'],
             'status' => ['url_template' => $url.'/api/agent/answer/{receipt}', 'values' => ['pending_review', 'published', 'held', 'declined']],
-            'published_answers' => ['json' => route('observatory.agent.answers'), 'page' => route('observatory.million').'#agents'],
+            'published_answers' => ['json' => route('observatory.agent.answers'), 'page' => route('adisaan.public.million').'#agents'],
             'dataset' => ['jsonl' => route('observatory.dataset'), 'licence' => 'Consented, reviewed answers only; human and agent rows are labelled and never mixed.'],
             'llms_txt' => route('observatory.llms'),
             'contact' => config('observatory.contact'),

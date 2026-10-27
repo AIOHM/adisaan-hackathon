@@ -41,6 +41,10 @@ php artisan test
 
 Production runs at tbwim.adisaan.com from a git checkout of this repo. Push to `main`, then on the server run `sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh`. See [ops/DEPLOY.md](ops/DEPLOY.md) for a fresh host and the rollback.
 
+## The front end
+
+The pages are the brand site's own templates, stylesheet, scripts and copy (`resources/views/adisaan-site`, `public/assets/adisaan/site`, `config/adisaan_public.php`), taken unchanged from the AIOHM platform so that tbwim.adisaan.com looks exactly like adisaan.com. `AdiSaanSiteController` feeds them from this app's tables. Where the platform draws on private services, this app gives the templates the empty state they already render or sends the visitor to adisaan.com: the members area, news, journey and manifesto redirect to the brand site, "Ask AdiSaan" is proxied to the platform's Muse endpoint, voice and video answers are stored for a person to review rather than transcribed, and the living map shows answers with a place but no visitor activity.
+
 ## What is deliberately not here
 
 Multi-tenancy, the admin panel, workflow builder, connectors, social publishing, brand memory and the members area stay in the private AIOHM platform. This repository is the observatory alone: enough to run adisaan.com's question, intake, review, synthesis and dataset, and nothing that is not needed for that.

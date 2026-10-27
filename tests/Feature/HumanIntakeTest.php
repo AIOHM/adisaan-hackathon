@@ -27,7 +27,7 @@ final class HumanIntakeTest extends TestCase
     {
         $this->get('/answer')->assertOk()->assertSee('_answer_form_token', false);
         $this->post('/answer', ['body' => 'Build one thing people need and keep it running quietly.', 'episode_ref' => 'imagine-one-million-euro', 'share_mode' => 'public', 'signature' => 'Ana', '_answer_form_token' => $this->proof()])
-            ->assertRedirect(route('observatory.received'));
+            ->assertRedirect(route('adisaan.public.received'));
         $echo = EchoSubmission::query()->firstOrFail();
         $this->assertTrue($echo->consent_quote);
         $this->assertNull($echo->released_at);

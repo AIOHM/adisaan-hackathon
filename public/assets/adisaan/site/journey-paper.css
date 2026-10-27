@@ -1,0 +1,122 @@
+/* The journey as a working paper, on the living map.
+
+   Working paper 01 is the manifesto and it sits on cream, the way a document
+   does. This one is the road, and a road belongs on the ground it crosses —
+   so the paper is transparent and the layout's living map shows through it:
+   the home page's atlas, with its activity points and answer beacons.
+
+   Scoped to .journey-page so none of it can reach the manifesto.
+*/
+
+/* No background of its own. The layout draws the living map — the same
+   fixed atlas the home page uses, with its activity points and answer
+   beacons — behind everything whenever the controller passes $livingMap.
+   This page used to paint a static copy of that map over the top, which
+   hid the points it was imitating. */
+.jpaper{position:relative;isolation:isolate;color:#f4f0e8;background:transparent}
+
+.jpaper__shell{width:min(1100px,calc(100% - 48px));margin-inline:auto}
+
+/* --- cover -------------------------------------------------------------- */
+.jpaper-cover{padding:clamp(56px,7vw,96px) 0 clamp(36px,4vw,56px);
+  border-bottom:1px solid rgba(214,178,94,.32)}
+.jpaper-cover__top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;
+  font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:rgba(233,199,117,.85)}
+.jpaper-cover__grid{display:grid;gap:clamp(24px,4vw,56px);margin-top:clamp(26px,3vw,40px)}
+@media(min-width:900px){.jpaper-cover__grid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:end}}
+.jpaper-kicker{margin:0 0 12px;font-size:13px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:#e9c775}
+.jpaper-cover h1{margin:0;font-size:clamp(40px,6vw,78px);line-height:1.02;
+  letter-spacing:-.035em;color:#f4f0e8}
+.jpaper-cover h1 em{font-style:normal;color:#e9c775}
+.jpaper-cover__dek{margin:18px 0 0;max-width:48ch;font-size:clamp(16px,1.6vw,19px);
+  line-height:1.6;color:#d5e2d0}
+
+/* The measured count, stated as a fact with its date, in the margin. */
+.jpaper-count{padding:18px 20px;border:1px solid rgba(214,178,94,.36);border-radius:14px;
+  background:rgba(244,240,232,.05)}
+.jpaper-count__n{display:block;font-size:clamp(34px,4.4vw,52px);font-weight:800;
+  line-height:1;letter-spacing:-.03em;color:#e9c775;font-variant-numeric:tabular-nums}
+.jpaper-count__label{display:block;margin-top:8px;font-size:13px;line-height:1.5;color:#d5e2d0}
+.jpaper-count__date{display:block;margin-top:6px;font-size:12px;color:rgba(213,226,208,.7)}
+
+/* --- sections ----------------------------------------------------------- */
+.jpaper-section{padding:clamp(44px,5.5vw,76px) 0;border-bottom:1px solid rgba(214,178,94,.18)}
+.jpaper-section:last-of-type{border-bottom:0}
+.jpaper-section__label{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(233,199,117,.8)}
+.jpaper-section h2{margin:0 0 18px;font-size:clamp(28px,3.4vw,44px);line-height:1.12;
+  letter-spacing:-.025em;color:#f4f0e8;max-width:20ch}
+.jpaper-section p{margin:0 0 16px;max-width:62ch;font-size:clamp(15px,1.5vw,17px);
+  line-height:1.68;color:#d5e2d0}
+.jpaper-section p:last-child{margin-bottom:0}
+.jpaper-section strong{color:#f4f0e8}
+
+/* A line the page stakes itself on. */
+.jpaper-pull{margin:clamp(26px,3vw,40px) 0;padding:0 0 0 clamp(18px,2.4vw,30px);
+  border-left:3px solid var(--gold)}
+.jpaper-pull p{margin:0;max-width:34ch;font-size:clamp(20px,2.4vw,30px);line-height:1.3;
+  letter-spacing:-.02em;color:#f4f0e8;font-weight:700}
+.jpaper-pull cite{display:block;margin-top:12px;font-style:normal;font-size:13px;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(233,199,117,.8)}
+
+/* --- the ask ------------------------------------------------------------ */
+.jpaper-ask{display:grid;gap:14px;margin-top:26px}
+@media(min-width:760px){.jpaper-ask{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.jpaper-ask__item{display:flex;flex-direction:column;gap:8px;padding:20px;
+  border:1px solid rgba(214,178,94,.3);border-radius:14px;background:rgba(244,240,232,.04)}
+.jpaper-ask__n{font-size:12px;font-weight:800;letter-spacing:.2em;color:#e9c775}
+.jpaper-ask__item h3{margin:0;font-size:17px;line-height:1.3;color:#f4f0e8}
+.jpaper-ask__item p{margin:0;font-size:14px;line-height:1.55;color:#d5e2d0}
+.jpaper-ask__item a{margin-top:auto;padding-top:6px;color:#e9c775;font-weight:700;
+  font-size:14px;text-decoration:none;border-bottom:1px solid rgba(233,199,117,.45);
+  align-self:flex-start}
+.jpaper-ask__item a:hover{color:#f0d28a;border-bottom-color:#f0d28a}
+
+/* --- share -------------------------------------------------------------- */
+.jpaper-share{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:26px}
+.jpaper-share__btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;
+  padding:0 22px;border:0;border-radius:999px;cursor:pointer;
+  background:var(--gold);color:var(--green);font-size:16px;font-weight:700;line-height:1;
+  transition:background-color 160ms ease,transform 160ms ease}
+.jpaper-share__btn:hover{background:#f0d28a}
+.jpaper-share__btn:active{transform:scale(.97)}
+.jpaper-share__btn:focus-visible{outline:2px solid #f4f0e8;outline-offset:3px}
+.jpaper-share__note{font-size:13px;color:rgba(213,226,208,.75)}
+
+/* The three data sections share the page's fixed living atlas. Their old
+   green fills, repeated map and glow masked the real activity beacons. */
+.journey-page .million-stage.journey-barometer,
+.journey-page .road,
+.journey-page .race-section{background:transparent}
+.journey-page .million-stage.journey-barometer::before,
+.journey-page .million-stage.journey-barometer::after,
+.journey-page .road__atlas,
+.journey-page .road__scene::after{display:none}
+.journey-page .home-section--dark{background:transparent}
+.journey-page .section,.journey-page .race-section{position:relative;z-index:1}
+
+/* The companion's face is fixed in the bottom right corner, about 72px
+   square with its margin. Keep the ask cards and the share button out from
+   under it rather than letting the last row of the page sit beneath a
+   floating avatar. */
+.jpaper-ask__item:last-child,
+.jpaper-share{padding-right:0}
+@media(min-width:760px) and (max-width:1180px){
+  .jpaper-ask__item:last-child{padding-bottom:64px}
+}
+.journey-page .jpaper:last-of-type .jpaper-section:last-of-type{padding-bottom:clamp(76px,8vw,120px)}
+
+@media(max-width:700px){
+  .jpaper__shell{width:calc(100% - 32px)}
+  .jpaper-cover{padding-top:40px}
+  .jpaper-ask__item:last-child{padding-bottom:20px}
+}
+
+/* "Share the road" is a button now (2026-10-26): it opens the share sheet like the header button, dressed exactly as the item links around it. */
+.jpaper-ask__item .jpaper-ask__share{margin-top:auto;padding-top:6px;color:#e9c775;font-weight:700;
+  font-size:14px;text-decoration:none;border-bottom:1px solid rgba(233,199,117,.45);
+  align-self:flex-start;background:none;border-top:0;border-left:0;border-right:0;border-radius:0;font-family:inherit;font-size:14px;font-weight:700;line-height:inherit;cursor:pointer;text-align:left}
+.jpaper-ask__item .jpaper-ask__share:hover{color:#f0d28a;border-bottom-color:#f0d28a}
+.jpaper-ask__item .jpaper-ask__share:focus-visible{outline:2px solid #e9c775;outline-offset:3px}

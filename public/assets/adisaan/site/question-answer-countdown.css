@@ -1,0 +1,381 @@
+.question-answer-clock{width:min(100%,540px);margin:0 auto 28px;padding:20px 24px;border:1px solid #d6b25e8a;border-radius:18px;background:#062909;color:#f4f0e8;text-align:center}
+.question-answer-clock[hidden]{display:none}
+.question-answer-clock__eyebrow{margin:0 0 12px;color:#e9c775;font-size:12px;font-weight:700;letter-spacing:.17em;line-height:1.4}
+.question-answer-clock__digits{display:flex;align-items:flex-start;justify-content:center;gap:clamp(10px,3vw,22px);font-variant-numeric:tabular-nums}
+.question-answer-clock__digits>span:not(.question-answer-clock__colon){display:grid;min-width:62px;gap:1px}
+.question-answer-clock__digits strong{font-size:clamp(34px,6vw,52px);font-weight:700;line-height:1;color:#f4f0e8}
+.question-answer-clock__digits small{color:#cbd8c7;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+.question-answer-clock__colon{padding-top:1px;color:#e9c775;font-size:clamp(28px,5vw,42px);line-height:1}
+.question-answer-clock__note{max-width:36ch;margin:14px auto 0;color:#cbd8c7;font-size:14px;line-height:1.5}
+.question-answer-clock__video{display:block;width:100%;aspect-ratio:16/9;border-radius:10px;background:#031c06}
+.question-answer-clock.is-revealing .question-answer-clock__content{opacity:0;transform:translateY(-8px);transition:opacity .24s ease,transform .24s ease}
+.question-answer-clock.is-revealed .question-answer-clock__content{animation:answer-appears .55s ease-out both}
+.question-answer-clock__retry{padding:0;border:0;background:none;color:#e9c775;font:inherit;text-decoration:underline;cursor:pointer}
+@keyframes answer-appears{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.question-answer-clock.is-revealing .question-answer-clock__content{transition:none}.question-answer-clock.is-revealed .question-answer-clock__content{animation:none}}
+@media(max-width:420px){.question-answer-clock{padding:18px 12px}.question-answer-clock__digits{gap:8px}.question-answer-clock__digits>span:not(.question-answer-clock__colon){min-width:55px}}
+
+/* Stand-by between the answer and the bonus answer. Deliberately plain: it
+   holds the frame for a minute and says what is coming, nothing else. */
+.answer-standby{display:grid;place-items:center;gap:10px;aspect-ratio:16/9;padding:24px;border-radius:12px;border:1px solid rgba(233,199,117,.34);background:radial-gradient(120% 90% at 50% 0%,rgba(233,199,117,.09),transparent 62%),#0b3811;text-align:center}
+.answer-standby[hidden]{display:none}
+/* One line now, so it carries the message and gets room to wrap. */
+.answer-standby__line{margin:0;max-width:26em;font-size:clamp(17px,2.2vw,22px);font-weight:700;line-height:1.3;color:#f4f0e8}
+.answer-standby__clock{display:flex;align-items:baseline;gap:8px;margin:4px 0 0}
+.answer-standby__clock strong{font-size:clamp(30px,5vw,44px);line-height:1;color:#e9c775;font-variant-numeric:tabular-nums}
+.answer-standby__clock span{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,240,232,.6)}
+.answer-standby__skip{margin-top:2px;padding:9px 16px;border-radius:999px;border:1px solid rgba(244,240,232,.3);background:transparent;color:#f4f0e8;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+.answer-standby__skip:hover{background:rgba(244,240,232,.1)}
+.answer-standby__skip:focus-visible{outline:3px solid #b69648;outline-offset:3px}
+
+
+/* --------------------------------------------------------------------------
+   The question card: two faces.
+
+   Face is the card you are dealt — deep forest, a gold tarot frame, a
+   numeral, the question, and a treeline along the bottom. Turn it and the
+   back shows what the clearing has heard: people against machines, and the
+   climb to a million.
+
+   It turns on hover, on keyboard focus, and on tap — hover alone would hide
+   the actions from anyone on a phone or a keyboard, and the actions live on
+   the back. Reduced motion swaps the faces instead of spinning them.
+   -------------------------------------------------------------------------- */
+.qcard{position:relative;perspective:1200px;background:none;border:0;padding:0;min-height:248px}
+.qcard__flip{position:relative;width:100%;height:100%;min-height:248px;transition:transform 620ms cubic-bezier(.16,1,.3,1);transform-style:preserve-3d}
+/* Hover only where hovering is real. On a touch device the emulated hover
+   sticks and re-fires as the page scrolls, which restarts the turn
+   mid-flight and leaves the card facing nowhere. Touch uses the tap class. */
+@media (hover: hover) {
+  .qcard:hover .qcard__flip{transform:rotateY(180deg)}
+}
+.qcard:focus-within .qcard__flip,
+.qcard.is-turned .qcard__flip{transform:rotateY(180deg)}
+
+.qcard__face{position:absolute;inset:0;display:flex;flex-direction:column;padding:24px 26px;border-radius:18px;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;overflow:hidden}
+/* backface-visibility hides a face but does not reliably take it out of
+   hit-testing: with the card turned, the front was still catching the taps
+   and Answer did nothing on a phone. Pointer events follow the turn
+   explicitly, so whichever face you can see is the one you can press. */
+.qcard__face--back{pointer-events:none}
+@media (hover: hover) {
+  .qcard:hover .qcard__face--front{pointer-events:none}
+  .qcard:hover .qcard__face--back{pointer-events:auto}
+}
+.qcard:focus-within .qcard__face--front,
+.qcard.is-turned .qcard__face--front{pointer-events:none}
+.qcard:focus-within .qcard__face--back,
+.qcard.is-turned .qcard__face--back{pointer-events:auto}
+
+/* --- the face --- */
+.qcard__face--front{color:#f4f0e8;
+  background:radial-gradient(120% 90% at 50% 8%,#13501f 0%,#0b3811 48%,#051a08 100%);
+  border:1px solid rgba(214,178,94,.55);
+  box-shadow:0 18px 44px -26px rgba(0,0,0,.9)}
+/* The tarot rule, inset, with four corner marks in the gap. */
+.qcard__face--front::before{content:"";position:absolute;inset:9px;border:1px solid rgba(214,178,94,.38);border-radius:12px;pointer-events:none}
+.qcard__face--front::after{content:"";position:absolute;inset:9px;pointer-events:none;
+  background:
+    linear-gradient(#e9c775 0 0) left 0 top 0/12px 1px no-repeat,
+    linear-gradient(#e9c775 0 0) left 0 top 0/1px 12px no-repeat,
+    linear-gradient(#e9c775 0 0) right 0 top 0/12px 1px no-repeat,
+    linear-gradient(#e9c775 0 0) right 0 top 0/1px 12px no-repeat,
+    linear-gradient(#e9c775 0 0) left 0 bottom 0/12px 1px no-repeat,
+    linear-gradient(#e9c775 0 0) left 0 bottom 0/1px 12px no-repeat,
+    linear-gradient(#e9c775 0 0) right 0 bottom 0/12px 1px no-repeat,
+    linear-gradient(#e9c775 0 0) right 0 bottom 0/1px 12px no-repeat}
+.qcard__numeral{position:relative;z-index:1;text-align:center;font-size:13px;font-weight:800;letter-spacing:.22em;color:#e9c775}
+/* The question is the card. It takes the whole middle and is centred on both
+   axes, so a short question and a long one are dealt the same hand. */
+.qcard__question{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;
+  margin:14px 0 10px;text-align:center;text-wrap:balance;
+  font-size:clamp(21px,2.2vw,26px);line-height:1.22;letter-spacing:-.015em;color:#f4f0e8}
+/* Room on the right for the seal, so a long area label never runs under it. */
+.qcard__turn{position:relative;z-index:1;margin-top:auto;padding-right:44px;text-align:left;
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(233,199,117,.8)}
+/* The OHM mark sits where a deck puts its maker's seal: bottom right, inside
+   the gold rule, quiet enough to be noticed second. */
+.qcard__seal{position:absolute;right:17px;bottom:14px;z-index:1;width:38px;height:auto;opacity:.6;pointer-events:none}
+.qcard.is-answered .qcard__face--front{border-color:rgba(154,220,159,.6)}
+.qcard.is-answered .qcard__numeral{color:#9adc9f}
+
+/* --- the back --- */
+.qcard__face--back{transform:rotateY(180deg);gap:12px;color:#073209;background:#ebebeb;border:1px solid #d6b25e}
+.qcard__back-title{margin:0;font-size:11px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:#3e5a40}
+.qcard__score{display:flex;align-items:baseline;gap:14px}
+.qcard__score-side{display:grid}
+.qcard__score-side strong{font-size:30px;line-height:1;color:#1f6b31}
+.qcard__score-side--machine strong{color:#8a6a1f}
+.qcard__score-side small{margin-top:2px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#47604b}
+.qcard__score-vs{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#7d8c7e}
+.qcard__climb{display:grid;gap:5px}
+.qcard__climb-bar{display:block;height:6px;border-radius:999px;background:rgba(7,50,9,.14);overflow:hidden}
+.qcard__climb-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#3d8650,#9adc9f)}
+.qcard__climb-meta,.qcard__area{font-size:12px;color:#47604b;line-height:1.35}
+.qcard__actions{display:flex;align-items:center;gap:16px;margin-top:auto}
+
+@media(prefers-reduced-motion:reduce){
+  /* No spin: the faces simply swap. */
+  .qcard__flip,.qcard:focus-within .qcard__flip,.qcard.is-turned .qcard__flip{transition:none;transform:none}
+  .qcard__face{backface-visibility:visible}
+  .qcard__face--back{transform:none;opacity:0;pointer-events:none}
+  .qcard:focus-within .qcard__face--back,.qcard.is-turned .qcard__face--back{opacity:1;pointer-events:auto}
+  .qcard:focus-within .qcard__face--front,.qcard.is-turned .qcard__face--front{opacity:0}
+}
+
+/* [hidden] is a UA rule of display:none, and .question-answer-clock__video
+   sets display:block, which beats it. Without this the finished answer stays
+   on screen behind the stand-by card and alongside the bonus answer — the
+   element reports hidden:true the whole time and renders at full size. */
+.question-answer-clock__video[hidden]{display:none}
+
+/* ---------------------------------------------------------------------------
+   A box that does not resize when the question changes
+
+   The ten questions wrap to two, three or four lines, which moved the video
+   up and down by 200px as the reel turned. The box reserves the tallest of
+   them and sits its text at the bottom, so everything below it stays put.
+
+   The reserve is a stack of all ten questions in one grid cell, invisible and
+   out of the accessibility tree: the browser measures the real strings at the
+   real width, so this stays correct on a phone and after a copy edit. A
+   longest-string guess is not good enough — question 5 is shorter than
+   question 8 and still wraps one line taller.
+   -------------------------------------------------------------------------- */
+.stage-box{display:grid;align-items:end;justify-items:center;width:100%}
+.stage-box>*{grid-area:1/1}
+.stage-box__ghosts{display:grid;visibility:hidden;pointer-events:none}
+.stage-box__ghosts>span{grid-area:1/1}
+/* The ghosts wrap exactly as the real text does because site.css styles both
+   through one selector — restating the type here was already wrong at phone
+   width, where the heading shrinks and the ghost did not, reserving 17px
+   nobody needed.
+
+   The bottom margin those rules carry moves out to the box, or the reserve
+   would include it twice. */
+.question-page-v2__intro .stage-box{margin:0 auto 20px}
+.question-page-v2__answer .stage-box--quote{margin:0 auto 18px}
+/* Specificity has to clear the (0,2,1) of the site.css rule above, which
+   carries that margin; a tie would leave this depending on load order. */
+.question-page-v2 .stage-box :is(h1,blockquote,.stage-box__ghosts>span){margin-block:0}
+
+/* ---------------------------------------------------------------------------
+   The answer reel
+
+   Ten questions in one frame. The middle card is where you are; its two
+   neighbours sit behind it turned on their edge, so the set reads as a reel
+   you can walk rather than a page you have to go back to.
+
+   Only three cards are ever drawn — active, previous, next. The rest are
+   flattened and taken out of the flow, so turning the reel animates three
+   elements instead of ten and nothing offscreen is paying for a transform.
+
+   The track's height is set by script from the active card, because a one-line
+   question and a three-line one are different heights and a fixed frame would
+   either clip the long one or leave a hole under the short one.
+   -------------------------------------------------------------------------- */
+/* One column, not three: the buttons ride over the frame's own edges. In a
+   three-column grid the neighbours spilled into the button columns and the
+   gold landed in the middle of a card. */
+.qreel{position:relative;width:min(100%,960px);margin:28px auto 0}
+#building{scroll-margin-top:100px}
+
+/* --- the gold buttons --- */
+.qreel__nav{position:absolute;top:50%;z-index:5;display:grid;place-items:center;
+  width:58px;height:58px;padding:0;border:0;border-radius:999px;
+  background:var(--gold);color:var(--green);cursor:pointer;
+  box-shadow:0 10px 26px -12px rgba(0,0,0,.85);
+  transition:transform 220ms cubic-bezier(.16,1,.3,1),background-color 160ms ease,box-shadow 220ms ease}
+.qreel__nav--prev{left:0;transform:translate(-18%,-50%)}
+.qreel__nav--next{right:0;transform:translate(18%,-50%)}
+.qreel__nav svg{width:24px;height:24px;display:block}
+/* The ring is a second, scaled copy of the button that fades as it grows —
+   a press you can see without the button itself moving under the finger. */
+.qreel__nav::after{content:"";position:absolute;inset:0;border-radius:999px;border:2px solid var(--gold);
+  opacity:0;transform:scale(1);pointer-events:none}
+@media (hover: hover){
+  .qreel__nav:hover{background:#f0d28a;box-shadow:0 14px 32px -12px rgba(0,0,0,.9)}
+  .qreel__nav--prev:hover{transform:translate(-18%,-50%) scale(1.08)}
+  .qreel__nav--next:hover{transform:translate(18%,-50%) scale(1.08)}
+  .qreel__nav:hover::after{animation:qreel-ring 1100ms ease-out infinite}
+}
+.qreel__nav:focus-visible{outline:2px solid #f4f0e8;outline-offset:3px}
+.qreel__nav--prev:active{transform:translate(-18%,-50%) scale(.94)}
+.qreel__nav--next:active{transform:translate(18%,-50%) scale(.94)}
+.qreel__nav.is-pressed::after{animation:qreel-ring 520ms ease-out 1}
+@keyframes qreel-ring{
+  from{opacity:.75;transform:scale(1)}
+  to{opacity:0;transform:scale(1.65)}
+}
+
+/* --- the reel --- */
+/* Clipped, so a neighbour peeks in from the edge instead of running off
+   under the page gutter. The padding keeps the active card's own shadow
+   and gold rule from being shaved by that clip. */
+.qreel__viewport{position:relative;overflow:hidden;padding:10px 0 14px;
+  perspective:1500px;perspective-origin:50% 42%}
+.qreel__track{position:relative;transform-style:preserve-3d;
+  transition:height 420ms cubic-bezier(.16,1,.3,1)}
+.qreel__slide{position:absolute;top:0;left:50%;width:min(100%,560px);
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:22px 22px 24px;border:1px solid rgba(214,178,94,.5);border-radius:19px;
+  background:linear-gradient(180deg,#0a3a11 0%,#052507 100%);
+  box-shadow:0 26px 60px -28px rgba(0,0,0,.95);
+  transform:translateX(-50%) scale(.6);opacity:0;z-index:0;pointer-events:none;visibility:hidden;
+  transition:transform 620ms cubic-bezier(.16,1,.3,1),opacity 420ms ease}
+.qreel__slide[data-pos="active"]{transform:translateX(-50%) rotateY(0) scale(1);opacity:1;z-index:3;
+  pointer-events:auto;visibility:visible}
+/* Left and right turn toward the middle, which is what makes the row read as
+   one reel seen at an angle rather than three cards side by side. */
+.qreel__slide[data-pos="prev"]{transform:translateX(-137%) rotateY(34deg) scale(.74);opacity:.34;z-index:2;visibility:visible}
+.qreel__slide[data-pos="next"]{transform:translateX(37%) rotateY(-34deg) scale(.74);opacity:.34;z-index:2;visibility:visible}
+/* Blurred as well as dimmed: a neighbour at this size is still legible, and
+   two readable questions on one screen is two questions competing. */
+.qreel__slide[data-pos="prev"],.qreel__slide[data-pos="next"]{filter:saturate(.62) blur(1.4px);cursor:pointer}
+
+/* No second frame inside the card. The slide already has its own rule and
+   ground; a bordered box within a bordered box was two cards for one answer.
+   The question is gone from here too — it is the page heading directly above,
+   and printing it twice made the card look like a different question. */
+.qreel__slide .question-answer-clock{width:100%;margin:0;padding:0;border:0;border-radius:0;background:none}
+
+/* The answer line and the question's number on one row. The number is a
+   sibling of the eyebrow, never a child: the stand-by script replaces that
+   element's text with "AND WHY THAT WAY" and would eat anything inside it. */
+.qreel__head{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 14px}
+.qreel__head .question-answer-clock__eyebrow{margin:0}
+.qreel__head-no{display:inline-grid;place-items:center;min-width:30px;height:22px;padding:0 7px;
+  border:1px solid rgba(214,178,94,.5);border-radius:999px;
+  color:#e9c775;font-size:12px;font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+
+/* The number of the question the button will answer, set into the gold so it
+   reads as part of the label and not as a second control. */
+.btn-no{display:inline-grid;place-items:center;min-width:30px;height:24px;padding:0 7px;border-radius:999px;
+  background:rgba(7,50,9,.16);color:var(--green);font-size:13px;font-weight:800;letter-spacing:.06em;
+  font-variant-numeric:tabular-nums}
+/* The one call to action sits halfway between the reel it closes and the
+   section that follows, rather than hard against the dots.
+
+   Block-level, not the inline-flex the other buttons use: as an inline box it
+   sat on a text baseline, and the line's descender added 22px under it that
+   the margin above could not see. The two gaps were 121 and 99. */
+.question-page-v2__answer a.question-page-v2__cta{display:flex;width:fit-content;
+  margin:clamp(96px,11vw,152px) auto 0}
+
+/* The waiting card: the seal, breathing, instead of a fake player. */
+.question-answer-clock--waiting .question-answer-clock__content{display:grid;justify-items:center;gap:14px}
+.qreel__soon{display:grid;place-items:center;width:104px;height:104px;border-radius:999px;
+  border:1px solid rgba(214,178,94,.34);background:radial-gradient(60% 60% at 50% 42%,rgba(214,178,94,.13),transparent 72%)}
+.qreel__soon img{opacity:.62;animation:qreel-breathe 5.5s ease-in-out infinite}
+@keyframes qreel-breathe{
+  0%,100%{opacity:.46;transform:scale(1)}
+  50%{opacity:.78;transform:scale(1.07)}
+}
+
+/* --- the rail under the reel --- */
+.qreel__rail{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:18px}
+.qreel__count{margin:0;font-size:12px;font-weight:700;letter-spacing:.14em;color:rgba(233,199,117,.75)}
+.qreel__count strong{color:#e9c775}
+.qreel__dots{display:flex;align-items:center;gap:8px;margin:0;padding:0;list-style:none}
+.qreel__dot{width:9px;height:9px;padding:0;border:0;border-radius:999px;cursor:pointer;
+  background:rgba(244,240,232,.26);transition:background-color 200ms ease,transform 200ms ease}
+.qreel__dot:hover{background:rgba(244,240,232,.5)}
+.qreel__dot[aria-selected="true"]{background:var(--gold);transform:scale(1.35)}
+.qreel__dot:focus-visible{outline:2px solid #f4f0e8;outline-offset:3px}
+
+/* The placeholder frame and the player share one box; the reel swaps which
+   of the two is showing when it turns to a question with no film yet. */
+.question-page-v2__film[data-film] .question-film-soon__frame{display:none}
+.question-page-v2__film[data-film].is-soon video{display:none}
+.question-page-v2__film[data-film].is-soon .question-film-soon__frame{display:grid}
+
+@media(max-width:860px){
+  .qreel__nav{width:48px;height:48px}
+  .qreel__nav svg{width:20px;height:20px}
+  .qreel__nav--prev{transform:translate(-30%,-50%)}
+  .qreel__nav--next{transform:translate(30%,-50%)}
+  .qreel__nav--prev:active{transform:translate(-30%,-50%) scale(.94)}
+  .qreel__nav--next:active{transform:translate(30%,-50%) scale(.94)}
+  .qreel__slide{padding:18px 16px 20px}
+  /* There is no room for a peek at phone width; the neighbours become a hint
+     at the edge rather than a second card. */
+  .qreel__slide[data-pos="prev"]{transform:translateX(-152%) rotateY(38deg) scale(.7);opacity:.26}
+  .qreel__slide[data-pos="next"]{transform:translateX(52%) rotateY(-38deg) scale(.7);opacity:.26}
+}
+/* The archive's own top margin drops to 92px at this width; the button's
+   space above has to follow it or the two stop matching. */
+@media(max-width:700px){
+  .question-page-v2__answer a.question-page-v2__cta{margin-top:92px}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .qreel__slide{transition:opacity 200ms ease}
+  .qreel__slide[data-pos="prev"],.qreel__slide[data-pos="next"]{opacity:0;visibility:hidden}
+  .qreel__nav,.qreel__track{transition:none}
+  .qreel__nav:hover::after,.qreel__nav.is-pressed::after{animation:none}
+  .qreel__soon img{animation:none;opacity:.62}
+}
+
+/* The launch countdown, inside the film frame. Big enough to be the thing
+   you look at, quiet enough not to shout over the question above it. */
+.film-countdown{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(12px,3vw,28px);
+  margin:14px 0 6px;font-variant-numeric:tabular-nums}
+.film-countdown>span{display:grid;justify-items:center;gap:2px;min-width:62px}
+.film-countdown strong{font-size:clamp(30px,5vw,46px);font-weight:800;line-height:1;
+  letter-spacing:-.03em;color:#e9c775}
+.film-countdown small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#cbd8c7}
+@media(max-width:560px){.film-countdown>span{min-width:52px}}
+
+/* The same card dealt wide, for the home page: one card across the column
+   instead of one of ten in a grid. */
+.qcard--wide{min-height:clamp(240px,26vw,320px);margin:0 auto 28px;width:min(100%,760px)}
+.qcard--wide .qcard__flip{min-height:clamp(240px,26vw,320px)}
+.qcard--wide .qcard__face{padding:clamp(22px,3vw,34px) clamp(24px,4vw,46px)}
+.qcard--wide .qcard__face--back{justify-content:center;gap:12px}
+/* One card across a column, not one of ten in a grid: the score can breathe. */
+.qcard--wide .qcard__score{font-size:clamp(15px,1.7vw,19px)}
+.qcard--wide .qcard__climb-meta{font-size:13px}
+.qcard--wide .qcard__question{font-size:clamp(24px,3.4vw,42px);line-height:1.18;max-width:22ch;margin-inline:auto}
+.qcard--wide .qcard__back-main{display:grid;grid-template-columns:minmax(0,1fr) 180px;align-items:center;gap:20px}
+.qcard--wide .qcard__back-copy{min-width:0;display:grid;gap:20px}
+/* The pillars (2026-10-26): people and machines on one plinth. They rise
+   when the card turns; a nested 3D transform would fight the flip, so the
+   depth is drawn (lit top, shaded side) and only the rise is animated. */
+.qcard__pillars{display:block;width:180px;max-width:100%;height:auto;justify-self:end;overflow:visible}
+.qcard__plinth{fill:rgba(7,50,9,.16)}
+.qcard__plinth-rim{fill:none;stroke:rgba(7,50,9,.28);stroke-width:1}
+.qcard__pillar-top{stroke-width:1}
+.qcard__pillar--people .qcard__pillar-top{fill:#8fd09c;stroke:#2d6a3b}
+.qcard__pillar--machines .qcard__pillar-top{fill:#f6e2a8;stroke:#9c7a2b}
+.qcard__pillar-side{stroke-width:1}
+.qcard__pillar--people .qcard__pillar-side{stroke:#245a31}
+.qcard__pillar--machines .qcard__pillar-side{stroke:#8a6a22}
+.qcard__pillar-num{font:800 15px/1 Montserrat,Arial,sans-serif;letter-spacing:.02em}
+.qcard__pillar-num--people{fill:#2d6a3b}
+.qcard__pillar-num--machines{fill:#9c7a2b}
+.qcard__pillar{transform-box:view-box;transform-origin:90px 150px;transform:scaleY(.06);transition:transform 720ms cubic-bezier(.2,.9,.3,1.05);transition-delay:calc(220ms + var(--i)*140ms)}
+.qcard__pillar-num{opacity:0;transition:opacity 300ms ease-out;transition-delay:calc(760ms + var(--i)*140ms)}
+@media(hover:hover){.qcard:hover .qcard__pillar{transform:scaleY(1)}.qcard:hover .qcard__pillar-num{opacity:1}}
+.qcard:focus-within .qcard__pillar,.qcard.is-turned .qcard__pillar{transform:scaleY(1)}
+.qcard:focus-within .qcard__pillar-num,.qcard.is-turned .qcard__pillar-num{opacity:1}
+.qcard__score-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.qcard__score-row .qcard__score{margin:0}
+.qcard__pillars--compact{width:72px;flex:none;margin:0}
+/* The deck's small cards grow a little so the back, with its pillars, no longer clips its buttons. */
+.qcard:not(.qcard--wide):not(.qcard--side),.qcard:not(.qcard--wide):not(.qcard--side) .qcard__flip{min-height:276px}
+@media(max-width:600px){
+  .qcard--wide,.qcard--wide .qcard__flip{min-height:340px}
+  .qcard--wide .qcard__back-main{grid-template-columns:minmax(0,1fr) 110px;gap:12px}
+  .qcard--wide .qcard__back-copy{gap:12px}
+  .qcard--wide .qcard__score{gap:6px}
+  .qcard--wide .qcard__score-side strong{font-size:24px}
+  .qcard--wide .qcard__score-side small{font-size:9px}
+  .qcard--wide .qcard__climb-meta{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.qcard__pillar{transform:none!important;transition:none}.qcard__pillar-num{opacity:1;transition:none}}
+
+/* The two ways on from the card: answer it, or go and see the deck. */
+.home-episode__act{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px 22px}
+.home-episode__act .home-link{font-size:16px;font-weight:600;color:#e9c775}
+@media(max-width:560px){.home-episode__act{flex-direction:column;gap:14px}}

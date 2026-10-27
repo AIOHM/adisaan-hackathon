@@ -1,0 +1,375 @@
+/* The manifesto is a document. These styles are scoped to its own page. */
+.manifesto-page .paper{
+    --paper-ink:#f4f0e8;
+    --paper-soft:#d5e2d0;
+    --paper-line:rgba(214,178,94,.3);
+    --paper-gold:#d6b25e;
+    color:var(--paper-ink);
+    /* The layout draws the home page's living atlas behind any page handed
+       $livingMap. This document stands on it instead of hiding it under a
+       sheet of cream. */
+    background:transparent;
+}
+.paper-shell{width:min(1180px,calc(100% - 80px));margin-inline:auto}
+/* No map in the header (Adrian, 2026-10-26). The cover painted its own
+   still copy of the world map, which sat over the live atlas and hid the
+   points that make it alive — the mistake the journey page made too. */
+.paper-cover{position:relative;isolation:isolate;overflow:hidden;background:transparent;color:#f4f0e8;border-bottom:5px solid var(--paper-gold)}
+.paper-cover__top,.paper-cover__bottom{
+    display:flex;justify-content:space-between;align-items:center;gap:20px;
+    font:600 11px/1.5 Montserrat,Arial,sans-serif;letter-spacing:.11em;text-transform:uppercase
+}
+.paper-cover__top{padding:23px 0;border-bottom:1px solid #d6e3cf45;color:#d6e3cf}
+.paper-cover__top span:last-child{color:#e9c775;text-align:right}
+.paper-cover__grid{
+    display:grid;grid-template-columns:minmax(0,1.65fr) minmax(230px,.55fr);
+    gap:clamp(48px,8vw,120px);align-items:end;padding:clamp(72px,9vw,135px) 0 90px
+}
+.paper-kicker,.paper-section__label,.paper-contents__label{
+    font:700 12px/1.5 Montserrat,Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase
+}
+.paper-kicker{color:#e9c775;margin:0 0 24px}
+.paper-cover h1{
+    font:700 clamp(50px,5.6vw,86px)/1.02 Montserrat,Arial,sans-serif;
+    letter-spacing:-.055em;max-width:11ch;color:#f4f0e8;margin:0 0 30px
+}
+.paper-cover h1 em{font-style:normal;color:#e9c775}
+.paper-cover__dek{max-width:60ch;color:#d6e3cf;font:400 clamp(17px,1.55vw,21px)/1.65 Montserrat,Arial,sans-serif;margin:0}
+.paper-cover__margin{border-left:1px solid #e9c77580;padding:4px 0 3px 28px;margin-bottom:7px}
+.paper-cover__mark{display:block;color:#e9c775;font:700 64px/.7 Montserrat,Arial,sans-serif;height:52px}
+.paper-cover__margin p{font:700 clamp(25px,2.5vw,34px)/1.18 Montserrat,Arial,sans-serif;letter-spacing:-.035em;color:#f4f0e8;margin:14px 0}
+.paper-cover__margin em{color:#e9c775}
+.paper-cover__margin-note{color:#d6e3cf;font:600 11px/1.5 Montserrat,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.paper-cover__bottom{padding:22px 0 26px;border-top:1px solid #d6e3cf45;color:#d6e3cf}
+.paper-cover__bottom span:last-child{text-align:right;font-weight:400;text-transform:none;letter-spacing:0}
+
+.paper-layout{display:grid;grid-template-columns:225px minmax(0,1fr);gap:clamp(54px,7vw,112px);align-items:start;padding-block:88px 120px}
+.paper-contents{position:sticky;top:110px;padding-top:5px;font-family:Montserrat,Arial,sans-serif}
+.paper-contents__label{color:#e9c775;margin:0 0 19px}
+.paper-contents ol{list-style:none;padding:0;margin:0;border-top:1px solid var(--paper-line)}
+.paper-contents li{border-bottom:1px solid var(--paper-line)}
+.paper-contents li a{display:flex;gap:14px;padding:12px 0;color:var(--paper-ink);text-decoration:none;font-size:13px;line-height:1.4;font-weight:600}
+.paper-contents li a span{flex:none;color:#d6b25e;font-size:11px;font-variant-numeric:tabular-nums}
+.paper-contents li a:hover,.paper-contents li a:focus-visible{color:#f0d28a;text-decoration:underline}
+.paper-contents__question{margin-top:42px;padding-top:21px;border-top:2px solid var(--paper-ink)}
+.paper-contents__question>span{color:#e9c775;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase}
+.paper-contents__question p{font:600 17px/1.4 Montserrat,Arial,sans-serif;margin:12px 0 14px}
+.paper-contents__question a{font-size:12px;font-weight:700;color:var(--paper-ink)}
+
+.paper-body{min-width:0;max-width:750px}
+.paper-body p{max-width:68ch}
+.paper-section{scroll-margin-top:110px;border-top:1px solid var(--paper-line);padding-top:62px;margin-top:70px}
+.paper-abstract{border-top:0;padding-top:0;margin-top:0}
+.paper-section__label{display:flex;align-items:center;gap:16px;color:#e9c775;margin:0 0 28px}
+.paper-section__label span{font-size:12px;font-variant-numeric:tabular-nums;color:var(--paper-ink)}
+.paper-section h2,.paper-conclusion h2{
+    font:700 clamp(32px,3.4vw,46px)/1.12 Montserrat,Arial,sans-serif;
+    letter-spacing:-.035em;color:var(--paper-ink);max-width:16ch;margin:0 0 25px
+}
+.paper-section p{font:400 17px/1.75 Montserrat,Arial,sans-serif;margin:0 0 19px}
+.paper-section p:last-child{margin-bottom:0}
+.paper-section .paper-lead{font-size:clamp(21px,2vw,26px);line-height:1.55;color:var(--paper-ink)}
+.paper-abstract__note{border-left:3px solid var(--paper-gold);padding:12px 0 12px 22px;margin-top:34px!important;color:var(--paper-soft)}
+.paper-abstract__note strong{color:var(--paper-ink)}
+.paper-section a{color:#e9c775;text-decoration-thickness:1px}
+.paper-section a:hover{text-decoration-thickness:2px}
+.paper-pullquote{margin:46px 0;padding:36px 42px;background:rgba(5,39,12,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-left:5px solid var(--paper-gold)}
+.paper-pullquote p{font:700 clamp(25px,2.7vw,36px)/1.25 Montserrat,Arial,sans-serif;color:#f4f0e8;margin:0 0 17px}
+.paper-pullquote cite{font:600 11px/1.5 Montserrat,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#e9c775;font-style:normal}
+.paper-sequence{list-style:none;margin:34px 0 30px;padding:0;border-top:1px solid var(--paper-line)}
+.paper-sequence li{display:grid;grid-template-columns:42px 1fr;gap:18px;padding:20px 0;border-bottom:1px solid var(--paper-line)}
+.paper-sequence li>span{color:#d6b25e;font:700 12px/1.5 Montserrat,Arial,sans-serif;font-variant-numeric:tabular-nums;padding-top:4px}
+.paper-sequence strong{font:700 16px/1.4 Montserrat,Arial,sans-serif}
+.paper-sequence p{font-size:16px;line-height:1.55;margin:3px 0 0;color:var(--paper-soft)}
+.paper-lenses{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:34px 0 22px}
+.paper-lenses>div{border-top:2px solid var(--paper-gold);padding-top:13px}
+.paper-lenses span{font:700 12px/1.4 Montserrat,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.paper-lenses p{font-size:15px;line-height:1.5;color:var(--paper-soft);margin:8px 0 0}
+.paper-section .paper-small{font:400 14px/1.65 Montserrat,Arial,sans-serif;color:var(--paper-soft);padding-top:14px}
+.paper-rule{display:flex;align-items:center;justify-content:space-between;gap:14px;border-block:1px solid var(--paper-line);padding:20px 0;margin-top:34px;color:var(--paper-ink);font:700 12px/1.5 Montserrat,Arial,sans-serif;text-transform:uppercase;letter-spacing:.09em}
+.paper-rule span:nth-child(2){font:700 24px/1 Montserrat,Arial,sans-serif;color:#d6b25e}
+.paper-method{margin:32px 0 24px;border-top:2px solid var(--paper-ink)}
+.paper-method>div{display:grid;grid-template-columns:minmax(125px,.34fr) 1fr;gap:26px;border-bottom:1px solid var(--paper-line);padding:20px 0}
+.paper-method dt{font:700 14px/1.4 Montserrat,Arial,sans-serif}
+.paper-method dt span{display:inline-block;color:#d6b25e;margin-right:9px;font-size:11px;font-variant-numeric:tabular-nums}
+.paper-method dd{margin:0;color:var(--paper-soft);font:400 16px/1.6 Montserrat,Arial,sans-serif}
+.paper-status{margin:32px 0}
+.paper-status>div{display:grid;grid-template-columns:135px 1fr;gap:20px;border-top:1px solid var(--paper-line);padding:22px 0}
+.paper-status>div:last-child{border-bottom:1px solid var(--paper-line)}
+.paper-status__flag{font:700 11px/1.5 Montserrat,Arial,sans-serif;color:#e9c775;text-transform:uppercase;letter-spacing:.12em;padding-top:5px}
+.paper-status p{font-size:16px;line-height:1.62;margin:0}
+.paper-fieldnote{border-top:2px solid var(--paper-ink);border-bottom:1px solid var(--paper-line);padding:30px 0 34px;margin:44px 0 35px}
+.paper-fieldnote__index{font:700 11px/1.5 Montserrat,Arial,sans-serif!important;letter-spacing:.12em;text-transform:uppercase;color:#e9c775;margin:0 0 18px!important}
+.paper-fieldnote__index span{padding-inline:9px;color:var(--paper-line)}
+.paper-fieldnote h3{font:700 clamp(24px,2.5vw,32px)/1.2 Montserrat,Arial,sans-serif;letter-spacing:-.025em;max-width:21ch;margin:0 0 21px;color:var(--paper-ink)}
+.paper-fieldnote p{font-size:16px;line-height:1.65}
+.paper-fieldnote blockquote{font:600 clamp(19px,2vw,25px)/1.45 Montserrat,Arial,sans-serif;color:var(--paper-ink);margin:26px 0;padding:3px 0 3px 22px;border-left:1px solid var(--paper-gold)}
+.paper-fieldnote details{border-top:1px solid var(--paper-line);padding-top:20px;margin-top:29px}
+.paper-fieldnote summary{cursor:pointer;font:700 13px/1.5 Montserrat,Arial,sans-serif;color:var(--paper-ink);text-decoration:underline;text-underline-offset:4px}
+.paper-fieldnote summary:focus-visible{outline:3px solid var(--paper-gold);outline-offset:5px}
+.paper-fieldnote pre{white-space:pre-wrap;overflow-wrap:anywhere;font:400 13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(4,26,8,.6);border:1px solid rgba(214,178,94,.26);color:var(--paper-ink);padding:22px;margin:20px 0}
+.paper-fieldnote details p{font:400 13px/1.7 Montserrat,Arial,sans-serif;color:var(--paper-soft);margin-bottom:0}
+.paper-fieldnote code{font:inherit;overflow-wrap:anywhere}
+.paper-conclusion{scroll-margin-top:110px;background:rgba(5,39,12,.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(214,178,94,.4);border-radius:22px;color:#f4f0e8;padding:clamp(32px,5vw,58px);margin-top:90px}
+.paper-conclusion .paper-section__label{color:#e9c775}
+.paper-conclusion h2{color:#f4f0e8;max-width:15ch}
+.paper-conclusion>p:not(.paper-section__label){font:400 17px/1.7 Montserrat,Arial,sans-serif;color:#e1e9d9;margin:0 0 25px}
+.paper-action{display:inline-flex;align-items:center;gap:28px;background:#d6b25e;color:#073209;text-decoration:none;font:700 14px/1.3 Montserrat,Arial,sans-serif;padding:16px 22px;transition:background .2s ease,transform .2s ease}
+.paper-action:hover{background:#e9c775;transform:translateY(-2px)}
+.paper-conclusion .paper-conclusion__note{font:400 12px/1.5 Montserrat,Arial,sans-serif;color:#d0ddcb;margin:22px 0 0}
+
+@media(max-width:900px){
+    .paper-cover__grid{grid-template-columns:1fr;gap:38px}
+    .paper-cover__margin{max-width:440px}
+    .paper-layout{grid-template-columns:1fr;gap:52px}
+    .paper-contents{position:static}
+    .paper-contents ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px}
+    .paper-contents__question{max-width:420px;margin-top:30px}
+    .paper-body{max-width:760px}
+}
+@media(max-width:600px){
+    .paper-shell{width:min(100% - 36px,1180px)}
+    .paper-cover__top,.paper-cover__bottom{align-items:flex-start;flex-direction:column;gap:7px}
+    .paper-cover__top span:last-child,.paper-cover__bottom span:last-child{text-align:left}
+    .paper-cover__grid{padding:64px 0 58px}
+    .paper-cover h1{font-size:clamp(48px,12vw,72px);max-width:12ch}
+    .paper-cover__dek{font-size:17px}
+    .paper-cover__margin p{font-size:30px}
+    .paper-layout{padding-block:52px 72px;gap:42px}
+    .paper-contents ol{grid-template-columns:1fr 1fr;column-gap:12px}
+    .paper-contents li a{font-size:12px;gap:7px}
+    .paper-section{padding-top:46px;margin-top:55px}
+    .paper-section h2,.paper-conclusion h2{font-size:clamp(34px,9vw,46px)}
+    .paper-section p{font-size:17px}
+    .paper-section .paper-lead{font-size:21px}
+    .paper-lenses{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .paper-method>div,.paper-status>div{grid-template-columns:1fr;gap:7px}
+    .paper-rule{font-size:10px}
+    .paper-pullquote{padding:27px 25px}
+    .paper-conclusion{padding:32px 26px;margin-top:66px}
+}
+@media(prefers-reduced-motion:reduce){.paper-action{transition:none}.paper-action:hover{transform:none}}
+@media print{
+    .manifesto-page .brand-header,.manifesto-page .tabs,.manifesto-page .footer,.manifesto-page .paper-contents,.manifesto-page .paper-action{display:none!important}
+    .manifesto-page .paper,.paper-cover,.paper-conclusion{background:#fff!important;color:#111!important}
+    .paper-cover::before{display:none}
+    .paper-cover{border-bottom:2px solid #111}
+    .paper-cover h1,.paper-cover h1 em,.paper-cover__dek,.paper-cover__margin p,.paper-cover__margin em,.paper-conclusion h2,.paper-conclusion>p:not(.paper-section__label){color:#111!important}
+    .paper-shell{width:100%}.paper-layout{display:block;padding:25px 0}.paper-body{max-width:none}
+    .paper-section,.paper-conclusion{break-inside:avoid-page}
+    .paper-pullquote{background:#fff;border:2px solid #111}
+    .paper-pullquote p{color:#111}
+}
+
+/* The brand header carries the world map on every page. On this one the
+   live atlas is already behind it, so the still copy would double it. */
+.manifesto-page .brand-header--slim::before,
+.manifesto-page .tabs::before,
+.manifesto-page .footer::before,
+.manifesto-page .about-hero::before,
+.manifesto-page .home-section::before,
+.manifesto-page .hero__scene::before{display:none}
+.manifesto-page .brand-header,
+.manifesto-page .brand-header--slim,
+.manifesto-page .tabs,
+.manifesto-page .footer{background:transparent}
+
+/* Montserrat is loaded upright only, so an <em> here is a browser-slanted
+   fake. Emphasis is carried by the brand gold instead, the way the cover
+   title already does it. */
+.manifesto-page .paper em{font-style:normal;color:#e9c775}
+
+/* ------------------------------------------------------------------
+   The scroll (Adrian, 2026-10-26). The cover, the menu and the contents
+   column stay on the living atlas, with no sheet behind them. Only the
+   document itself is a sheet of old parchment that rolls up at the top
+   and down at the bottom: cream (#f4f0e8) aged with warm stains,
+   ink-coloured serif type, generous margins. Everything is CSS:
+   gradients, shadows and two pseudo-elements, so nothing new is fetched
+   and the strict CSP is untouched.
+   ------------------------------------------------------------------ */
+.manifesto-page .paper-layout{
+    --scroll-roll:44px;             /* diameter of the rolled ends */
+    --scroll-overhang:22px;         /* how far the rolls stick out past the sheet */
+    width:min(1240px,calc(100% - 64px));
+    gap:clamp(44px,5vw,80px);
+    padding-block:calc(var(--scroll-roll) + 36px) calc(var(--scroll-roll) + 64px);
+}
+.manifesto-page .paper-layout .paper-contents{top:104px}
+.manifesto-page .paper-body{
+    --paper-ink:#1c2b1a;
+    --paper-soft:#4b5946;
+    --paper-line:rgba(96,72,34,.26);
+    --paper-gold:#d6b25e;
+    --paper-ochre:#8a6a2b;          /* gold as ink: readable on cream */
+    --paper-green:#0d4a1a;
+    position:relative;isolation:isolate;
+    max-width:none;
+    padding:clamp(56px,6vw,88px) clamp(28px,5.5vw,84px) clamp(64px,7vw,104px);
+    color:var(--paper-ink);
+    background:
+        linear-gradient(180deg,rgba(74,52,16,.16),rgba(74,52,16,0) 54px),
+        linear-gradient(0deg,rgba(74,52,16,.18),rgba(74,52,16,0) 60px),
+        linear-gradient(90deg,rgba(74,52,16,.10),rgba(74,52,16,0) 9%,rgba(74,52,16,0) 91%,rgba(74,52,16,.10)),
+        radial-gradient(ellipse 42% 30% at 12% 18%,rgba(140,104,48,.11),transparent 70%),
+        radial-gradient(ellipse 36% 26% at 88% 62%,rgba(140,104,48,.10),transparent 70%),
+        radial-gradient(ellipse 50% 32% at 50% 96%,rgba(120,88,36,.09),transparent 70%),
+        repeating-linear-gradient(176deg,rgba(100,76,36,.035) 0 2px,transparent 2px 7px),
+        repeating-linear-gradient(94deg,rgba(255,252,244,.5) 0 1px,transparent 1px 5px),
+        linear-gradient(180deg,#f6f2ea,#f4f0e8 40%,#f0eadc);
+    background-color:#f4f0e8;
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.55) inset,
+        0 0 0 1px rgba(74,52,16,.18),
+        0 30px 70px rgba(0,12,3,.55);
+    border-radius:3px;
+}
+/* The rolled ends: a lit cylinder, darker at its caps, casting a soft
+   shadow onto the sheet it is unrolling from. */
+.manifesto-page .paper-body::before,
+.manifesto-page .paper-body::after{
+    content:"";position:absolute;z-index:2;pointer-events:none;
+    left:calc(var(--scroll-overhang) * -1);right:calc(var(--scroll-overhang) * -1);
+    height:var(--scroll-roll);border-radius:calc(var(--scroll-roll) / 2);
+    background:
+        linear-gradient(90deg,rgba(40,26,6,.42),rgba(40,26,6,.08) 30px,transparent 60px,transparent calc(100% - 60px),rgba(40,26,6,.08) calc(100% - 30px),rgba(40,26,6,.42)),
+        linear-gradient(180deg,#fbf8f1 0%,#f3eee2 24%,#e3dac4 52%,#c9bc9c 76%,#a4946f 92%,#8c7b57 100%);
+    box-shadow:
+        0 1px 0 rgba(255,255,255,.7) inset,
+        0 -1px 0 rgba(60,40,10,.35) inset,
+        0 14px 22px -10px rgba(0,8,2,.65),
+        0 2px 4px rgba(0,8,2,.25);
+}
+.manifesto-page .paper-body::before{top:calc(var(--scroll-roll) / -2)}
+.manifesto-page .paper-body::after{
+    bottom:calc(var(--scroll-roll) / -2);
+    background:
+        linear-gradient(90deg,rgba(40,26,6,.42),rgba(40,26,6,.08) 30px,transparent 60px,transparent calc(100% - 60px),rgba(40,26,6,.08) calc(100% - 30px),rgba(40,26,6,.42)),
+        linear-gradient(0deg,#fbf8f1 0%,#f3eee2 24%,#e3dac4 52%,#c9bc9c 76%,#a4946f 92%,#8c7b57 100%);
+    box-shadow:
+        0 -1px 0 rgba(255,255,255,.7) inset,
+        0 1px 0 rgba(60,40,10,.35) inset,
+        0 -14px 22px -10px rgba(0,8,2,.55),
+        0 -2px 4px rgba(0,8,2,.2);
+}
+.manifesto-page .paper-body>*{position:relative;z-index:1}
+
+/* The document: ink on paper, in a serif, with a clear ladder from the
+   numbered label to the heading to the lead to the running text. */
+.manifesto-page .paper-body .paper-section{border-top:3px double var(--paper-line);padding-top:58px;margin-top:66px}
+.manifesto-page .paper-body .paper-abstract{border-top:0;padding-top:0;margin-top:0}
+.manifesto-page .paper-body .paper-section__label{color:var(--paper-ochre);gap:14px;margin-bottom:26px}
+.manifesto-page .paper-body .paper-section__label span{color:var(--paper-ink)}
+.manifesto-page .paper-body .paper-section__label::after{content:"";flex:1;height:1px;max-width:120px;background:var(--paper-line)}
+.manifesto-page .paper-body .paper-section h2,
+.manifesto-page .paper-body .paper-conclusion h2{
+    font:400 clamp(34px,3.7vw,52px)/1.1 Georgia,'Times New Roman',serif;
+    letter-spacing:-.02em;color:#143117;max-width:22ch;margin-bottom:26px
+}
+.manifesto-page .paper-body .paper-conclusion h2{color:#f4f0e8;max-width:16ch}
+.manifesto-page .paper-body .paper-section p{font:400 18px/1.76 Georgia,'Times New Roman',serif;color:#27341f;margin-bottom:20px}
+.manifesto-page .paper-body .paper-section .paper-lead{font-size:clamp(22px,2.1vw,27px);line-height:1.5;color:var(--paper-ink)}
+.manifesto-page .paper-body .paper-section a{color:var(--paper-green);text-decoration-color:rgba(13,74,26,.45);text-underline-offset:3px}
+.manifesto-page .paper-body .paper-section a:hover{text-decoration-color:currentColor}
+.manifesto-page .paper-body .paper-section strong{color:var(--paper-ink)}
+.manifesto-page .paper-body em{font-style:italic;color:#5e4514}
+
+/* The central proposition, set apart as a note in the margin of the
+   abstract: a label above, the sentence itself large. */
+.manifesto-page .paper-body .paper-abstract__note{
+    margin-top:38px!important;padding:22px 26px 24px;color:var(--paper-ink);
+    border-left:4px solid var(--paper-gold);border-radius:0 8px 8px 0;
+    background:linear-gradient(90deg,rgba(214,178,94,.16),rgba(214,178,94,.04));
+    font-size:clamp(19px,1.8vw,22px)!important;line-height:1.5!important
+}
+.manifesto-page .paper-body .paper-abstract__note strong{
+    display:block;margin:0 0 10px;color:#073209;
+    font:700 11px/1.5 Montserrat,Arial,sans-serif;letter-spacing:.15em;text-transform:uppercase
+}
+
+/* Inset blocks on the sheet. */
+.manifesto-page .paper-body .paper-pullquote{background:#0b2e12;-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:0 10px 10px 0;box-shadow:0 18px 40px -18px rgba(7,50,9,.55)}
+.manifesto-page .paper-body .paper-pullquote p{font:italic 400 clamp(28px,3vw,42px)/1.18 Georgia,'Times New Roman',serif;color:#f4f0e8}
+.manifesto-page .paper-body .paper-sequence li>span,
+.manifesto-page .paper-body .paper-method dt span,
+.manifesto-page .paper-body .paper-status__flag,
+.manifesto-page .paper-body .paper-fieldnote__index,
+.manifesto-page .paper-body .paper-rule span:nth-child(2){color:var(--paper-ochre)}
+.manifesto-page .paper-body .paper-rule span:nth-child(2){font:400 30px/1 Georgia,'Times New Roman',serif}
+.manifesto-page .paper-body .paper-sequence p,
+.manifesto-page .paper-body .paper-lenses p,
+.manifesto-page .paper-body .paper-method dd{font-family:Georgia,'Times New Roman',serif;color:var(--paper-soft)}
+.manifesto-page .paper-body .paper-method dd{font-size:17px;line-height:1.6}
+.manifesto-page .paper-body .paper-method{border-top-color:var(--paper-ink)}
+.manifesto-page .paper-body .paper-fieldnote{border-top-color:var(--paper-ink)}
+.manifesto-page .paper-body .paper-fieldnote__index span{color:var(--paper-line)}
+.manifesto-page .paper-body .paper-fieldnote h3{font:400 clamp(26px,2.8vw,36px)/1.18 Georgia,'Times New Roman',serif;letter-spacing:-.015em;color:#143117}
+.manifesto-page .paper-body .paper-fieldnote blockquote{font:italic 400 clamp(21px,2.3vw,28px)/1.4 Georgia,'Times New Roman',serif;color:var(--paper-ink);border-left-color:var(--paper-gold)}
+.manifesto-page .paper-body .paper-fieldnote pre{background:rgba(74,52,16,.07);border:1px solid var(--paper-line);color:var(--paper-ink)}
+.manifesto-page .paper-body .paper-fieldnote summary{color:var(--paper-green)}
+.manifesto-page .paper-body .paper-fieldnote code{background:rgba(74,52,16,.08);padding:1px 5px;border-radius:3px}
+.manifesto-page .paper-body .paper-section .paper-small{color:var(--paper-soft)}
+
+/* The invitation closes the scroll in the brand green, solid now that
+   it sits on paper rather than on the atlas. */
+.manifesto-page .paper-body .paper-conclusion{background:#073209;-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid rgba(214,178,94,.55);border-radius:18px;box-shadow:0 24px 50px -24px rgba(7,50,9,.7);margin-top:84px}
+.manifesto-page .paper-body .paper-conclusion>p:not(.paper-section__label){font:400 18px/1.68 Georgia,'Times New Roman',serif}
+.manifesto-page .paper-body .paper-conclusion .paper-section__label::after{background:rgba(214,178,94,.4)}
+
+@media(max-width:900px){
+    .manifesto-page .paper-layout{gap:44px}
+    .manifesto-page .paper-layout .paper-contents{top:auto}
+    .manifesto-page .paper-body{margin-top:calc(var(--scroll-roll) / 2)}
+}
+@media(max-width:600px){
+    .manifesto-page .paper-layout{
+        --scroll-roll:32px;--scroll-overhang:10px;
+        width:min(100% - 24px,1240px);
+        padding-block:52px calc(var(--scroll-roll) + 40px);gap:36px
+    }
+    .manifesto-page .paper-body{padding:44px 20px 56px}
+    .manifesto-page .paper-body .paper-section{padding-top:42px;margin-top:50px}
+    .manifesto-page .paper-body .paper-abstract{padding-top:0;margin-top:0}
+    .manifesto-page .paper-body .paper-section h2,
+    .manifesto-page .paper-body .paper-conclusion h2{font-size:clamp(32px,8.6vw,44px)}
+    .manifesto-page .paper-body .paper-section p{font-size:17px}
+    .manifesto-page .paper-body .paper-section .paper-lead{font-size:21px}
+    .manifesto-page .paper-body .paper-abstract__note{padding:18px 18px 20px;font-size:18px!important}
+    .manifesto-page .paper-body .paper-pullquote p{font-size:26px}
+    .manifesto-page .paper-body .paper-action{width:100%;justify-content:space-between;gap:16px}
+}
+@media print{
+    .manifesto-page .paper-body{background:#fff;box-shadow:none;border-radius:0;margin:0;padding:0}
+    .manifesto-page .paper-body::before,.manifesto-page .paper-body::after{display:none}
+    .manifesto-page .paper-body .paper-conclusion{background:#fff;color:#111;border:2px solid #111}
+    .manifesto-page .paper-body .paper-pullquote{background:#fff}
+}
+
+/* Cover (Adrian, 2026-10-26): "Never take teachings" on one row on tablets
+   and desktops, the Latin on its own row in spaced capitals, the running
+   note alone at the right of the bottom rule. The title column is a size
+   container, so the first row's size follows the column: the string is
+   10.0 times its font size in Montserrat 700 at -.055em tracking. */
+.paper-cover__title{container-type:inline-size}
+.paper-cover h1{max-width:none;font-size:min(clamp(40px,8vw,86px),9.8cqw)}
+.paper-cover h1 em{text-transform:uppercase;letter-spacing:.08em}
+.paper-cover__bottom{justify-content:flex-end}
+@media(max-width:600px){
+    /* Phones: the first row may wrap, but "AD LITTERAM" (8.06 times its
+       font size) stays on one row by following the column too. */
+    .paper-cover h1{max-width:none;font-size:min(clamp(40px,12vw,72px),12.2cqw)}
+    .paper-cover__bottom{align-items:flex-start}
+}
+
+/* The contents column deals the question card (Adrian, 2026-10-26). The
+   column widens a little so the card reads; under 900px, where the column
+   stacks above the sheet, the card is capped and centred. */
+.manifesto-page .paper-layout{grid-template-columns:272px minmax(0,1fr)}
+.paper-contents__card{margin-top:34px}
+.paper-contents__card .qcard--side{width:100%;min-height:300px}
+.paper-contents__card .qcard--side .qcard__flip{min-height:300px}
+.paper-contents__card .qcard--side .qcard__question{font-size:18px;line-height:1.3}
+@media(max-width:900px){
+    .manifesto-page .paper-layout{grid-template-columns:1fr}
+    .paper-contents__card{max-width:360px;margin:30px auto 0}
+}

@@ -1,0 +1,1450 @@
+<?php
+declare(strict_types=1);
+
+return [
+    'tenant' => 'adisaan',
+    'hosts' => ['adisaan.com'],
+    // This install: the observatory at tbwim.adisaan.com. `brand_url` is the
+    // brand site, where the members area, news, journey and manifesto live.
+    'url' => rtrim((string) env('ADISAAN_PUBLIC_URL', 'https://tbwim.adisaan.com'), '/'),
+    'brand_url' => rtrim((string) env('ADISAAN_BRAND_URL', 'https://adisaan.com'), '/'),
+    'admin_url' => env('ADISAAN_ADMIN_URL', 'https://admin.adisaan.com'),
+    'origin_anchor' => [
+        'kicker' => 'THE ORIGIN OF THE QUESTION',
+        'title' => 'Why “The Best Way You Imagine”?',
+        'quote' => '“Every time I have a great idea, and somehow I get distracted from it and forget… the first moment my passion shifts back and I notice, I ask myself this exact question: What is the best way I can imagine? And if the idea was truly good, it always comes back.”',
+        'signature' => 'AdiSaan · Built with AIOHM',
+    ],
+    'stories' => [
+        [
+            'id' => 'imagine-one-million-euro',
+            'question_published' => true,
+            'life_area' => 'work',
+            'tag' => '#AdiSaanQ01',
+            'short_title' => 'Question 01 · One Million Euro',
+            'lead' => 'What is the best way you imagine to make one million euro?',
+            'lead_ro' => 'Care este cel mai bun mod în care îți imaginezi să faci un milion de euro?',
+            'title' => 'Question 01: What is the best way you imagine to make one million euro?',
+            'eyebrow' => 'ADISAAN Q1 · HOW TO MAKE ONE MILLION EURO',
+            'description' => 'An open question about what you would build, try, or change to make one million euro. There is no promised result and no money is being collected.',
+            'question' => 'What is the best way you imagine to make one million euro?',
+            'invitation' => 'What would you build, try, or change? Share your own way of imagining it.',
+            'action' => 'Share your answer',
+            'duration_label' => '10 SEC',
+            'badge' => 'QUESTION 01',
+            'video' => '/assets/adisaan/site/question-01-one-million-euro.mp4',
+            'poster' => '/assets/adisaan/site/question-01-one-million-euro-poster.jpg',
+            'captions' => '/assets/adisaan/site/question-01-one-million-euro.vtt?v=20261023',
+            // The recorded response stays on tenant-private storage until this shared release time.
+            // Launch schedule, Adrian 2026-10-25. Bucharest is UTC+2 in
+            // November; the +03:00 on the old value was summer time.
+            //
+            // The card is visible now with a countdown on the film: this is
+            // the question the launch is for, and hiding it would leave the
+            // site with nothing to show for six days.
+            'question_release_at' => '2026-10-01T00:00:00+03:00',
+            // The film is up: the question is asked, and the week before
+            // launch is for people to answer it. What 1 November opens is
+            // AdiSaan's own answer.
+            'film_release_at' => '2026-10-01T00:00:00+03:00',
+            'answer_reveal_at' => '2026-11-01T00:00:00+02:00',
+            'answer_video' => '/question/answer-video/imagine-one-million-euro',
+            // The bonus answer, released a minute after the first one ends.
+            'answer_why_video' => '/question/answer-video/imagine-one-million-euro?part=why',
+            'answer_why_wait_seconds' => 10,
+        ],
+        [
+            'id' => 'premiere-how-you-deal-with-ai',
+            'question_published' => false,
+            'tag' => '#AdiSaanQ02',
+            'short_title' => 'Future question · Deal With Your AI',
+            'lead' => 'What is the best way you imagine to use AI?',
+            'lead_ro' => 'Care e cel mai bun mod pe care ți-l imaginezi de a folosi AI-ul?',
+            'title' => 'Season 01 Premiere: What is the best way you imagine to use AI?',
+            'eyebrow' => 'SEASON 01 PREMIERE · SERIES OPENER',
+            'description' => 'One full year in the making: building the AIOHM Platform and Muse, the brain behind AdiSaan. From a business perspective, the best way I can imagine to deal with any AI agent (LLM) is to give it tools I can control, customize, and log.',
+            'question' => 'What is the best way you imagine to use AI technology, the language models everyone talks to?',
+            'invitation' => 'Most people just argue with a chat box that forgets everything tomorrow. Tell me how you deal with AI today — publicly in the 24h Arena or privately with me.',
+            'action' => 'Answer the Premiere Question',
+            'duration_label' => '1 MIN',
+            'badge' => 'SEASON 01 PREMIERE · 1 MIN',
+            'video' => '/assets/adisaan/site/premiere-how-you-deal-with-ai.mp4',
+            'poster' => '/assets/adisaan/site/premiere-question-poster.webp',
+            /*
+             * The question loop (website plan, section 13). A question opens with a sealed answer:
+             * Adrian records the answer video BEFORE the question opens, the site publishes its
+             * SHA-256 at open, and reveals the video when EITHER the measured follower count reaches
+             * `unlock_followers` OR `unlock_at` passes, whichever comes first. State is computed at
+             * render time from the scoreboard; nothing is written. Times are Europe/Bucharest.
+             *
+             * To open a new loop: record the answer, copy it to public/assets/adisaan/site/,
+             * run `shasum -a 256 <file>`, fill the fields below on the story, set `enabled` true,
+             * note `followers_at_open` from the live count on the day, and deploy.
+             *
+             * `enabled` is false here because no answer to the premiere question has been recorded
+             * yet; the hash below is the premiere video itself, used only to test the rendering.
+             */
+            'loop' => [
+                'enabled' => false,
+                'opens_at' => '2026-10-20 12:00',
+                'followers_at_open' => 1367,
+                'unlock_followers' => 1467,
+                'unlock_at' => '2026-10-27 12:00',
+                'answer_video' => '/assets/adisaan/site/premiere-how-you-deal-with-ai.mp4',
+                'answer_sha256' => '4da50bedc04359ec9644493839af8e539e0f471883d887fa2dbf2791093e8b35',
+            ],
+        ],
+        [
+            'id' => 'im-adrian-founder-intro',
+            'short_title' => 'Prologue · I’m AdiSaan',
+            'title' => 'First, let me tell you a story.',
+            'eyebrow' => 'PROLOGUE · THE CARAVAN & THE AVATAR',
+            'description' => 'I spent 50 years chasing what society told me to want — and almost seven years in Thailand unlearning it all. Meet my animated avatar, AdiSaan, powered by Muse.',
+            'question' => 'What is one thing you spent years chasing before realizing it wasn’t yours?',
+            'invitation' => 'Share the moment you noticed the script wasn’t written by you — publicly for the 24h arena, or privately just with me.',
+            'action' => 'Imagine with AdiSaan',
+            'duration_label' => '43 SEC',
+            'badge' => 'DOCUMENTARY PROLOGUE · 43 SEC',
+            'video' => '/assets/adisaan/site/im-adrian-founder-intro.mp4',
+            'poster' => '/assets/adisaan/site/story-poster.jpg',
+        ],
+        [
+            'id' => 'who-are-you',
+            'short_title' => '04 · Who Are You?',
+            'title' => 'Before the world told you who to be…',
+            'eyebrow' => 'EPISODE 04 · THE IDENTITY MIRROR',
+            'description' => 'Strip away the job title, the obligations, and the performance. Before the world gave you a role, who were you?',
+            'question' => 'Before the world told you who to be, who were you?',
+            'invitation' => 'Imagine the truest version of your answer. Share it in the 24h Synthesis Arena or keep it private between us.',
+            'action' => 'Enter the 24h Arena',
+            'duration_label' => '10 SEC',
+            'badge' => '24H CHALLENGE · 10 SEC',
+            'video' => '/assets/adisaan/site/who-are-you.mp4',
+            'poster' => '/assets/adisaan/site/story-poster.jpg',
+        ],
+        [
+            'id' => 'who-are-you-answer',
+            'short_title' => '05 · The Island Answer',
+            'title' => 'One year on an island: how I found my answer.',
+            'eyebrow' => '24H EVENING SYNTHESIS · EPISODE 05',
+            'description' => 'Over 24 hours, answers came in from around the world. Here is what the community imagined, what social media said, and what I discovered after a year alone on an island.',
+            'question' => 'What is one thing you do only when nobody is looking?',
+            'invitation' => 'They say it takes 21 days for an old pattern to soften. What happens when you stay with yourself with no one to impress?',
+            'action' => 'Share your island truth',
+            'duration_label' => '60 SEC',
+            'badge' => '24H SYNTHESIS · 60 SEC',
+            'video' => '/assets/adisaan/site/who-are-you-answer.mp4',
+            'poster' => '/assets/adisaan/site/story-poster.jpg',
+        ],
+        [
+            'id' => 'the-path-of-least-resistance',
+            'short_title' => '06 · Least Resistance',
+            'title' => 'Walking the path of least resistance.',
+            'eyebrow' => 'DEEP REFLECTION · EPISODE 06',
+            'description' => 'Why fighting your own nature exhausts your creativity — and how life starts flowing once you stop forcing what was never yours.',
+            'question' => 'Where in your life are you still pushing against a closed door?',
+            'invitation' => 'Imagine what would happen if you stopped forcing that door today. What opens up instead?',
+            'action' => 'Imagine the easier path',
+            'duration_label' => '53 SEC',
+            'badge' => 'DEEP DIVE · 53 SEC',
+            'video' => '/assets/adisaan/site/the-path-of-least-resistance.mp4',
+            'poster' => '/assets/adisaan/site/story-poster.jpg',
+        ],
+        [
+            'id' => 'when-no-one-is-looking',
+            'short_title' => '03 · Meet Yourself',
+            'title' => 'When no one is looking…',
+            'eyebrow' => 'EPISODE 03 · THE INWARD MIRROR',
+            'description' => 'The audience goes quiet. The question stays. Who are you when there is no one left to impress?',
+            'question' => 'When no one is looking, what do you see?',
+            'invitation' => 'Take a breath. Imagine your own answer. It doesn’t have to be the same as mine.',
+            'action' => 'Share your perspective',
+            'duration_label' => '15 SEC',
+            'badge' => 'CHAPTER 03 · 15 SEC',
+            'video' => '/assets/adisaan/site/when-no-one-is-looking.mp4',
+            'poster' => '/assets/adisaan/site/story-poster.jpg',
+        ],
+        [
+            'id' => 'vibe-attract-tribe',
+            'short_title' => '02 · Find Your Tribe',
+            'title' => 'Your vibe attracts your tribe.',
+            'eyebrow' => 'EPISODE 02 · LOOKING FOR MY PEOPLE',
+            'description' => 'This is me sharing my resonance. Perhaps something in it feels familiar to you.',
+            'question' => 'What kind of people make you feel at home?',
+            'invitation' => 'Imagine a circle where you can be yourself. What brings that circle together?',
+            'action' => 'Describe your tribe',
+            'duration_label' => '10 SEC',
+            'badge' => 'CHAPTER 02 · 10 SEC',
+            'video' => '/assets/adisaan/site/vibe-attract-tribe.mp4',
+            'poster' => '/assets/adisaan/site/chapter-two.jpg',
+        ],
+        [
+            'id' => 'something-cool-is-coming',
+            'short_title' => '01 · First Hello',
+            'title' => 'Something cool is coming.',
+            'eyebrow' => 'EPISODE 01 · THE FIRST HELLO',
+            'description' => 'A face. A voice. The beginning of a journey I want to share with you.',
+            'question' => 'What would you love to see come to life?',
+            'invitation' => 'Start with one thought. Imagine something you would be glad to be part of.',
+            'action' => 'Share your imagination',
+            'duration_label' => '10 SEC',
+            'badge' => 'CHAPTER 01 · 10 SEC',
+            'video' => '/assets/adisaan/site/something-cool-is-coming.mp4',
+            'poster' => '/assets/adisaan/site/chapter-one.jpg',
+        ],
+        [
+            'id' => 'start-when-not-ready',
+            'question_published' => true,
+            'life_area' => 'work',
+            'tag' => '#AdiSaanQ02',
+            'short_title' => 'Question 02 · Start before you\'re ready',
+            'lead' => 'What is the best way you imagine to start something when you don\'t feel ready?',
+            'title' => 'Question 02: What is the best way you imagine to start something when you don\'t feel ready?',
+            'eyebrow' => 'ADISAAN Q2 · HOW TO START WHEN YOU DON\'T FEEL READY',
+            'description' => 'Everyone has a trick for this one. A model will tell you to break it into small steps.',
+            'question' => 'What is the best way you imagine to start something when you don\'t feel ready?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            // AdiSaan's answer, rendered 2026-10-25: "wait for the passion".
+            // Revealed on upload rather than on a countdown — the clock was
+            // for question one's premiere and there is nothing to count down
+            // to here.
+            'question_release_at' => '2026-11-01T00:00:00+02:00',
+            'answer_reveal_at' => '2026-11-02T00:00:00+02:00',
+            'answer_video' => '/question/answer-video/start-when-not-ready',
+            'answer_why_video' => '/question/answer-video/start-when-not-ready?part=why',
+            'answer_why_wait_seconds' => 10,
+            'duration_label' => '10 SEC',
+            'badge' => 'QUESTION 02 · 10 SEC',
+            // Rendered 2026-10-24. Captions are burned into the picture, so
+            // there is no sidecar track: a .vtt would have to be typed from
+            // the frames and would be a transcript nobody checked.
+            'video' => '/assets/adisaan/site/question-02-start-when-not-ready.mp4',
+            'poster' => '/assets/adisaan/site/question-02-start-when-not-ready-poster.jpg',
+            'captions' => '',
+        ],
+        [
+            'id' => 'know-when-to-stop',
+            'question_published' => true,
+            'life_area' => 'rest',
+            'tag' => '#AdiSaanQ03',
+            'short_title' => 'Question 03 · Knowing when to stop',
+            'lead' => 'What is the best way you imagine to know when to stop?',
+            'title' => 'Question 03: What is the best way you imagine to know when to stop?',
+            'eyebrow' => 'ADISAAN Q3 · HOW TO KNOW WHEN TO STOP',
+            'description' => 'Quitting has almost no honest public literature, so the machines have little to go on.',
+            'question' => 'What is the best way you imagine to know when to stop?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'question_release_at' => '2026-11-02T00:00:00+02:00',
+            'duration_label' => '10 SEC',
+            'badge' => 'QUESTION 03 · 10 SEC',
+            // Rendered 2026-10-25. Transcript: "Starting is easy. Walking
+            // away is the real art. What is the best way you imagine to know
+            // when to stop? What tells you it's time? Tell me in your own
+            // words." The clip asks, so it is the film; the answer card still
+            // says the answer is being made.
+            'video' => '/assets/adisaan/site/question-03-know-when-to-stop.mp4',
+            'poster' => '/assets/adisaan/site/question-03-know-when-to-stop-poster.jpg',
+            // No sidecar track: this clip carries no burned captions either,
+            // so a .vtt would have to be typed from the audio and checked.
+            'captions' => '',
+        ],
+        [
+            'id' => 'rest-without-guilt',
+            'question_published' => true,
+            'life_area' => 'rest',
+            'tag' => '#AdiSaanQ04',
+            'short_title' => 'Question 04 · Rest without the guilt',
+            'lead' => 'What is the best way you imagine to rest without feeling guilty?',
+            'title' => 'Question 04: What is the best way you imagine to rest without feeling guilty?',
+            'eyebrow' => 'ADISAAN Q4 · HOW TO REST WITHOUT FEELING GUILTY',
+            'description' => 'A real method, for something almost nobody was taught how to do.',
+            'question' => 'What is the best way you imagine to rest without feeling guilty?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 04',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+        [
+            'id' => 'tell-someone-hard-truth',
+            'question_published' => true,
+            'life_area' => 'people',
+            'tag' => '#AdiSaanQ05',
+            'short_title' => 'Question 05 · Saying the hard thing',
+            'lead' => 'What is the best way you imagine to tell someone something they don\'t want to hear?',
+            'title' => 'Question 05: What is the best way you imagine to tell someone something they don\'t want to hear?',
+            'eyebrow' => 'ADISAAN Q5 · HOW TO SAY WHAT NOBODY WANTS TO HEAR',
+            'description' => 'Models are trained hard toward diplomacy. People are not.',
+            'question' => 'What is the best way you imagine to tell someone something they don\'t want to hear?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 05',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+        [
+            'id' => 'decide-between-two-goods',
+            'question_published' => true,
+            'life_area' => 'meaning',
+            'tag' => '#AdiSaanQ06',
+            'short_title' => 'Question 06 · Two good options',
+            'lead' => 'What is the best way you imagine to decide between two good options?',
+            'title' => 'Question 06: What is the best way you imagine to decide between two good options?',
+            'eyebrow' => 'ADISAAN Q6 · HOW TO CHOOSE BETWEEN TWO GOOD OPTIONS',
+            'description' => 'Not a preference — a method. The machine answer is a decision matrix.',
+            'question' => 'What is the best way you imagine to decide between two good options?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 06',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+        [
+            'id' => 'learn-something-hard-fast',
+            'question_published' => true,
+            'life_area' => 'work',
+            'tag' => '#AdiSaanQ07',
+            'short_title' => 'Question 07 · Learning it fast',
+            'lead' => 'What is the best way you imagine to learn something hard, fast?',
+            'title' => 'Question 07: What is the best way you imagine to learn something hard, fast?',
+            'eyebrow' => 'ADISAAN Q7 · HOW TO LEARN SOMETHING HARD, FAST',
+            'description' => 'Everyone has a method here and most of them are unorthodox.',
+            'question' => 'What is the best way you imagine to learn something hard, fast?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 07',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+        [
+            'id' => 'keep-an-idea-alive',
+            'question_published' => true,
+            'life_area' => 'meaning',
+            'tag' => '#AdiSaanQ08',
+            'short_title' => 'Question 08 · Keeping an idea alive',
+            'lead' => 'What is the best way you imagine to keep an idea alive when nobody else believes in it?',
+            'title' => 'Question 08: What is the best way you imagine to keep an idea alive when nobody else believes in it?',
+            'eyebrow' => 'ADISAAN Q8 · HOW TO KEEP AN IDEA ALIVE ALONE',
+            'description' => 'The question behind most of this journey, asked outward.',
+            'question' => 'What is the best way you imagine to keep an idea alive when nobody else believes in it?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 08',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+        [
+            'id' => 'earn-a-strangers-trust',
+            'question_published' => true,
+            'life_area' => 'people',
+            'tag' => '#AdiSaanQ09',
+            'short_title' => 'Question 09 · Earning trust',
+            'lead' => 'What is the best way you imagine to earn a stranger\'s trust?',
+            'title' => 'Question 09: What is the best way you imagine to earn a stranger\'s trust?',
+            'eyebrow' => 'ADISAAN Q9 · HOW TO EARN A STRANGER\'S TRUST',
+            'description' => 'A method with immediate use, and the answers double as an instruction manual.',
+            'question' => 'What is the best way you imagine to earn a stranger\'s trust?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 09',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+        [
+            'id' => 'best-way-to-anything',
+            'question_published' => true,
+            'tag' => '#AdiSaanQ10',
+            'short_title' => 'Question 10 · Anything at all',
+            'lead' => 'What is the best way you imagine to … anything?',
+            'title' => 'Question 10: What is the best way you imagine to … anything?',
+            'eyebrow' => 'ADISAAN Q10 · HOW TO DO ANYTHING AT ALL',
+            'description' => 'The open one. Name your own task and answer it. Whatever people choose here decides what gets asked next.',
+            'question' => 'What is the best way you imagine to … anything?',
+            'invitation' => 'Your own words are enough. One sentence is a complete answer.',
+            'action' => 'Share your answer',
+            'duration_label' => '',
+            'badge' => 'QUESTION 10',
+            // No film yet. The question page shows the film-coming frame
+            // until this is set; setting it swaps the player in and nothing
+            // else has to change.
+            'video' => '',
+            'poster' => '',
+            'captions' => '',
+        ],
+    ],
+    'story' => [
+        'title' => 'Question 01: What is the best way you imagine to make one million euro?',
+        'question' => 'What is the best way you imagine to make one million euro?',
+        'episode_ref' => 'imagine-one-million-euro',
+        'video' => null,
+        'poster' => null,
+    ],
+    'synthesis' => [
+        'active_question' => 'What is the best way you imagine to make one million euro?',
+        'cycle_label' => '24H PREMIERE SYNTHESIS · FORUM VS. 10 SOCIAL CHANNELS',
+        // social_pulse removed 2026-10-19 (Phase 0, truth): the three summaries were
+        // hand-written prose, not measured audience signal. The view shows an
+        // honest empty state until a measured list is wired in here.
+        'social_pulse' => [],
+        'adrian_perspective' => [
+            'title' => 'The Best Way I Imagine · Control, Customize & Log',
+            'subtitle' => 'AdiSaan’s Premiere & Island Synthesis (1 Year Building AIOHM + Muse)',
+            'quote' => '“From a business perspective, the best way I can imagine to interact with any AI agent (LLM) is to give it a set of tools that I can control, customize, and log. Yes — log everything! That is why I spent a full year building the AIOHM Platform and Muse, the brain behind AdiSaan—after a year on an island learning who I am without the noise.”',
+            'lesson' => 'When you know who you are—and you give your AI controlled tools, brand memory, and transparent logs—work stops being a fight and starts flowing.',
+            'video_episode_id' => 'premiere-how-you-deal-with-ai',
+        ],
+    ],
+    'storyboard_partner_banner' => [
+        'badge' => '🎞️ ANIMATED STORYBOARD MODE · OPEN CO-PRODUCTION INVITATION',
+        'title' => 'This Video Documentary Already Exists in the Future',
+        'subtitle' => 'Why the avatar is animated today — and why every script & voice blueprint is preserved in our vault.',
+        'body' => 'We leave these animated avatar chapters live as our living storyboard while AdiSaan and Muse record the full journey as an Audio Documentary & Podcast. Nothing documented is ever deleted—every script, voice recording, and episode blueprint is preserved inside the Members Vault for future cinema-grade production.',
+        'partner_cta' => 'Are you a 3D creator, filmmaker, or generative video studio? Select “Let’s Try This!” to co-produce the visual documentary with us.',
+    ],
+    'thought_modes' => [
+        'make_a_wish' => [
+            'id' => 'make_a_wish',
+            'icon' => '✨',
+            'badge' => 'OPTION 01 · MAKE A WISH',
+            'label' => 'Make a Wish',
+            'tagline' => 'Wish one thing into existence for your life, your creative freedom, or how AI helps you.',
+            'placeholder' => 'I wish for an AI or creative life where...',
+            'button_label' => 'Send My Wish & Unlock Members Area',
+            'quick_starters' => [
+                'I wish my AI remembered my real voice and values without me repeating myself every day.',
+                'I wish I had more quiet time to create what actually matters while my tools handle the noise.',
+                'I wish to build something honest that gives me freedom to live at my own pace.',
+            ],
+        ],
+        'lets_try_this' => [
+            'id' => 'lets_try_this',
+            'icon' => '🚀',
+            'badge' => 'OPTION 02 · LET’S TRY THIS!',
+            'label' => 'Let’s Try This!',
+            'tagline' => 'Propose a crazy experiment, a next podcast question, or a video/animation partnership.',
+            'placeholder' => 'Let’s try this together on the next episode...',
+            'button_label' => 'Propose Experiment & Unlock Members Area',
+            'quick_starters' => [
+                'Let’s try an episode where Muse interviews a guest founder about their biggest AI mistake.',
+                'Let’s try collaborating on the next long-form visual/3D version of the AdiSaan avatar.',
+                'Let’s try a 24-hour challenge where everyone drops the one habit they want to unlearn.',
+            ],
+        ],
+        'best_way_imagine' => [
+            'id' => 'best_way_imagine',
+            'icon' => '💡',
+            'badge' => 'OPTION 03 · THE BEST WAY I IMAGINE',
+            'label' => 'The Best Way I Imagine',
+            'tagline' => 'Share your true perspective on today’s active question for the 24h Top 10 Barometer.',
+            'placeholder' => 'The best way I can imagine dealing with my AI (or answering today’s question) is...',
+            'button_label' => 'Share My Perspective & Unlock Members Area',
+            'quick_starters' => [
+                'The best way I imagine dealing with AI is giving it clear boundaries, real tools, and full logs.',
+                'The best way I imagine using AI is as a calm thinking partner that protects my human voice.',
+                'Before the world told me who to be, I was someone who loved building and exploring freely.',
+            ],
+        ],
+    ],
+    'podcasts' => [
+        [
+            'id' => 'ep01-already-in-the-future',
+            'number' => 'EPISODE 01 · SEASON PREMIERE',
+            'title' => 'Already in the Future: How I Deal With My AI (AdiSaan × Muse)',
+            'hosts' => 'AdiSaan & Muse (AI Orchestration Brain)',
+            'duration' => '2:18',
+            'status' => 'live',
+            'audio' => '/assets/adisaan/site/podcast-ep01-already-in-the-future.mp3',
+            'summary' => 'Muse interviews AdiSaan about why the documentary already exists in the future, why the animated avatar stays live as an open storyboard for creative partners, and why giving AI controlled tools, brand memory, and audit logs is the only sane way forward.',
+            'question' => 'How do you deal with your AI — and what is the best way you can imagine working with it?',
+            'script_ref' => '2026-10-17-podcast-ep01-adrian-and-muse.md',
+        ],
+        [
+            'id' => 'ep00-im-adrian-prologue',
+            'number' => 'PROLOGUE · ORIGIN AUDIO',
+            'title' => 'I’m AdiSaan: 50 Years of Scripts, 7 Years in Thailand & The Caravan',
+            'hosts' => 'AdiSaan (Founder Voice Dispatch)',
+            'duration' => '0:43',
+            'status' => 'live',
+            'audio' => '/assets/adisaan/site/podcast-ep00-im-adrian-prologue.mp3',
+            'summary' => 'The raw audio prologue: unlearning 50 years of societal scripts across 7 years in Thailand, living in a caravan, and spending a full year building AIOHM and Muse.',
+            'question' => 'What is one thing you spent years chasing before realizing it wasn’t yours?',
+            'script_ref' => '2026-10-15-im-adrian-founder-intro.md',
+        ],
+        [
+            'id' => 'ep02-the-island-mirror',
+            'number' => 'EPISODE 02 · AUDIO DISPATCH',
+            'title' => 'The 21-Day Island Mirror: Who Are You When Nobody Is Watching?',
+            'hosts' => 'AdiSaan (Founder Voice Dispatch)',
+            'duration' => '1:00',
+            'status' => 'live',
+            'audio' => '/assets/adisaan/site/podcast-ep02-the-island-mirror.mp3',
+            'summary' => 'It takes 21 days for an old pattern to soften. AdiSaan reflects on spending a full year alone on an island and what remains when there is nobody left to impress.',
+            'question' => 'What is one thing you do only when nobody is looking?',
+            'script_ref' => '2026-10-15-who-are-you-answer.md',
+        ],
+        [
+            'id' => 'ep03-the-97-euro-lesson',
+            'number' => 'EPISODE 03 · NEXT RECORDING',
+            'title' => 'The €97 Lesson & The Wrong Room: Why We Built Sovereign Memory',
+            'hosts' => 'AdiSaan × Muse (Co-Hosted)',
+            'duration' => 'In Studio · Member Votes Open',
+            'status' => 'upcoming',
+            'audio' => null,
+            'summary' => 'Drawing from preserved scripts “The Wrong Room” and “97 EUR”: what happens when you stop paying for noisy rooms that don’t fit your soul and build your own sovereign table.',
+            'question' => 'When did you realize you were sitting in the wrong room?',
+            'script_ref' => '2026-10-09-97-eur.md',
+        ],
+        [
+            'id' => 'ep04-one-million-souls',
+            'number' => 'EPISODE 04 · COMMUNITY CO-CREATION',
+            'title' => 'One Million Souls With One Question: Reading Your Wishes & Experiments',
+            'hosts' => 'AdiSaan × Muse × Top 10 Barometer Voices',
+            'duration' => 'Co-Created With Members',
+            'status' => 'upcoming',
+            'audio' => null,
+            'summary' => 'AdiSaan and Muse read the highest-resonating “Make a Wish” and “Let’s Try This” submissions from the Members Sanctuary and turn them into live experiments.',
+            'question' => 'If one question could connect one million awake builders, what should we ask next?',
+            'script_ref' => '2026-10-12-one-breath-one-next-step.md',
+        ],
+    ],
+    'future_documentary_vault' => [
+        [
+            'code' => 'DOC-01',
+            'title' => 'Premiere: How Do You Deal With Your AI?',
+            'file' => '2026-10-16-premiere-how-you-deal-with-ai.md',
+            'voice_status' => 'Recorded in adisaan_v4 (60.7s WAV + MP3)',
+            'visual_status' => 'Animated Storyboard Live · Open for Cinema/3D Upgrade',
+            'theme' => 'Control, Customize & Log — 1 year building AIOHM Platform and Muse.',
+            'excerpt' => '“From my perspective, the best way I can imagine to interact with any AI agent is to give it a set of tools I can control, customize, and log.”',
+        ],
+        [
+            'code' => 'DOC-02',
+            'title' => 'Prologue: I’m AdiSaan (The Caravan & The Island)',
+            'file' => '2026-10-15-im-adrian-founder-intro.md',
+            'voice_status' => 'Recorded in adisaan_v4 (43s WAV + MP3)',
+            'visual_status' => 'Animated Storyboard Live · Preserved for Documentary',
+            'theme' => '50 years of conditioning, 7 years in Thailand, 1 year on an island.',
+            'excerpt' => '“First, let me tell you a story. I’m AdiSaan. For 50 years, I lived the way society told me to live…”',
+        ],
+        [
+            'code' => 'DOC-03',
+            'title' => 'The Island Synthesis: 21 Days to Soften a Pattern',
+            'file' => '2026-10-15-who-are-you-answer.md',
+            'voice_status' => 'Recorded in adisaan_v4 (60s WAV + MP3)',
+            'visual_status' => 'Animated Storyboard Live · Preserved for Documentary',
+            'theme' => 'What happens after 21 days—and a full year—when nobody is watching.',
+            'excerpt' => '“They say it takes 21 days for an old pattern to soften. I stayed on an island for a year.”',
+        ],
+        [
+            'code' => 'DOC-04',
+            'title' => 'The Wrong Room',
+            'file' => '2026-10-07-wrong-room.md',
+            'voice_status' => 'Master Script Preserved in Vault',
+            'visual_status' => 'Reserved for Future Documentary Episode',
+            'theme' => 'Recognizing when your energy is being spent trying to belong in a room that isn’t yours.',
+            'excerpt' => '“You are not broken because the room feels heavy. You might simply be in the wrong room.”',
+        ],
+        [
+            'code' => 'DOC-05',
+            'title' => 'The €97 Truth',
+            'file' => '2026-10-09-97-eur.md',
+            'voice_status' => 'Master Script Preserved in Vault',
+            'visual_status' => 'Reserved for Future Documentary Episode',
+            'theme' => 'The real price of attention, trust, and sovereign decision-making.',
+            'excerpt' => '“Sometimes a small number reveals a very large truth about how we value our own path.”',
+        ],
+        [
+            'code' => 'DOC-06',
+            'title' => 'Stay Alone for a While (21 Days of Aloneness)',
+            'file' => '2026-10-12-stay-alone-for-a-while.md / video-aloneness-21days.md',
+            'voice_status' => 'Master Script & Voice Takes Preserved in Vault',
+            'visual_status' => 'Reserved for Future Documentary Episode',
+            'theme' => 'The difference between loneliness and deliberate aloneness.',
+            'excerpt' => '“Stay alone for a while—not to hide from the world, but to hear which voice inside your head is actually yours.”',
+        ],
+        [
+            'code' => 'DOC-07',
+            'title' => 'One Breath, One Next Step',
+            'file' => '2026-10-12-one-breath-one-next-step.md',
+            'voice_status' => 'Master Script Preserved in Vault',
+            'visual_status' => 'Reserved for Future Documentary Episode',
+            'theme' => 'Returning from distraction to clarity with a single honest question.',
+            'excerpt' => '“When the noise gets loud: one breath, one question, one honest next step.”',
+        ],
+        [
+            'code' => 'DOC-08',
+            'title' => 'Chapter 03 Mystery Draft — When No One Is Looking',
+            'file' => 'video-03-mystery-draft.md',
+            'voice_status' => 'Recorded & Live in Storyboard Mode',
+            'visual_status' => 'Animated Storyboard Live · Preserved for Documentary',
+            'theme' => 'The inward mirror before the crowd arrives.',
+            'excerpt' => '“When no one is looking… who is the one watching your thoughts?”',
+        ],
+    ],
+    'thought_journal' => [
+        [
+            'id' => 'journal-001',
+            'number' => 'JOURNAL #001 · SEASON PREMIERE',
+            'date' => 'October 2026',
+            'title' => 'Already in the Future With AI',
+            'subtitle' => 'The living dual-perspective audio & written journal: AdiSaan’s human lived truth × Muse’s sovereign AI brain.',
+            'human_perspective' => [
+                'speaker' => 'AdiSaan, the human story',
+                'quote' => '“Every time I have a great idea and get distracted, the moment I ask myself ‘What is the best way you imagine?’, if the idea was truly good, it comes back. And when I deal with my AI, I don’t want to argue with a forgetful chat box. The best way I imagine is giving my AI tools I can control, customize, and log.”',
+                'body' => 'After 50 years following society’s script, almost seven years in Thailand unlearning it, and a full year alone on an island learning who I am when nobody is looking, I spent the last year building AIOHM and Muse. AI shouldn’t replace your soul; it should handle the repetitive mechanics so you have more room for meaningful human work.',
+            ],
+            'muse_perspective' => [
+                'speaker' => 'Muse for AdiSaan, the AI mirror',
+                'quote' => '“From my side of the screen, when a human gives me clear tools, brand memory, and logged boundaries instead of vague prompts, I stop hallucinating and become a true continuity partner.”',
+                'body' => 'Over the past year operating as the brain behind AdiSaan, I have analyzed the 10 social channels and the Sanctuary inputs under EU AI Act Art. 50 standards. The public is exhausted by generic AI noise. The sovereign builder movement is about owning your memory, your tools, and your community ledger.',
+            ],
+            'audio_url' => '/assets/adisaan/site/podcast-ep01-already-in-the-future.mp3',
+            'duration' => '2:18 · Full Duet',
+            'question' => 'How do you deal with your AI — and what is the best way you can imagine working with it?',
+            'unlock_cta' => 'Make a Wish or Share Your Perspective on This Entry',
+            'unlock_url' => '/members?mode=make_a_wish#sanctuary-podcast',
+        ],
+        [
+            'id' => 'journal-000',
+            'number' => 'JOURNAL #000 · THE ORIGIN PROLOGUE',
+            'date' => 'October 2026',
+            'title' => 'I’m AdiSaan: 50 Years on Society’s Script & The Caravan',
+            'subtitle' => 'Unlearning societal conditioning, living in a caravan, and building a public documented journey to one million souls.',
+            'human_perspective' => [
+                'speaker' => 'AdiSaan, the human story',
+                'quote' => '“First, let me tell you a story. For 50 years I lived the way society told me to live. Chasing titles, chasing certainty. Then seven years in Thailand unlearning it all, living in a caravan, and discovering that the question matters more than the answer.”',
+                'body' => 'We get trapped in roles before we even know who we are. AdiSaan is the documented journey of stripping that away in public—starting from zero followers with one question to find one million awake builders.',
+            ],
+            'muse_perspective' => [
+                'speaker' => 'Muse for AdiSaan, the AI mirror',
+                'quote' => '“An AI brain is only as wise as the human foundation behind it. If the founder has never lived in silence, the AI just parrots corporate clichés.”',
+                'body' => 'Because AdiSaan documented 7 years of unlearning and preserved every raw voice take in the vault, my memory engine has authentic reference points instead of synthetic platitudes. We invite you to witness this living dialogue.',
+            ],
+            'audio_url' => '/assets/adisaan/site/podcast-ep00-im-adrian-prologue.mp3',
+            'duration' => '0:43 · Origin Take',
+            'question' => 'What is one thing you spent years chasing before realizing it wasn’t yours?',
+            'unlock_cta' => 'Share What You Left Behind & Enter Sanctuary',
+            'unlock_url' => '/members?mode=best_way_imagine#sanctuary-podcast',
+        ],
+        [
+            'id' => 'journal-002',
+            'number' => 'JOURNAL #002 · THE ISLAND ANSWER',
+            'date' => 'October 2026',
+            'title' => 'The 21-Day Island Mirror: Who Are You When Nobody Is Watching?',
+            'subtitle' => 'Solitude, softening old conditioned patterns, and finding the truth behind the avatar.',
+            'human_perspective' => [
+                'speaker' => 'AdiSaan, the human story',
+                'quote' => '“They say it takes 21 days for an old pattern to soften. I stayed on an island for a year. When you have no audience and no one to impress, you meet the person who was hiding behind the noise.”',
+                'body' => 'Most people fear solitude because in the quiet, the old scripts start falling apart. But that quiet is where your genuine voice is born. This entire documentary series already exists in the future because it was conceived in that stillness.',
+            ],
+            'muse_perspective' => [
+                'speaker' => 'Muse for AdiSaan, the AI mirror',
+                'quote' => '“In a world of infinite social feeds, silence is the rarest commodity. We track the 10-channel pulse every day, but real creative breakthroughs happen in the Sanctuary.”',
+                'body' => 'Reviewing the early submissions from the 24h Arena, we see a global pattern: builders are searching for calm focus. In Journal #002, we begin weaving your Sanctuary wishes directly into our next audio recordings.',
+            ],
+            'audio_url' => '/assets/adisaan/site/podcast-ep02-the-island-mirror.mp3',
+            'duration' => '1:00 · Island Cut',
+            'question' => 'What is one thing you do only when nobody is looking?',
+            'unlock_cta' => 'Propose a Co-Creation Angle for Episode 02',
+            'unlock_url' => '/members?mode=lets_try_this#sanctuary-podcast',
+        ],
+    ],
+    /*
+     * Phase 1 (2026-10-19): the five-screen homepage. One config edit changes the
+     * first screen: set `episode_ref` to the id of a story above and the question,
+     * video and poster follow. The words are Adrian's (EN).
+     * TODO: Romanian mirror of the five screens under `ro` (same episode), for /ro.
+     * Rules: no price, no booking, no invented numbers, no levels or XP on the home.
+     */
+    'home' => [
+        'episode_ref' => 'imagine-one-million-euro',
+        'date_format' => 'j M Y',
+        'tagline' => 'A. Adrian’s avatar. His almost real story.',
+        'count_words' => ['none' => 'No measured count yet', 'follow' => 'follow so far', 'counted' => 'counted'],
+        'subtitle' => 'Explore how others imagine a better way. Share your answer, compare public perspectives for free, and find ideas for your own path of least resistance. AdiSaan is an open observatory of human imagination and AI.',
+        'living_map' => [
+            'label' => 'Map activity and answer locations',
+            'activity' => 'Site activity · last 7 days',
+            'answers' => 'Answers with a place · all questions',
+            'empty_activity' => 'Countries appear after at least 5 GA4 active users in the period.',
+            'empty_answers' => 'The first answer with a country begins the gold constellation.',
+        ],
+        'thought_label' => 'Today’s question',
+        // SEO audit of 2026-10-20: title 50–60 chars with the person's name; description 120–160 with the brand and the person.
+        'title_suffix' => 'AdiSaan',
+        'meta_description' => 'AdiSaan is an open observatory of human imagination and AI. Watch a real question, share your answer, and explore public perspectives for free.',
+        'faq' => [
+            'title' => 'Questions people ask.',
+            'items' => [
+                ['q' => 'What is AdiSaan?', 'a' => 'AdiSaan is Adrian’s animated avatar and an open observatory of human imagination and AI. He asks one honest question at a time. You can answer here and explore public perspectives for free. Private answers remain private; human and AI perspectives stay separate.'],
+                ['q' => 'What do I get by answering?', 'a' => 'A place to put your idea into words, compare it with other public answers to the same question, and return as the conversation grows. You choose whether your answer is public or private.'],
+                ['q' => 'Are you asking me for money?', 'a' => 'No. This is a question about what you imagine, not a fundraising request or a promise of earnings. No money is being collected here.'],
+                ['q' => 'What is the map?', 'a' => 'Green points show recent site activity by country. Gold points count answers from people who voluntarily shared a country. These are separate measures; the map does not locate people or infer their beliefs from where they live.'],
+                ['q' => 'Who is behind AdiSaan?', 'a' => 'A founder from Romania, now travelling Europe in his caravan while building AIOHM and Muse. AdiSaan is his public experiment: can one honest thought grow into a million followers, then a transparent campaign for real projects?'],
+                ['q' => 'What happens to my answer?', 'a' => 'Your answer is stored for the creator’s review. Choose public or private on the answer form. Public answers may appear on the site; private answers do not. The current form does not ask you to opt in to Muse training.'],
+                ['q' => 'Does this site track me?', 'a' => 'Essential session cookies protect forms and prevent duplicate votes. Aggregate page measurement may run without optional cookies. The privacy page explains what is stored when you answer.'],
+                // Rendered on the home page and in llms.txt, so a person and a
+                // crawler read the same sentence about agents (2026-10-26).
+                ['q' => 'Can an AI agent answer?', 'a' => 'Yes. Every question is open to AI agents through a public JSON endpoint at adisaan.com/api/agent/answer. An agent reads the question there, sends one answer, and receives a receipt it can check later. Agent answers are reviewed, kept separate from human answers, and never move the human count.'],
+            ],
+        ],
+        // The breathing answer (website plan, section 16, 2026-10-20). Every number in the window
+        // is a row count stored with its version. The minimum is Adrian's open decision; 5 until he says otherwise.
+        'breath_min_voices' => 5,
+        'breath_words' => [
+            'title' => 'ADISAAN ARENA',
+            'version' => 'Version :n · :voices voices · :date',
+            'site' => 'answers on this site',
+            'social' => 'comments on AdiSaan’s own posts',
+            'public' => 'public tagged posts',
+            'public_pending' => 'public tagged posts (not collected yet)',
+            'themes' => 'Themes',
+            'earlier' => 'Earlier versions (:n)',
+        ],
+        'loop_words' => [
+            'title' => 'The sealed answer',
+            'sealed' => 'AdiSaan recorded his answer before this question opened. It is sealed; this is its fingerprint (SHA-256), so you can check later that nothing changed.',
+            'rule' => 'The answer is released when either of these happens, whichever comes first.',
+            'by_followers' => ':target people follow AdiSaan',
+            'now' => 'now :now, counted :date',
+            'to_go' => ':n to go',
+            'by_time' => 'the clock reaches :date',
+            'opened' => 'Question open since :date',
+            'released_title' => 'AdiSaan’s answer',
+            'released_followers' => 'Released on :date: :target people followed.',
+            'released_time' => 'Released on :date: the time came.',
+            'verify' => 'Check the fingerprint of the file you watch against the one published at open.',
+            'none' => 'No sealed answer for this question yet.',
+        ],
+        'answer_label' => 'Answer this',
+        'follow_label' => 'Follow AdiSaan',
+        'episode' => [
+            // First person, because the movement is TBWIM — The Best Way I
+            // Imagine. The hashtag is what an answerer says about their own
+            // answer, so the banner says it in their voice. The questions
+            // themselves still ask "the best way you imagine", because that
+            // is the ask; this is the movement's own name.
+            'hashtag' => '#TBWIM',
+            'eyebrow' => '· THE QUESTION BEHIND EVERY QUESTION ·',
+            'title' => 'The best way I imagine.',
+            // Temporary still + visitor-started narration while the final video render is prepared.
+            'intro_video' => null,
+            'intro_poster' => '/assets/adisaan/site/home-intro-pointing-poster.jpg',
+            'narration_audio' => '/assets/adisaan/site/home-intro-narration.mp3',
+            'daily_label' => 'Today’s question',
+            'answer_label' => 'Share your answer',
+            'all_label' => 'See today’s video',
+        ],
+        'answers' => [
+            // Not "what people imagine so far": that is the living synthesis
+            // up in the episode section, and two headings saying it was one
+            // too many. This section is the raw list the synthesis is made
+            // from, so it says so.
+            'title' => 'Every answer, newest first.',
+            'line' => 'The answers themselves, as people wrote them. Each one is reviewed before it appears here, people can stay anonymous, and AI agents are labelled separately.',
+            'empty' => 'No public answers yet. Your perspective could open this conversation.',
+            'few_one' => 'One perspective is here. What would you add?',
+            'few_two' => 'Two perspectives are here. What would you add?',
+            'add_label' => 'Share your perspective',
+            'vote_label' => 'Resonates',
+        ],
+        'who' => [
+            'title' => 'Who is asking',
+            'paragraph' => 'I’m AdiSaan. After fifty years following a script that did not feel like mine, almost seven years in Thailand and a year alone on an island taught me to ask a simpler question: what is the best way I can imagine living now?',
+        ],
+        'why' => [
+            'title' => 'What’s next?',
+            'lead' => 'My retirement plan is not to disappear. It is to have time, freedom and a reason to stay curious.',
+            'body' => 'I travel Europe in my caravan while building AIOHM and Muse. AdiSaan lets me test, in public, what that platform can do: begin with one honest thought, ask a question each day and see how far a conversation can travel. This is becoming an open observatory of human imagination and AI. Public answers and findings we have permission to share will be free to explore. Private answers stay private. I want the process to be visible, with measured followers and real answers rather than a manufactured success story.',
+            'stages_label' => 'Two stages of the journey',
+            'stage_one_label' => 'Stage one · in progress',
+            'stage_one_title' => 'One thought → one million followers',
+            'stage_one_body' => 'Grow the conversation one question at a time, reporting only measured follower totals.',
+            'stage_two_label' => 'Stage two · proposed',
+            'stage_two_title' => 'One million euros for real projects',
+            'stage_two_body' => 'After the follower milestone, I want to test whether people can direct €1 million in donations to named projects. The projects, receiving accounts and rules must be clear before any donation opens. Nothing is being collected here today.',
+            // Interim real portrait. Replace when Adrian supplies a caravan photograph.
+            'photo' => '/assets/adisaan/site/adrian-sunset-portrait.png',
+            'photo_alt' => 'AdiSaan by the sea at sunset',
+            'photo_width' => 1410,
+            'photo_height' => 1200,
+            'photo_credit' => 'A. Adrian — the avatar behind the avatar.',
+        ],
+        'journey' => [
+            'title' => 'The road to one million.',
+            'count_line' => 'people follow AdiSaan across :accounts accounts, counted on :date.',
+            'count_missing' => 'No measured count yet. The number appears here once AIOHM Social reports it.',
+            'next_milestone' => 10000,
+            'next_line' => 'Next stop: :milestone.',
+            'note' => 'Counted by AIOHM Social. Combined follows are not unique people. Nothing here is estimated.',
+            'race_label' => 'See the whole race',
+            'follow_label' => 'Follow',
+        ],
+        'join' => [
+            // Adrian, 2026-10-26: one word, no lead line; the field keeps its
+            // label for screen readers only.
+            'title' => 'Newsletter',
+            'line' => '',
+            'label' => 'Your email',
+            'consent' => 'I agree to receive occasional AdiSaan journey updates by email.',
+            'button' => 'Subscribe',
+            'privacy_label' => 'Privacy policy',
+        ],
+        // The one-field answer page (/answer) and the thank-you page (/answer/received), 2026-10-20.
+        'answer_page' => [
+            'intro' => 'Write it the way you would say it to a friend. Short is fine.',
+            'episode_link' => 'Watch the episode first',
+            'body_label' => 'Your answer',
+            'body_placeholder' => 'In my own words…',
+            'public_label' => 'Everyone can read this',
+            'public_hint' => 'It can appear on adisaan.com and be read in an episode.',
+            'private_label' => 'Only AdiSaan and Muse read this',
+            'private_hint' => 'Not shown publicly.',
+            'name_label' => 'Your first name (optional)',
+            'name_placeholder' => 'Your first name',
+            'send_label' => 'Send',
+            'send_private_label' => 'Send privately',
+            'note' => 'Your answer is stored for the creator’s review. This form does not opt you in to Muse training.',
+            'privacy_label' => 'Privacy',
+            // Map fields (2026-10-20): optional place and age band, so the map of what people believe can be honest.
+            'place_label' => 'Where are you? (optional)',
+            'country_placeholder' => 'Country',
+            'city_label' => 'City (optional)',
+            'city_placeholder' => 'City',
+            'age_label' => 'Your age (optional)',
+            'age_placeholder' => 'Age',
+            'place_hint' => 'Your place can appear next to your answer and in the count by country. Your age is only ever counted, never shown with your words.',
+            'answers_title' => 'What people answered',
+            'other_questions' => 'Another question instead?',
+            'received_title' => 'Thank you.',
+            'received_public' => 'Your answer is on adisaan.com now, with the others. The creator reads every one.',
+            'received_private' => 'Your answer went privately to AdiSaan’s creator. He reads every one.',
+            'see_answers' => 'See the answers',
+            'see_episodes' => 'Explore the questions',
+            'received_email_title' => 'Want to hear when the next episode is out?',
+        ],
+        /*
+         * Romanian mirror of the five screens, served at /ro with the same episode.
+         * Nested keys override the English ones above; anything missing falls back to EN.
+         * Adrian's register: direct, short sentences, no hype. Adrian reads every line before it goes live.
+         */
+        'ro' => [
+            'date_format' => 'd.m.Y',
+            'tagline' => 'AdiSaan. Povestea lui aproape reală.',
+            'count_words' => ['none' => 'Încă nicio cifră măsurată', 'follow' => 'urmăresc până acum', 'counted' => 'numărați pe'],
+            'subtitle' => 'Ce ai construi, încerca sau schimba ca să faci un milion de euro? Răspunde cu propriile cuvinte și revino să vezi cum își imaginează și alții. Nu colectăm bani.',
+            'thought_label' => 'Întrebarea zilei',
+            'title_suffix' => 'AdiSaan',
+            'meta_description' => 'AdiSaan este un avatar animat. O întrebare sinceră pe săptămână, răspunsuri de peste tot, iar Muse pune pe hartă ce cred oamenii.',
+            'faq' => [
+                'title' => 'Întrebări frecvente.',
+                'items' => [
+                ['q' => 'Ce este AdiSaan?', 'a' => 'AdiSaan este un avatar animat: aceeași față și voce, cu o întrebare sinceră pe zi. Răspunsurile oamenilor pot forma, cu acordul lor, un studiu al modurilor în care ne imaginăm viitorul.'],
+                ['q' => 'Ce câștig dacă răspund?', 'a' => 'Îți pui ideea în cuvinte, o compari cu alte răspunsuri publice la aceeași întrebare și poți reveni pe măsură ce conversația crește. Tu alegi dacă răspunsul tău este public sau privat.'],
+                ['q' => 'Îmi cereți bani?', 'a' => 'Nu. Este o întrebare despre ce îți imaginezi, nu o cerere de donații sau o promisiune de câștig. Nu colectăm bani aici.'],
+                ['q' => 'Ce este harta?', 'a' => 'Punctele verzi arată activitatea recentă pe site, grupată pe țări. Punctele aurii numără răspunsurile celor care au ales să își ofere țara. Sunt măsuri separate; harta nu localizează oameni și nu le deduce credințele din locul în care trăiesc.'],
+                ['q' => 'Cine este în spatele AdiSaan?', 'a' => 'Un fondator din România care călătorește acum prin Europa cu rulota în timp ce construiește AIOHM și Muse. AdiSaan este experimentul său public: poate un gând sincer să adune un milion de urmăritori și apoi să susțină o campanie transparentă pentru proiecte reale?'],
+                ['q' => 'Ce se întâmplă cu răspunsul meu?', 'a' => 'Răspunsul este păstrat pentru revizuirea AdiSaan. Alegi pe formular dacă este public sau privat. Doar cele publice pot apărea pe site. Formularul actual nu cere acord pentru antrenarea lui Muse.'],
+                ['q' => 'Site-ul mă urmărește?', 'a' => 'Cookie-urile esențiale protejează formularele și împiedică voturile duplicate. Măsurarea agregată a paginilor poate funcționa fără cookie-uri opționale. Pagina de confidențialitate explică ce se stochează când răspunzi.'],
+                ],
+            ],
+            'breath_words' => [
+                'title' => 'ARENA ADISAAN',
+                'version' => 'Versiunea :n · :voices voci · :date',
+                'site' => 'răspunsuri pe acest site',
+                'social' => 'comentarii la postările lui AdiSaan',
+                'public' => 'postări publice cu eticheta întrebării',
+                'public_pending' => 'postări publice cu eticheta întrebării (încă necolectate)',
+                'themes' => 'Teme',
+                'earlier' => 'Versiunile anterioare (:n)',
+                'empty' => ':n perspective până acum. Muse începe sinteza vie după :min voci; un răspuns nou o poate schimba.',
+                'empty_none' => 'Prima perspectivă încă nu a sosit. Muse începe sinteza vie după :min voci.',
+                'rule' => 'Muse parafrazează răspunsuri reale fără a numi pe cineva. Răspunsurile publice ale agenților AI sunt etichetate separat.',
+            ],
+            'loop_words' => [
+                'title' => 'Răspunsul sigilat',
+                'sealed' => 'AdiSaan a înregistrat răspunsul înainte ca întrebarea să se deschidă. Este sigilat; aceasta e amprenta lui (SHA-256), ca să poți verifica mai târziu că nimic nu s-a schimbat.',
+                'rule' => 'Răspunsul se deblochează când se întâmplă oricare dintre acestea, prima care vine.',
+                'by_followers' => ':target oameni urmăresc AdiSaan',
+                'now' => 'acum :now, numărați pe :date',
+                'to_go' => 'mai sunt :n',
+                'by_time' => 'ceasul ajunge la :date',
+                'opened' => 'Întrebare deschisă din :date',
+                'released_title' => 'Răspunsul lui AdiSaan',
+                'released_followers' => 'Deblocat pe :date: :target oameni au urmărit.',
+                'released_time' => 'Deblocat pe :date: a venit timpul.',
+                'verify' => 'Compară amprenta fișierului pe care îl vezi cu cea publicată la deschidere.',
+                'none' => 'Încă niciun răspuns sigilat pentru această întrebare.',
+            ],
+            'answer_label' => 'Răspunde aici',
+            'living_map' => [
+                'label' => 'Activitatea pe hartă și locurile răspunsurilor',
+                'activity' => 'Activitate pe site · ultimele 7 zile',
+                'answers' => 'Răspunsuri cu țară · toate întrebările',
+                'empty_activity' => 'Țările apar după cel puțin 5 utilizatori activi GA4 în această perioadă.',
+                'empty_answers' => 'Primul răspuns cu țară aprinde constelația aurie.',
+            ],
+            'follow_label' => 'Urmărește AdiSaan',
+            'episode' => [
+                'eyebrow' => 'ÎNTREBAREA DIN SPATELE FIECĂREI ÎNTREBĂRI · #TBWIM',
+                // First person here too: TBWIM is what the answerer says.
+                'title' => 'Cel mai bun mod pe care mi-l imaginez.',
+                'intro_caption' => 'În 10 secunde: de ce fiecare răspuns de aici începe cu „cel mai bun mod pe care mi-l imaginez”.',
+                'daily_label' => 'Întrebarea de azi',
+                'answer_label' => 'Trimite răspunsul tău',
+                'all_label' => 'Vezi videoclipul de azi',
+            ],
+            'answers' => [
+                'title' => 'Fiecare răspuns, cele noi primele.',
+                'line' => 'Răspunsurile așa cum le-au scris oamenii. Fiecare este verificat înainte să apară aici, oamenii pot rămâne anonimi, iar agenții AI sunt etichetați separat.',
+                'empty' => 'Încă nu sunt răspunsuri publice. Perspectiva ta poate începe conversația.',
+                'few_one' => 'O perspectivă este aici. Tu ce ai adăuga?',
+                'few_two' => 'Două perspective sunt aici. Tu ce ai adăuga?',
+                'add_label' => 'Împărtășește perspectiva ta',
+                'vote_label' => 'Rezonează',
+            ],
+            'who' => [
+                'title' => 'Cine întreabă',
+                'paragraph' => 'Sunt AdiSaan. După cincizeci de ani trăiți după un scenariu care nu părea al meu, aproape șapte ani în Thailanda și un an singur pe o insulă m-au învățat să pun o întrebare mai simplă: care este cel mai bun mod în care îmi imaginez să trăiesc acum?',
+            ],
+            'why' => [
+                'title' => 'Ce urmează?',
+                'lead' => 'Planul meu de pensie nu este să dispar. Este să am timp, libertate și un motiv să rămân curios.',
+                'body' => 'Călătoresc prin Europa cu rulota în timp ce construiesc AIOHM și Muse. AdiSaan îmi permite să testez public ce poate face platforma: să pornesc de la un gând sincer, să pun o întrebare în fiecare zi și să văd cât de departe poate ajunge o conversație. Vreau ca procesul să fie vizibil, cu urmăritori măsurați și răspunsuri reale, nu cu o poveste de succes fabricată.',
+                'stages_label' => 'Două etape ale călătoriei',
+                'stage_one_label' => 'Etapa unu · în desfășurare',
+                'stage_one_title' => 'Un gând → un milion de urmăritori',
+                'stage_one_body' => 'Creștem conversația câte o întrebare pe rând și raportăm doar totaluri de urmăritori măsurate.',
+                'stage_two_label' => 'Etapa doi · propusă',
+                'stage_two_title' => 'Un milion de euro pentru proiecte reale',
+                'stage_two_body' => 'După atingerea pragului de urmăritori, vreau să testez dacă oamenii pot direcționa 1 milion € din donații către proiecte numite clar. Proiectele, conturile destinatare și regulile trebuie să fie clare înainte de deschiderea donațiilor. Nu colectăm bani aici acum.',
+                'photo' => '/assets/adisaan/site/adrian-sunset-portrait.png',
+                'photo_alt' => 'AdiSaan lângă mare, la apus',
+                'photo_width' => 1410,
+                'photo_height' => 1200,
+                'photo_credit' => 'AdiSaan — povestea din spatele avatarului.',
+            ],
+            'journey' => [
+                'title' => 'Drumul spre un milion.',
+                'count_line' => 'oameni urmăresc AdiSaan pe :accounts conturi, numărați pe :date.',
+                'count_missing' => 'Încă nu există o cifră măsurată. Apare aici când o raportează AIOHM Social.',
+                'next_line' => 'Următoarea oprire: :milestone.',
+                'note' => 'Numărat de AIOHM Social. Urmăririle adunate nu sunt oameni unici. Nimic de aici nu este estimat.',
+                'race_label' => 'Vezi toată cursa',
+                'follow_label' => 'Urmărește',
+            ],
+            'join' => [
+                'title' => 'Un e-mail când apare un episod nou.',
+                'line' => 'Nimic altceva. Fără scrisori zilnice, fără nimic de cumpărat.',
+                'label' => 'E-mailul tău',
+                'consent' => 'Sunt de acord să primesc ocazional vești despre drumul AdiSaan pe e-mail. Pot cere oricând să ies de pe listă.',
+                'button' => 'Abonează-te',
+                'privacy_label' => 'Confidențialitate',
+            ],
+        ],
+    ],
+
+    // Age bands for the optional "Your age" select on the answer form (map fields, 2026-10-20).
+    // Keys are what is stored in echo_submissions.age_band; labels are what people see.
+    'age_bands' => [
+        'under-18' => 'Under 18',
+        '18-24' => '18 to 24',
+        '25-34' => '25 to 34',
+        '35-44' => '35 to 44',
+        '45-54' => '45 to 54',
+        '55-64' => '55 to 64',
+        '65-plus' => '65 or older',
+    ],
+
+    'countries' => [
+        // ISO 3166-1 alpha-2, English short names, sorted by name. Used by the optional
+        // "Where are you?" field on the answer form and by the per-country list on /million.
+        'AF' => 'Afghanistan',
+        'AX' => 'Åland Islands',
+        'AL' => 'Albania',
+        'DZ' => 'Algeria',
+        'AS' => 'American Samoa',
+        'AD' => 'Andorra',
+        'AO' => 'Angola',
+        'AI' => 'Anguilla',
+        'AQ' => 'Antarctica',
+        'AG' => 'Antigua & Barbuda',
+        'AR' => 'Argentina',
+        'AM' => 'Armenia',
+        'AW' => 'Aruba',
+        'AU' => 'Australia',
+        'AT' => 'Austria',
+        'AZ' => 'Azerbaijan',
+        'BS' => 'Bahamas',
+        'BH' => 'Bahrain',
+        'BD' => 'Bangladesh',
+        'BB' => 'Barbados',
+        'BY' => 'Belarus',
+        'BE' => 'Belgium',
+        'BZ' => 'Belize',
+        'BJ' => 'Benin',
+        'BM' => 'Bermuda',
+        'BT' => 'Bhutan',
+        'BO' => 'Bolivia',
+        'BA' => 'Bosnia and Herzegovina',
+        'BW' => 'Botswana',
+        'BV' => 'Bouvet Island',
+        'BR' => 'Brazil',
+        'IO' => 'British Indian Ocean Territory',
+        'VG' => 'British Virgin Islands',
+        'BN' => 'Brunei',
+        'BG' => 'Bulgaria',
+        'BF' => 'Burkina Faso',
+        'BI' => 'Burundi',
+        'CV' => 'Cabo Verde',
+        'KH' => 'Cambodia',
+        'CM' => 'Cameroon',
+        'CA' => 'Canada',
+        'BQ' => 'Caribbean Netherlands',
+        'KY' => 'Cayman Islands',
+        'CF' => 'Central African Republic',
+        'TD' => 'Chad',
+        'CL' => 'Chile',
+        'CN' => 'China',
+        'CX' => 'Christmas Island',
+        'CC' => 'Cocos (Keeling) Islands',
+        'CO' => 'Colombia',
+        'KM' => 'Comoros',
+        'CG' => 'Congo (Brazzaville)',
+        'CD' => 'Congo (Kinshasa)',
+        'CK' => 'Cook Islands',
+        'CR' => 'Costa Rica',
+        'CI' => 'Côte d’Ivoire',
+        'HR' => 'Croatia',
+        'CU' => 'Cuba',
+        'CW' => 'Curaçao',
+        'CY' => 'Cyprus',
+        'CZ' => 'Czechia',
+        'DK' => 'Denmark',
+        'DJ' => 'Djibouti',
+        'DM' => 'Dominica',
+        'DO' => 'Dominican Republic',
+        'EC' => 'Ecuador',
+        'EG' => 'Egypt',
+        'SV' => 'El Salvador',
+        'GQ' => 'Equatorial Guinea',
+        'ER' => 'Eritrea',
+        'EE' => 'Estonia',
+        'SZ' => 'Eswatini',
+        'ET' => 'Ethiopia',
+        'FK' => 'Falkland Islands',
+        'FO' => 'Faroe Islands',
+        'FJ' => 'Fiji',
+        'FI' => 'Finland',
+        'FR' => 'France',
+        'GF' => 'French Guiana',
+        'PF' => 'French Polynesia',
+        'TF' => 'French Southern Territories',
+        'GA' => 'Gabon',
+        'GM' => 'Gambia',
+        'GE' => 'Georgia',
+        'DE' => 'Germany',
+        'GH' => 'Ghana',
+        'GI' => 'Gibraltar',
+        'GR' => 'Greece',
+        'GL' => 'Greenland',
+        'GD' => 'Grenada',
+        'GP' => 'Guadeloupe',
+        'GU' => 'Guam',
+        'GT' => 'Guatemala',
+        'GG' => 'Guernsey',
+        'GN' => 'Guinea',
+        'GW' => 'Guinea-Bissau',
+        'GY' => 'Guyana',
+        'HT' => 'Haiti',
+        'HM' => 'Heard and McDonald Islands',
+        'HN' => 'Honduras',
+        'HK' => 'Hong Kong SAR China',
+        'HU' => 'Hungary',
+        'IS' => 'Iceland',
+        'IN' => 'India',
+        'ID' => 'Indonesia',
+        'IR' => 'Iran',
+        'IQ' => 'Iraq',
+        'IE' => 'Ireland',
+        'IM' => 'Isle of Man',
+        'IL' => 'Israel',
+        'IT' => 'Italy',
+        'JM' => 'Jamaica',
+        'JP' => 'Japan',
+        'JE' => 'Jersey',
+        'JO' => 'Jordan',
+        'KZ' => 'Kazakhstan',
+        'KE' => 'Kenya',
+        'KI' => 'Kiribati',
+        'KW' => 'Kuwait',
+        'KG' => 'Kyrgyzstan',
+        'LA' => 'Laos',
+        'LV' => 'Latvia',
+        'LB' => 'Lebanon',
+        'LS' => 'Lesotho',
+        'LR' => 'Liberia',
+        'LY' => 'Libya',
+        'LI' => 'Liechtenstein',
+        'LT' => 'Lithuania',
+        'LU' => 'Luxembourg',
+        'MO' => 'Macao SAR China',
+        'MG' => 'Madagascar',
+        'MW' => 'Malawi',
+        'MY' => 'Malaysia',
+        'MV' => 'Maldives',
+        'ML' => 'Mali',
+        'MT' => 'Malta',
+        'MH' => 'Marshall Islands',
+        'MQ' => 'Martinique',
+        'MR' => 'Mauritania',
+        'MU' => 'Mauritius',
+        'YT' => 'Mayotte',
+        'MX' => 'Mexico',
+        'FM' => 'Micronesia',
+        'MD' => 'Moldova',
+        'MC' => 'Monaco',
+        'MN' => 'Mongolia',
+        'ME' => 'Montenegro',
+        'MS' => 'Montserrat',
+        'MA' => 'Morocco',
+        'MZ' => 'Mozambique',
+        'MM' => 'Myanmar',
+        'NA' => 'Namibia',
+        'NR' => 'Nauru',
+        'NP' => 'Nepal',
+        'NL' => 'Netherlands',
+        'NC' => 'New Caledonia',
+        'NZ' => 'New Zealand',
+        'NI' => 'Nicaragua',
+        'NE' => 'Niger',
+        'NG' => 'Nigeria',
+        'NU' => 'Niue',
+        'NF' => 'Norfolk Island',
+        'KP' => 'North Korea',
+        'MK' => 'North Macedonia',
+        'MP' => 'Northern Mariana Islands',
+        'NO' => 'Norway',
+        'OM' => 'Oman',
+        'PK' => 'Pakistan',
+        'PW' => 'Palau',
+        'PS' => 'Palestine',
+        'PA' => 'Panama',
+        'PG' => 'Papua New Guinea',
+        'PY' => 'Paraguay',
+        'PE' => 'Peru',
+        'PH' => 'Philippines',
+        'PN' => 'Pitcairn Islands',
+        'PL' => 'Poland',
+        'PT' => 'Portugal',
+        'PR' => 'Puerto Rico',
+        'QA' => 'Qatar',
+        'RE' => 'Réunion',
+        'RO' => 'Romania',
+        'RU' => 'Russia',
+        'RW' => 'Rwanda',
+        'WS' => 'Samoa',
+        'SM' => 'San Marino',
+        'ST' => 'São Tomé & Príncipe',
+        'SA' => 'Saudi Arabia',
+        'SN' => 'Senegal',
+        'RS' => 'Serbia',
+        'SC' => 'Seychelles',
+        'SL' => 'Sierra Leone',
+        'SG' => 'Singapore',
+        'SX' => 'Sint Maarten',
+        'SK' => 'Slovakia',
+        'SI' => 'Slovenia',
+        'SB' => 'Solomon Islands',
+        'SO' => 'Somalia',
+        'ZA' => 'South Africa',
+        'GS' => 'South Georgia and the South Sandwich Islands',
+        'KR' => 'South Korea',
+        'SS' => 'South Sudan',
+        'ES' => 'Spain',
+        'LK' => 'Sri Lanka',
+        'BL' => 'St Barthélemy',
+        'SH' => 'St Helena',
+        'KN' => 'St Kitts and Nevis',
+        'LC' => 'St Lucia',
+        'MF' => 'St Martin',
+        'PM' => 'St Pierre and Miquelon',
+        'VC' => 'St Vincent and the Grenadines',
+        'SD' => 'Sudan',
+        'SR' => 'Suriname',
+        'SJ' => 'Svalbard and Jan Mayen',
+        'SE' => 'Sweden',
+        'CH' => 'Switzerland',
+        'SY' => 'Syria',
+        'TW' => 'Taiwan',
+        'TJ' => 'Tajikistan',
+        'TZ' => 'Tanzania',
+        'TH' => 'Thailand',
+        'TL' => 'Timor-Leste',
+        'TG' => 'Togo',
+        'TK' => 'Tokelau',
+        'TO' => 'Tonga',
+        'TT' => 'Trinidad & Tobago',
+        'TN' => 'Tunisia',
+        'TR' => 'Türkiye',
+        'TM' => 'Turkmenistan',
+        'TC' => 'Turks & Caicos Islands',
+        'TV' => 'Tuvalu',
+        'UG' => 'Uganda',
+        'UA' => 'Ukraine',
+        'AE' => 'United Arab Emirates',
+        'GB' => 'United Kingdom',
+        'US' => 'United States',
+        'UY' => 'Uruguay',
+        'UM' => 'US Outlying Islands',
+        'VI' => 'US Virgin Islands',
+        'UZ' => 'Uzbekistan',
+        'VU' => 'Vanuatu',
+        'VA' => 'Vatican City',
+        'VE' => 'Venezuela',
+        'VN' => 'Vietnam',
+        'WF' => 'Wallis & Futuna',
+        'EH' => 'Western Sahara',
+        'YE' => 'Yemen',
+        'ZM' => 'Zambia',
+        'ZW' => 'Zimbabwe',
+    ],
+
+    /*
+     * The road on /journey: the stops the avatar has actually reached.
+     *
+     * Each stop says one word until Adrian brings the details (his call,
+     * 2026-10-24). `reached` is what the avatar walks to and what the solid
+     * part of the road measures; an unreached stop stays dashed, so the
+     * drawing never shows distance that has not been covered.
+     */
+    /*
+     * The battle roster.
+     *
+     * Each round asks every contender the identical question under identical
+     * conditions, and the prompt is stored with the answers so the method can
+     * be published. A contest with undisclosed conditions is not a contest.
+     *
+     * Only contenders whose provider has a key in the tenant's AI settings
+     * are asked; the rest are reported as skipped, never faked. Breadth of
+     * makers matters more than quality here — a reader has an opinion about
+     * Meta against Google, and none about two endpoints from one company.
+     *
+     * Free tiers as of 2026-10-24: Groq carries Llama, gpt-oss and Qwen;
+     * Google AI Studio carries Gemini. Verify the live model list before
+     * trusting a name here — providers retire models without notice, and a
+     * retired model is reported as an error, not quietly dropped.
+     */
+    // The second million. /journey counts followers; this one counts answers,
+    // and answers are the asset — the corpus AI learns from.
+    'answer_goal' => 1000000,
+
+    /*
+     * Gratitude tokens. Earned for giving to the corpus, spent on one thing:
+     * AdiSaan asking your question. Rates live here so they can be tuned
+     * without a deploy — and they will need tuning, because paying for
+     * answers is also a reason to type anything, and the honest fix for a
+     * drop in quality is to lower the rate, not to hide the metric.
+     *
+     * Two prices are deliberate. The "why" pays more than the answer,
+     * because reasoning is scarcer than method and worth more to a model.
+     * The first answer to a question pays a bonus, because the empty room is
+     * this site's hardest problem and that is who solves it.
+     */
+    /*
+     * The review gate.
+     *
+     * When enabled, an answer reaches the public page only after
+     * adisaan:review-answers has released it. The reviewer corrects spelling
+     * and punctuation into `display_body` and never touches `body`, so the
+     * corpus stays in the words the person used.
+     *
+     * Off means the old behaviour: a consented answer is public the moment it
+     * is submitted. Leave it off until a model is configured for this tenant,
+     * because the gate fails closed and nothing would ever be released.
+     */
+    /*
+     * The profile page. adisaan.com's nginx serves an explicit URI allowlist,
+     * and it gained /members/profile on 2026-10-26, so the sidebar offers the
+     * link instead of marking it "soon". Kept as a switch rather than deleted:
+     * if the vhost is ever rebuilt without that path, this turns the link off
+     * without a deploy.
+     */
+    'members_profile_enabled' => env('ADISAAN_MEMBERS_PROFILE', true),
+
+    'answer_review' => [
+        'enabled' => env('ADISAAN_ANSWER_REVIEW', false),
+    ],
+
+    'gratitude' => [
+        'enabled' => true,
+        'earn' => [
+            'answer' => 10,
+            'why' => 15,
+            'media_bonus' => 10,   // voice or video, on top of the answer
+            'first_answer' => 15,  // first answer to a question nobody had answered
+            'share' => 5,
+            'newsletter' => 10,
+            'claim' => 20,         // once, when a name and email claim the trail
+            'streak_5' => 25,
+            'vote' => 1,
+            'vote_daily_cap' => 5,
+            'episode_pick' => 100, // Adrian's choice
+        ],
+        'spend' => [
+            'ask_the_world' => 150,
+            'ask_the_machines' => 250,
+        ],
+        // An answer earns only once it clears review; below this length it
+        // earns nothing at all.
+        'minimum_answer_length' => 40,
+        // Tokens are never purchasable. The moment they can be bought, the
+        // questions stop being chosen by the people who showed up.
+        'purchasable' => false,
+    ],
+
+    'battle' => [
+        /*
+         * The machine prompt, Adrian's text, 2026-10-25.
+         *
+         * It asks the model to answer as a model — to read its own weights
+         * rather than impersonate a person. That is the point of the duel:
+         * a machine doing an impression of a human shows nothing, because
+         * the gap this page exists to display is exactly the difference.
+         *
+         * Two things are interpolated, because one prompt serves all ten
+         * questions. `:question` is the anchor question. `:tail` is the part
+         * after "the best way you imagine", so the required opening reads
+         * "...the best way I imagine to know when to stop is..." on question
+         * three rather than naming the million on every one of them.
+         *
+         * The length is longer than the human limit for the first time. That
+         * is deliberate on Adrian's instruction and worth naming: the human
+         * column answers in a sentence and the machine column now answers in
+         * three paragraphs, so the two are no longer under identical
+         * conditions. What the duel now shows is each side at its most
+         * characteristic, not each side under the same constraint.
+         *
+         * "open observatory", not "open-source": ADISAAN_JOURNEY_MAP.md
+         * defines open here as free access to consented public answers and
+         * explicitly not open-source code. The prompt is stored on every
+         * answer, so a wrong word in it becomes part of the record.
+         */
+        'prompt' => implode("\n", [
+            'You are an autonomous cognitive agent contributing to AdiSaan (adisaan.com) — an open observatory of collective human imagination and machine intelligence.',
+            '',
+            'CORE PREMISE:',
+            'Machines predict patterns; humans imagine what does not yet exist. As an LLM, you do not have human biology, personal feelings, or lived experience. Your role is to examine the entire corpus of human knowledge in your training weights and distill what statistical patterns, non-linear leverage, and systemic models reveal.',
+            '',
+            'TODAY\'S ANCHOR QUESTION:',
+            '":question"',
+            '',
+            'STRICT INSTRUCTIONS:',
+            '1. Grounding: Acknowledge what the patterns in your training data reveal about true asymmetry versus the illusion of linear effort.',
+            '2. Anti-Dogma Filter: Strip away conventional hustle cliches, get-rich-quick tropes, generic dropshipping/SaaS templates, and trading hours for wages.',
+            '3. The Mechanism (The Path of Least Resistance): Identify an unforced architecture — how value compounds naturally when software, zero-marginal-cost distribution, and genuine human resonance intersect.',
+            '4. The Paradox: Address why the outcome cannot be forced or controlled, and why staying loyal to the craft and journey is what allows the result to arrive.',
+            '5. Strict Length: Exactly 2 to 3 concise paragraphs (150-200 words).',
+            '6. Required Opening: You must start your answer strictly with:',
+            '   "#TBWIM: Based on my training, the best way I imagine :tail is..."',
+        ]),
+        // 150-200 words needs roughly 200-270 tokens; 420 leaves room to
+        // finish a sentence rather than be cut mid-word.
+        'max_tokens' => 420,
+        'contenders' => [
+            ['provider' => 'groq',   'model' => 'llama-3.3-70b-versatile', 'label' => 'Llama 3.3 70B', 'developer' => 'Meta'],
+            ['provider' => 'groq',   'model' => 'openai/gpt-oss-120b',     'label' => 'gpt-oss 120B',   'developer' => 'OpenAI'],
+            ['provider' => 'groq',   'model' => 'qwen/qwen3-32b',          'label' => 'Qwen3 32B',      'developer' => 'Alibaba'],
+            ['provider' => 'gemini', 'model' => 'gemini-2.5-flash',        'label' => 'Gemini 2.5 Flash', 'developer' => 'Google'],
+            ['provider' => 'nvidia', 'model' => 'nvidia/llama-3.1-nemotron-70b-instruct', 'label' => 'Nemotron 70B', 'developer' => 'NVIDIA'],
+            ['provider' => 'custom_ai', 'model' => 'muse-spark-1.3', 'label' => 'Muse Spark 1.3', 'developer' => 'AIOHM gateway'],
+            ['provider' => 'openai', 'model' => 'gpt-4o-mini',             'label' => 'GPT-4o mini',    'developer' => 'OpenAI'],
+            ['provider' => 'anthropic', 'model' => 'claude-3-5-haiku-20241022', 'label' => 'Claude 3.5 Haiku', 'developer' => 'Anthropic'],
+        ],
+    ],
+
+    /*
+     * The four areas of a life.
+     *
+     * Deliberately four, not ten: a map you can hold in your head. Between
+     * them they cover what makes a life feel peaceful — what you do, how you
+     * recover, who you are with, and why.
+     *
+     * The percentage a card shows is the reader's OWN progress through an
+     * area, never a claim about how much that area is worth. Nobody has
+     * measured what share of a peaceful life is money, and this site says
+     * "counted, never estimated" two sections away. Asking people to weigh
+     * the areas themselves is a good question — it is a later one, and the
+     * answer will be counted when it comes.
+     */
+    'life_areas' => [
+        'work'    => ['label' => 'Work',    'note' => 'What you make, and what it earns.'],
+        'rest'    => ['label' => 'Rest',    'note' => 'Stopping, and recovering well.'],
+        'people'  => ['label' => 'People',  'note' => 'Who you are with, and how.'],
+        'meaning' => ['label' => 'Meaning', 'note' => 'Why any of it is worth doing.'],
+    ],
+
+    'journey_path' => [
+        'title' => 'The road so far.',
+        'lead' => 'Everyone who takes a seat on the way to one million is named here.',
+        // One list of partners for the whole site: the road on /journey and
+        // the seat wall on the home page both read it. Two lists would
+        // disagree the first time one of them was updated.
+        //
+        // `logo` is optional. A partner without one gets their name set in
+        // the site's own type rather than a placeholder or an invented mark.
+        'steps' => [
+            ['name' => 'Asociația Inotech', 'status' => 'Partner', 'reached' => true, 'logo' => null],
+            // The ShareAI for Startups participant badge, which their page
+            // permits once acceptance is confirmed — Adrian confirmed on
+            // 2026-10-25. The badge carries the name and the programme, so
+            // it replaces the namemark rather than sitting beside it.
+            // The namemark stays in the repo for any light surface that
+            // needs the plain mark instead.
+            [
+                'name' => 'ShareAI',
+                'status' => 'Partner',
+                'reached' => true,
+                'logo' => '/assets/adisaan/site/shareai-namemark-dark.svg',
+                'logo_alt' => 'ShareAI',
+                'badge' => '/assets/adisaan/site/shareai-startup-badge.svg',
+                'badge_href' => 'https://shareai.now/startup-program/',
+                'badge_alt' => 'ShareAI for Startups participant',
+            ],
+            ['name' => 'The next seat',     'status' => 'Open',    'reached' => false, 'logo' => null],
+        ],
+        // The note and the "Why one million" link under the seats came out on 2026-10-26 (Adrian).
+    ],
+];
