@@ -12,8 +12,10 @@ REF="${1:-origin/main}"
 cd "$APP"
 git config --global --add safe.directory "$APP" >/dev/null 2>&1 || true
 echo "== fetch"; git fetch --prune origin
-before=$(git rev-parse --short HEAD)
-git checkout -q --detach "$REF" 2>/dev/null || git reset -q --hard "$REF"
+before=$(git rev-parse --short HEAD 2>/dev/null || echo none)
+git checkout -q -B main 2>/dev/null || true
+git reset -q --hard "$REF"
+git branch -q --set-upstream-to=origin/main main 2>/dev/null || true
 after=$(git rev-parse --short HEAD)
 echo "   $before -> $after ($(git log -1 --format='%s' HEAD))"
 echo "== dependencies"; composer install --no-dev --optimize-autoloader --no-interaction --quiet
