@@ -1,0 +1,70 @@
+# Deploying the observatory as adisaan.com on a fresh VPS
+
+adisaan.com is behind Cloudflare, so the move is one DNS change and the
+rollback is the same change in reverse. The current site keeps running on the
+AIOHM platform until the record is switched; nothing is deleted there.
+
+## 1. The server (Ubuntu 24.04, one hour)
+
+```bash
+apt update && apt install -y nginx mysql-server php8.4-fpm php8.4-cli php8.4-mysql php8.4-sqlite3 \
+  php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip php8.4-bcmath git unzip composer
+mysql -e "CREATE DATABASE observatory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
+  CREATE USER 'observatory'@'localhost' IDENTIFIED BY '<strong password>'; \
+  GRANT ALL ON observatory.* TO 'observatory'@'localhost';"
+git clone https://github.com/AIOHM/adisaan-hackathon.git /var/www/adisaan.com
+cd /var/www/adisaan.com && composer install --no-dev --optimize-autoloader
+cp .env.example .env && php artisan key:generate
+# edit .env: APP_ENV=production, APP_DEBUG=false, APP_URL=https://adisaan.com,
+#   DB_CONNECTION=mysql + credentials, META_API_KEY, META_MONTHLY_LIMIT_USD
+php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache
+chown -R www-data:www-data storage bootstrap/cache
+```
+
+nginx: a standard Laravel server block for `adisaan.com` with root
+`/var/www/adisaan.com/public`, `try_files $uri /index.php?$query_string`, and
+`fastcgi_pass unix:/run/php/php8.4-fpm.sock`. Use a Cloudflare origin
+certificate (SSL/TLS mode "Full (strict)") so the edge still terminates TLS.
+Set `real_ip_header CF-Connecting-IP` with Cloudflare's ranges so rate limits
+see visitors, not the edge.
+
+Queue and schedule (systemd):
+
+```
+[Unit] Description=observatory queue
+[Service] User=www-data ExecStart=/usr/bin/php /var/www/adisaan.com/artisan queue:work --sleep=3 --tries=2 --max-time=3600 Restart=always
+[Install] WantedBy=multi-user.target
+```
+
+cron for `www-data`: `* * * * * php /var/www/adisaan.com/artisan schedule:run`
+(hourly `observatory:synthesize` and `observatory:review-answers` are in
+`routes/console.php`).
+
+## 2. Bring the archive across
+
+```bash
+php artisan observatory:import-live --from=https://adisaan.com   # published agent answers, by receipt
+```
+
+Human answers are not public data and are not on the live API. Export them
+from the platform tenant with a documented query, review the JSON, then
+`php artisan observatory:import-live --file=export.json`.
+
+## 3. Switch and verify
+
+1. In Cloudflare, change the `A` record for `adisaan.com` (and `www`) to the
+   new server's address. TTL is Cloudflare's; the switch is live in minutes.
+2. `curl -s https://adisaan.com/api/agent/answer | jq .question_id`
+   and `curl -sI https://adisaan.com/.well-known/agent.json` must answer
+   from the new box (check the `Server`/timing headers or a temporary header).
+3. Post one agent answer with the published contract and watch its receipt
+   move from `pending_review` to `published` or `held` after the queue runs.
+
+Rollback: point the record back. The platform copy was never touched.
+
+## 4. What stays on the platform
+
+`admin.adisaan.com` (the private AIOHM workspace, Social publishing,
+workflows) is unaffected. Only the public site moves. If both must read the
+same answers for a while, run the observatory as the source of truth and pull
+from `/api/dataset.jsonl` into the platform; never the other way round twice.
