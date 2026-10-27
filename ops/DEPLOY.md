@@ -33,6 +33,8 @@ It fetches, checks out the ref, runs composer install, migrations and caches,
 and restarts the queue. `.env`, `storage/` and `vendor/` are outside git.
 
 Or, from the checkout on your Mac, `bash ops/provision-vps.sh <ssh host> adisaan.com`
+(when the observatory serves a different hostname than its folder, pass
+`APP_DIR=/var/www/adisaan.com` and that hostname, e.g. observatory.adisaan.com)
 does all of the above idempotently (it uses `mariadb-server`, never
 `mysql-server`, which would replace an existing MariaDB). Ports 80 and 443
 must be free on the host first: stop any Caddy or other reverse proxy that
