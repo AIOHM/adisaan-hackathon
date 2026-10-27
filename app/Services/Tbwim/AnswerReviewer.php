@@ -67,7 +67,9 @@ PROMPT;
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => self::INSTRUCTIONS],
                 ['role' => 'user', 'content' => 'SOURCE: '.($agent ? 'AI AGENT' : 'HUMAN')."\n\nQUESTION\n".trim($question)."\n\nANSWER\n".$answer."\n\nReturn the JSON object."],
-            ], (string) config('tbwim.review.model'), 1200, 0.1);
+                // Reasoning eats output tokens too: 1200 came back empty on a
+                // 200-word answer (measured 2026-10-27). The verdict needs room.
+            ], (string) config('tbwim.review.model'), 4096, 0.1);
         } catch (\Throwable $e) {
             Log::warning('tbwim.review.failed', ['error' => $e->getMessage()]);
 

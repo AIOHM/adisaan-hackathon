@@ -56,7 +56,9 @@ PROMPT;
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => $instructions],
                 ['role' => 'user', 'content' => $input],
-            ], (string) config('tbwim.synthesis.model'), 2000, 0.5);
+                // Same reasoning headroom as the reviewer: verdicts starved at
+                // 1200, and synthesis reads every voice at once (2026-10-27).
+            ], (string) config('tbwim.synthesis.model'), 4096, 0.5);
             $parsed = $this->parse($result['text'], count($voices), $min, $max);
             if (isset($parsed['error'])) {
                 $lastProblem = $parsed['error'];
