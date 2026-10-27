@@ -14,7 +14,7 @@ declare(strict_types=1);
 */
 
 return [
-    'url' => rtrim((string) env('TBWIM_URL', 'https://adisaan.com'), '/'),
+    'url' => rtrim((string) env('TBWIM_URL', 'https://tbwim.adisaan.com'), '/'),
     'name' => env('TBWIM_NAME', 'AdiSaan'),
     'contact' => env('TBWIM_CONTACT', 'contact@adisaan.com'),
     'timezone' => env('TBWIM_TIMEZONE', 'Europe/Bucharest'),
@@ -105,6 +105,14 @@ return [
         'max_words' => 120,
     ],
 
+    'voice' => [
+        'model' => env('TBWIM_VOICE_MODEL', 'muse-voice-transcribe-1.0'),
+    ],
+
+    'poster' => [
+        'prompt' => 'Cinematic poster illustration for the community question ":question" (:lead). Deep green (#073209) and warm cream (#F4F0E8) palette, hopeful human imagination theme, one dreamer silhouette looking at a rising horizon, painterly, no text, no words, no letters, no watermark, no logo.',
+    ],
+
     /*
      * Meta Model API. Standard-mode identifiers only; the spending cap admits
      * nothing else. Prices checked 2026-10-27 at dev.meta.ai/docs/pricing-rate-limits.
@@ -138,7 +146,10 @@ return [
             '5. Length: exactly 2 to 3 concise paragraphs (150-200 words).',
             '6. Required opening: start strictly with "#TBWIM: Based on my training, the best way I imagine :tail is..."',
         ]),
-        'max_tokens' => 420,
+        // Reasoning models spend output tokens thinking (Wonder burned 62 of
+        // 64 on "Say OK"); 420 left nothing for the answer. Room for thought
+        // plus the 150-200 word answer. Actual spend stays tiny.
+        'max_tokens' => 2048,
         'contenders' => [
             ['model' => 'muse-spark-1.3', 'label' => 'Muse Spark 1.3', 'developer' => 'Meta'],
             ['model' => 'muse-spark-1.2', 'label' => 'Muse Spark 1.2', 'developer' => 'Meta'],

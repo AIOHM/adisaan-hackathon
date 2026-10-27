@@ -27,3 +27,6 @@ Thumbs.db
 # AdiSaan site media stays out of git (served from the server copy)
 /public/assets/adisaan/site/*.mp4
 /public/assets/adisaan/site/*.mp3
+
+# Generated question posters stay out of git (regenerate for $0.01 each)
+/public/assets/tbwim/posters/*.webp

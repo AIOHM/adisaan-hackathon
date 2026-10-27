@@ -57,6 +57,9 @@ final class Questions
                     $q[$key] = $base.$q[$key];
                 }
             }
+            if (($local = $this->generatedPoster($q['id'])) !== null) {
+                $q['poster'] = $local;
+            }
             $q['open'] = $this->schedule->questionReleased($s);
             $out[] = $q;
         }
@@ -104,6 +107,16 @@ final class Questions
         return $q !== null && $q['open'] ? $q : null;
     }
 
+    /** Absolute URL of a generated poster, or null when there is none. */
+    public function generatedPoster(string $id): ?string
+    {
+        if (! PosterGenerator::safeId($id) || ! is_file(public_path(PosterGenerator::DIR.'/'.$id.'.'.PosterGenerator::EXT))) {
+            return null;
+        }
+
+        return rtrim((string) config('tbwim.url'), '/').'/'.PosterGenerator::DIR.'/'.$id.'.'.PosterGenerator::EXT;
+    }
+
     private function parse(mixed $value): ?Carbon
     {
         if (empty($value)) {
@@ -124,6 +137,9 @@ final class Questions
                 if (! empty($q[$key]) && str_starts_with((string) $q[$key], '/')) {
                     $q[$key] = $base.$q[$key];
                 }
+            }
+            if (is_string($q['id'] ?? null) && ($local = $this->generatedPoster($q['id'])) !== null) {
+                $q['poster'] = $local;
             }
             $at = $this->parse($q['opens_at'] ?? null);
             $q['open'] = $at !== null && $at->isPast();

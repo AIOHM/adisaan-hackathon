@@ -35,9 +35,9 @@
 
     /** The models that actually answer here, in their own colours. */
     $machines = [
+        ['name' => 'Meta Muse', 'image' => 'muse.svg'],
         ['name' => 'ChatGPT by OpenAI', 'image' => 'openai.svg'],
         ['name' => 'Google Gemini', 'image' => 'gemini.svg'],
-        ['name' => 'Anthropic Claude', 'image' => 'claude.svg'],
         ['name' => 'Moonshot Kimi', 'image' => 'kimi.svg'],
     ];
 

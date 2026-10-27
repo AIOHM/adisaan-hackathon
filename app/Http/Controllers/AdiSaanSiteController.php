@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TranscribeVoiceAnswer;
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
 use App\Services\AdiSaan\GratitudeLedger;
@@ -279,6 +280,9 @@ final class AdiSaanSiteController extends Controller
         }
 
         $this->awardForAnswer($request, $episodeRef, $echo, $media !== null);
+        if ($mediaPath !== null) {
+            TranscribeVoiceAnswer::dispatch($echo->public_id);
+        }
 
         if ($request->expectsJson()) {
             return response()->json(['ok' => true, 'receipt' => $echo->public_id, 'public' => $isPublic, 'message' => $isPublic ? 'Received. A person reads every public answer before it is shown.' : 'Received privately.'], 201);
@@ -621,6 +625,10 @@ final class AdiSaanSiteController extends Controller
     private function stories(): array
     {
         return array_map(function (array $story): array {
+            if (is_string($story['id'] ?? null) && ($local = $this->questions->generatedPoster($story['id'])) !== null) {
+                $story['poster'] = $local;
+            }
+
             return $story + [
                 'share_url' => config('adisaan_public.url').'/#story-'.$story['id'],
                 'answer_url' => route('adisaan.public.answer', ['story' => $story['id']]),

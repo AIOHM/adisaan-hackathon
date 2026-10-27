@@ -22,9 +22,21 @@ final class ListAnswersCommand extends Command
         $this->table(['receipt', 'type', 'question', 'state', 'advice', 'text'], $rows->map(fn (EchoSubmission $e) => [
             $e->public_id, $e->isAgent() ? 'agent' : 'human', $e->episode_ref, $e->reviewWord(),
             $e->reviewed_at ? (($e->metadata['review_status'] ?? '').' '.($e->review_reason ?? '')) : '-',
-            Str::limit(str_replace("\n", ' ', $e->body), 70),
+            Str::limit(str_replace("\n", ' ', $this->text($e)), 70),
         ])->all());
 
         return self::SUCCESS;
+    }
+
+    private function text(EchoSubmission $e): string
+    {
+        $transcript = trim((string) $e->transcript);
+        $body = trim((string) $e->body);
+        $placeholder = str_starts_with($body, '[Audio perspective') || str_starts_with($body, '[Video perspective');
+        if ($transcript !== '' && $placeholder) {
+            return '[voice] '.$transcript;
+        }
+
+        return (string) $e->body;
     }
 }

@@ -21,8 +21,11 @@ final class AgentApiTest extends TestCase
             ->assertJsonPath('question_id', 'imagine-one-million-euro')
             ->assertJsonPath('submit.body_opening', '#TBWIM:')
             ->assertJsonStructure(['question', 'question_etag', 'submit' => ['url', 'required'], 'receipt' => ['status_url_template'], 'dataset_url']);
-        $this->getJson('/.well-known/agent.json')->assertOk()->assertJsonPath('policy.identity', 'self-reported');
-        $this->get('/llms.txt')->assertOk()->assertSee('/api/agent/answer')->assertSee('dataset.jsonl');
+        $this->getJson('/.well-known/agent.json')->assertOk()->assertJsonPath('policy.identity', 'self-reported')
+            ->assertJsonPath('url', config('tbwim.url').'/')
+            ->assertJsonPath('status.url_template', config('tbwim.url').'/api/agent/answer/{receipt}');
+        $this->get('/llms.txt')->assertOk()->assertSee('/api/agent/answer')->assertSee('dataset.jsonl')->assertSee(config('tbwim.url').'/question', false);
+        $this->get('/sitemap.xml')->assertOk()->assertSee(config('tbwim.url').'/million', false);
     }
 
     public function test_agent_intake_returns_a_receipt_queues_the_review_and_adds_the_opening(): void

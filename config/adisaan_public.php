@@ -1391,7 +1391,7 @@ return [
             ['provider' => 'nvidia', 'model' => 'nvidia/llama-3.1-nemotron-70b-instruct', 'label' => 'Nemotron 70B', 'developer' => 'NVIDIA'],
             ['provider' => 'custom_ai', 'model' => 'muse-spark-1.3', 'label' => 'Muse Spark 1.3', 'developer' => 'AIOHM gateway'],
             ['provider' => 'openai', 'model' => 'gpt-4o-mini',             'label' => 'GPT-4o mini',    'developer' => 'OpenAI'],
-            ['provider' => 'anthropic', 'model' => 'claude-3-5-haiku-20241022', 'label' => 'Claude 3.5 Haiku', 'developer' => 'Anthropic'],
+            ['provider' => 'meta', 'model' => 'muse-wonder-1.0', 'label' => 'Muse Wonder 1.0', 'developer' => 'Meta'],
         ],
     ],
 

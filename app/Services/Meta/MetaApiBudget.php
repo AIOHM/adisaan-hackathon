@@ -30,9 +30,17 @@ final class MetaApiBudget
     /** Flat per-image price in micro-USD ($0.01). */
     public const IMAGE_MODELS = ['muse-image-1.0' => 10000];
 
+    /** Voice transcription in micro-USD per audio second ($0.18/hour, whole seconds). */
+    public const AUDIO_MODELS = ['muse-voice-transcribe-1.0' => 50];
+
     public const CHAT_PATH = '/v1/chat/completions';
 
     public const IMAGE_PATH = '/v1/images/generations';
+
+    public const AUDIO_PATH = '/v1/asr/transcribe';
+
+    /** The API rejects clips over 10 minutes; the reservation assumes the max. */
+    public const MAX_AUDIO_SECONDS = 600;
 
     public const MAX_INPUT_TOKENS = 1048576;
 
@@ -56,6 +64,19 @@ final class MetaApiBudget
         [$inputPrice, $outputPrice] = self::PRICES[$model] ?? self::PRICES['muse-spark-1.3'];
 
         return (int) ceil(($input * $inputPrice + $output * $outputPrice) / 100);
+    }
+
+    public static function reservationForAudio(string $model = 'muse-voice-transcribe-1.0'): int
+    {
+        return self::MAX_AUDIO_SECONDS * (self::AUDIO_MODELS[$model] ?? 50);
+    }
+
+    /** Meta bills whole seconds, rounded down; the API caps clips at 10 minutes. */
+    public static function costForAudio(int $audioMs): int
+    {
+        $seconds = max(0, min(self::MAX_AUDIO_SECONDS, (int) floor(max(0, $audioMs) / 1000)));
+
+        return $seconds * (self::AUDIO_MODELS['muse-voice-transcribe-1.0'] ?? 50);
     }
 
     public function middleware(): callable
@@ -177,6 +198,14 @@ final class MetaApiBudget
             return;
         }
         $this->release($period, $reservation - min(count($images) * (self::IMAGE_MODELS[$model] ?? 0), $reservation));
+    }
+
+    public function settleAudio(string $period, mixed $audioMs, int $reservation): void
+    {
+        if (! is_int($audioMs) || $audioMs < 0) {
+            return;
+        }
+        $this->release($period, $reservation - min(self::costForAudio($audioMs), $reservation));
     }
 
     public function release(string $period, int $micros): void
