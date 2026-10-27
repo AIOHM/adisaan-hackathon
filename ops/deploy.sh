@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Deploy the observatory on the server from GitHub. Run ON the server:
 #
-#   sudo bash /var/www/adisaan.com/ops/deploy.sh [ref]
+#   sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh [ref]
 #
 # Pulls the given ref (default: origin/main) into the checkout, installs
 # production dependencies, migrates, rebuilds caches, fixes permissions and
 # restarts the queue worker. .env, storage and vendor are never touched by git.
 set -euo pipefail
-APP="${APP:-/var/www/adisaan.com}"
+APP="${APP:-/var/www/tbwim.adisaan.com}"
 REF="${1:-origin/main}"
 cd "$APP"
 git config --global --add safe.directory "$APP" >/dev/null 2>&1 || true

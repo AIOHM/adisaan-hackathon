@@ -12,8 +12,8 @@ apt update && apt install -y nginx mariadb-server php8.4-fpm php8.4-cli php8.4-m
 mysql -e "CREATE DATABASE observatory CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; \
   CREATE USER 'observatory'@'localhost' IDENTIFIED BY '<strong password>'; \
   GRANT ALL ON observatory.* TO 'observatory'@'localhost';"
-git clone https://github.com/AIOHM/adisaan-hackathon.git /var/www/adisaan.com
-cd /var/www/adisaan.com && composer install --no-dev --optimize-autoloader
+git clone https://github.com/AIOHM/adisaan-hackathon.git /var/www/tbwim.adisaan.com
+cd /var/www/tbwim.adisaan.com && composer install --no-dev --optimize-autoloader
 cp .env.example .env && php artisan key:generate
 # edit .env: APP_ENV=production, APP_DEBUG=false, APP_URL=https://adisaan.com,
 #   DB_CONNECTION=mysql + credentials, META_API_KEY, META_MONTHLY_LIMIT_USD
@@ -25,8 +25,8 @@ The server copy is a git checkout of https://github.com/AIOHM/adisaan-hackathon.
 After the first provisioning, every later deploy is, on the server:
 
 ```bash
-sudo bash /var/www/adisaan.com/ops/deploy.sh          # origin/main
-sudo bash /var/www/adisaan.com/ops/deploy.sh v1.2.0   # or any ref
+sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh          # origin/main
+sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh v1.2.0   # or any ref
 ```
 
 It fetches, checks out the ref, runs composer install, migrations and caches,
@@ -34,14 +34,14 @@ and restarts the queue. `.env`, `storage/` and `vendor/` are outside git.
 
 Or, from the checkout on your Mac, `bash ops/provision-vps.sh <ssh host> adisaan.com`
 (when the observatory serves a different hostname than its folder, pass
-`APP_DIR=/var/www/adisaan.com` and that hostname, e.g. tbwim.adisaan.com)
+`APP_DIR=<folder>` and that hostname)
 does all of the above idempotently (it uses `mariadb-server`, never
 `mysql-server`, which would replace an existing MariaDB). Ports 80 and 443
 must be free on the host first: stop any Caddy or other reverse proxy that
 holds them.
 
 nginx: a standard Laravel server block for `adisaan.com` with root
-`/var/www/adisaan.com/public`, `try_files $uri /index.php?$query_string`, and
+`/var/www/tbwim.adisaan.com/public`, `try_files $uri /index.php?$query_string`, and
 `fastcgi_pass unix:/run/php/php8.4-fpm.sock`. Set `real_ip_header
 CF-Connecting-IP` with Cloudflare's ranges so rate limits see visitors, not
 the edge.
@@ -59,11 +59,11 @@ Queue and schedule (systemd):
 
 ```
 [Unit] Description=observatory queue
-[Service] User=www-data ExecStart=/usr/bin/php /var/www/adisaan.com/artisan queue:work --sleep=3 --tries=2 --max-time=3600 Restart=always
+[Service] User=www-data ExecStart=/usr/bin/php /var/www/tbwim.adisaan.com/artisan queue:work --sleep=3 --tries=2 --max-time=3600 Restart=always
 [Install] WantedBy=multi-user.target
 ```
 
-cron for `www-data`: `* * * * * php /var/www/adisaan.com/artisan schedule:run`
+cron for `www-data`: `* * * * * php /var/www/tbwim.adisaan.com/artisan schedule:run`
 (hourly `observatory:synthesize` and `observatory:review-answers` are in
 `routes/console.php`).
 

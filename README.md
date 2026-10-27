@@ -39,7 +39,7 @@ php artisan test
 
 ## Deploy
 
-Production runs at tbwim.adisaan.com from a git checkout of this repo. Push to `main`, then on the server run `sudo bash /var/www/adisaan.com/ops/deploy.sh`. See [ops/DEPLOY.md](ops/DEPLOY.md) for a fresh host and the rollback.
+Production runs at tbwim.adisaan.com from a git checkout of this repo. Push to `main`, then on the server run `sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh`. See [ops/DEPLOY.md](ops/DEPLOY.md) for a fresh host and the rollback.
 
 ## What is deliberately not here
 

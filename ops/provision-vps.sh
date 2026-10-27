@@ -3,7 +3,7 @@
 # touching DNS. Safe to re-run. Run from the repository root on your Mac:
 #
 #   bash ops/provision-vps.sh <ssh host> [domain]
-#   APP_DIR=/var/www/adisaan.com bash ops/provision-vps.sh <ssh host> tbwim.adisaan.com
+#   bash ops/provision-vps.sh <ssh host> tbwim.adisaan.com
 #
 # Example: bash ops/provision-vps.sh blanka-vps-legacy adisaan.com
 #
@@ -23,7 +23,7 @@ set -euo pipefail
 HOST="${1:?usage: provision-vps.sh <ssh host> [domain]}"
 DOMAIN="${2:-adisaan.com}"
 # APP_DIR overrides the install path when the hostname differs from the folder
-# (e.g. APP_DIR=/var/www/adisaan.com ... tbwim.adisaan.com).
+# (e.g. APP_DIR=/var/www/other-folder ... tbwim.adisaan.com).
 APP="${APP_DIR:-/var/www/${DOMAIN}}"
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 

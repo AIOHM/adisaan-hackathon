@@ -7,7 +7,7 @@ anything from the private AIOHM platform.
 
 ## Where it runs
 - Production: 169.58.39.185 (vps.adisaan.com, SSH `adisaan-vps`), path
-  `/var/www/adisaan.com`, a git checkout of this repo on `main`. nginx vhost
+  `/var/www/tbwim.adisaan.com`, a git checkout of this repo on `main`. nginx vhost
   `observatory.conf`, database `observatory` on host MariaDB, queue worker
   `observatory-queue`, scheduler cron for `www-data`.
 - The brand site adisaan.com and the admin at admin.adisaan.com are the AIOHM
@@ -15,10 +15,10 @@ anything from the private AIOHM platform.
   render adisaan.com.
 
 ## Deploy
-- Push to `main`, then on the server: `sudo bash /var/www/adisaan.com/ops/deploy.sh`
+- Push to `main`, then on the server: `sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh`
   (fetch, reset to origin/main, composer install, migrate, caches, queue
   restart, local check). Pass a ref to deploy something else.
-- Fresh host: `APP_DIR=/var/www/adisaan.com bash ops/provision-vps.sh <ssh host> tbwim.adisaan.com`.
+- Fresh host: `bash ops/provision-vps.sh <ssh host> tbwim.adisaan.com`.
 - `.env`, `storage/` and `vendor/` are outside git. `META_API_KEY` and
   `META_MONTHLY_LIMIT_USD` live only in the server `.env`.
 - A deploy is an approval boundary: do it when asked, report what the script
