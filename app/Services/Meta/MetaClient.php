@@ -87,7 +87,7 @@ final class MetaClient
             ->timeout(300)
             ->attach('request', (string) json_encode(['model' => $model, 'audioEncoding' => 'WAV', 'mode' => 'PUSH_TO_TALK']), 'request.json', ['Content-Type' => 'application/json'])
             ->attach('audio', (string) file_get_contents($wavPath), 'clip.wav', ['Content-Type' => 'audio/wav'])
-            ->post(config('tbwim.meta.url').MetaApiBudget::AUDIO_PATH);
+            ->post(config('tbwim.meta.url').'/asr/transcribe');
         if ($response->status() === 401) {
             $this->budget->release($period, $reservation);
 

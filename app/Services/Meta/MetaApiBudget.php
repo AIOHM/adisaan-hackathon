@@ -37,8 +37,6 @@ final class MetaApiBudget
 
     public const IMAGE_PATH = '/v1/images/generations';
 
-    public const AUDIO_PATH = '/v1/asr/transcribe';
-
     /** The API rejects clips over 10 minutes; the reservation assumes the max. */
     public const MAX_AUDIO_SECONDS = 600;
 
