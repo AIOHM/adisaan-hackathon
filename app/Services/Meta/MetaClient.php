@@ -85,7 +85,7 @@ final class MetaClient
         $response = Http::withToken($apiKey)
             ->acceptJson()
             ->timeout(300)
-            ->attach('request', (string) json_encode(['model' => $model, 'audioEncoding' => 'WAV', 'mode' => 'PUSH_TO_TALK']), 'request.json', ['Content-Type' => 'application/json'])
+            ->attach('request', (string) json_encode(['model' => $model, 'audioEncoding' => 'WAV', 'mode' => 'PUSH_TO_TALK']), null, ['Content-Type' => 'application/json'])
             ->attach('audio', (string) file_get_contents($wavPath), 'clip.wav', ['Content-Type' => 'audio/wav'])
             ->post(config('tbwim.meta.url').'/asr/transcribe');
         if ($response->status() === 401) {
