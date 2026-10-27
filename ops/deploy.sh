@@ -9,6 +9,7 @@
 set -euo pipefail
 APP="${APP:-/var/www/tbwim.adisaan.com}"
 REF="${1:-origin/main}"
+DOMAIN="${DOMAIN:-tbwim.adisaan.com}"
 cd "$APP"
 git config --global --add safe.directory "$APP" >/dev/null 2>&1 || true
 echo "== fetch"; git fetch --prune origin
@@ -24,5 +25,5 @@ echo "== caches"; php artisan config:cache -q && php artisan route:cache -q && p
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
 echo "== queue"; systemctl restart observatory-queue && systemctl is-active observatory-queue
-echo "== check"; curl -s -o /dev/null -w "   local http: %{http_code}\n" -H "Host: adisaan.com" http://127.0.0.1/api/agent/answer
+echo "== check"; curl -s -o /dev/null -w "   local http: %{http_code}\n" -H "Host: ${DOMAIN}" http://127.0.0.1/api/agent/answer
 echo "deployed $after"
