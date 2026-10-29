@@ -11,7 +11,7 @@ final class AnswerCountdownTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_homepage_countdown_is_a_rolling_sixty_seconds(): void
+    public function test_homepage_countdown_is_a_rolling_ten_seconds(): void
     {
         $html = $this->get('/')->assertOk()->getContent();
 
@@ -26,10 +26,10 @@ final class AnswerCountdownTest extends TestCase
         $serverNow = strtotime($match[2]);
         $this->assertIsInt($deadline);
         $this->assertIsInt($serverNow);
-        // Rolling window: sixty seconds from render time, with a small
+        // Rolling window: ten seconds from render time, with a small
         // tolerance for the milliseconds between the two now() calls.
-        $this->assertGreaterThanOrEqual(55, $deadline - $serverNow);
-        $this->assertLessThanOrEqual(65, $deadline - $serverNow);
+        $this->assertGreaterThanOrEqual(5, $deadline - $serverNow);
+        $this->assertLessThanOrEqual(15, $deadline - $serverNow);
     }
 
     public function test_homepage_countdown_reveals_into_fresh_answers(): void

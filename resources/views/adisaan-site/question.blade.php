@@ -162,13 +162,13 @@
                                             @endif
                                         </div>
                                     </div>
-                                {{-- A rolling sixty seconds that ends in the
+                                {{-- A rolling ten seconds that ends in the
                                      freshest released answers, not a fixed
                                      embargo date that goes stale. The featured
                                      card always counts; later cards only while
                                      their scheduled date is still future. --}}
                                 @elseif($i === 0 || ($slideRevealAt && $slideRevealAt->isFuture()))
-                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}" data-deadline="{{ now()->addMinute()->toIso8601String() }}" data-server-now="{{ now()->toIso8601String() }}" data-answer-video="{{ $story['answer_video'] ?? '' }}">
+                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}" data-deadline="{{ now()->addSeconds(10)->toIso8601String() }}" data-server-now="{{ now()->toIso8601String() }}" data-answer-video="{{ $story['answer_video'] ?? '' }}">
                                         <div class="question-answer-clock__content" aria-live="polite">
                                             <div class="qreel__head">
                                                 <p class="question-answer-clock__eyebrow">FRESH ANSWERS IN</p>
