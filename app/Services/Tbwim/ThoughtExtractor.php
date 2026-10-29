@@ -45,7 +45,9 @@ PROMPT;
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => self::INSTRUCTIONS],
                 ['role' => 'user', 'content' => $prompt],
-            ], (string) config('tbwim.extraction.model'), 2048, 0.3);
+            // Reasoning eats output tokens too (measured on review and
+                // synthesis): 2048 comes back empty, 4096 leaves room.
+            ], (string) config('tbwim.extraction.model'), 4096, 0.3);
             $lastResponse = $result['text'];
             $parsed = $this->parse($result['text']);
             if (isset($parsed['error'])) {
