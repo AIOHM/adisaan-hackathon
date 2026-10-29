@@ -1195,6 +1195,9 @@ html.js .reveal.is-in{opacity:1;transform:none}
 .home-who__photo{margin:32px 0 0;max-width:640px}
 .home-who__photo img{display:block;width:100%;height:auto;border-radius:12px}
 .home-who__photo figcaption{font-size:14px;color:var(--muted);margin-top:8px}
+.about-avatar{margin:28px 0;max-width:300px}
+.about-avatar img{display:block;width:100%;height:auto;border-radius:12px}
+.about-avatar figcaption{font-size:14px;color:var(--muted);margin-top:8px}
 .home-journey__count{font-size:20px;font-weight:600;line-height:1.35;max-width:34ch;margin:0 0 10px;color:#f4f0e8}
 .home-journey__count strong{display:block;font-size:clamp(48px,5.4vw,80px);font-weight:700;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:#e9c775;margin-bottom:8px}
 .home-journey__next{font-size:18px;color:#d6e3cf;margin:0 0 32px}

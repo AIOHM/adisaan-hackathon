@@ -408,6 +408,15 @@ final class AdiSaanSiteController extends Controller
         ]);
     }
 
+    public function about(Request $request): View
+    {
+        $shared = $this->shared('about');
+
+        return view('adisaan-site.about', $shared + [
+            'question' => $this->currentEpisode($shared['stories'], config('adisaan_public.home.episode_ref')),
+        ]);
+    }
+
     public function privacy(Request $request): View
     {
         return view('adisaan-site.privacy', $this->shared(''));

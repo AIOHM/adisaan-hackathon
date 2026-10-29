@@ -193,10 +193,11 @@
              rules, and a tab that behaves the way the other one already
              taught people it would. --}}
         <details class="tabs__members tabs__million">
-            <summary @if(in_array($active, ['million', 'journey'], true)) aria-current="page" @endif>The million</summary>
+            <summary @if(in_array($active, ['million', 'journey', 'about'], true)) aria-current="page" @endif>The million</summary>
             <div class="tabs__members-menu">
                 <a href="{{ route('adisaan.public.million') }}" @if($active === 'million') aria-current="page" @endif>The million</a>
                 <a href="{{ route('adisaan.public.journey') }}" @if($active === 'journey') aria-current="page" @endif>The journey</a>
+                <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
             </div>
         </details>
         <details class="tabs__members">

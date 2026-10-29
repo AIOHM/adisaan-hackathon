@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
  * the journey, the manifesto) send the visitor there.
  */
 Route::controller(AdiSaanSiteController::class)->group(function (): void {
-    // The root serves the question experience (the hackathon entry point);
-    // the brand home lives on at /construction.
-    Route::get('/', 'question')->name('adisaan.public.home');
+    // The root serves the million page (the hackathon entry point); the
+    // question experience lives on at /question.
+    Route::get('/', 'million')->name('adisaan.public.home');
     Route::get('/construction', 'home')->name('adisaan.public.construction');
     Route::get('/ro', 'homeRo')->name('adisaan.public.home_ro');
     Route::post('/', 'lead')->middleware('throttle:30,1')->name('adisaan.public.construction.lead');
@@ -28,6 +28,7 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::get('/answer/received', 'received')->name('adisaan.public.received');
     Route::post('/answer/received', 'storeReceived')->middleware('throttle:30,1')->name('adisaan.public.received.store');
     Route::get('/million', 'million')->name('adisaan.public.million');
+    Route::get('/about', 'about')->name('adisaan.public.about');
     Route::get('/privacy', 'privacy')->name('adisaan.public.privacy');
     Route::get('/api/journey/scoreboard', 'boardJson')->middleware('throttle:60,1')->name('adisaan.public.board');
     Route::post('/cookie-consent/log', 'cookieConsent')->middleware('throttle:30,1')->name('cookie-consent.log');
@@ -35,7 +36,7 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::post('/api/ask-muse/follow-up', 'askMuseFollowUp')->withoutMiddleware([ValidateCsrfToken::class])->name('adisaan.public.ask-muse.follow-up');
 });
 
-foreach (['members' => '/members', 'members.profile' => '/members/profile', 'news' => '/news', 'journey' => '/journey', 'manifesto' => '/manifesto', 'about' => '/about'] as $name => $path) {
+foreach (['members' => '/members', 'members.profile' => '/members/profile', 'news' => '/news', 'journey' => '/journey', 'manifesto' => '/manifesto'] as $name => $path) {
     Route::get($path, static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').$path, 302))->name('adisaan.public.'.$name);
 }
 

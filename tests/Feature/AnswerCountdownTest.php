@@ -11,9 +11,9 @@ final class AnswerCountdownTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_homepage_countdown_is_a_rolling_ten_seconds(): void
+    public function test_question_countdown_is_a_rolling_ten_seconds(): void
     {
-        $html = $this->get('/')->assertOk()->getContent();
+        $html = $this->get('/question')->assertOk()->getContent();
 
         $found = preg_match(
             '/data-answer-countdown[^>]*data-deadline="([^"]+)"[^>]*data-server-now="([^"]+)"/',
@@ -32,9 +32,9 @@ final class AnswerCountdownTest extends TestCase
         $this->assertLessThanOrEqual(15, $deadline - $serverNow);
     }
 
-    public function test_homepage_countdown_reveals_into_fresh_answers(): void
+    public function test_question_countdown_reveals_into_fresh_answers(): void
     {
-        $this->get('/')->assertOk()
+        $this->get('/question')->assertOk()
             ->assertSee('FRESH ANSWERS IN', false)
             ->assertSee('Fresh answers land when the clock reaches zero.', false);
     }
