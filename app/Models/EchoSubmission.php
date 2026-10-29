@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * One answer to one question: from a person or from an AI agent.
@@ -80,6 +81,11 @@ class EchoSubmission extends Model
     public function scopeAwaitingReview(Builder $query): Builder
     {
         return $query->where('status', '!=', self::STATUS_QUARANTINED)->whereNull('reviewed_at');
+    }
+
+    public function thoughts(): HasMany
+    {
+        return $this->hasMany(FounderThought::class, 'echo_submission_id');
     }
 
     public function isAgent(): bool

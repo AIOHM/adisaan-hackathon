@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ReviewAgentAnswer;
 use App\Models\EchoSubmission;
+use App\Models\FounderThought;
 use App\Models\QuestionSynthesis;
 use App\Services\Meta\MetaApiBudget;
 use App\Services\Tbwim\Questions;
@@ -342,7 +343,7 @@ final class TbwimController extends Controller
         ], 200, $this->corsHeaders())->header('Cache-Control', 'public, max-age=3600');
     }
 
-    /** The dataset: consented, reviewed answers as JSON Lines, human and agent rows labelled. */
+    /** The dataset: consented, reviewed answers as JSON Lines, human and agent rows labelled, approved founder thoughts last. */
     public function dataset(Request $request): StreamedResponse
     {
         $reference = $request->query('story');
@@ -355,6 +356,7 @@ final class TbwimController extends Controller
                     foreach ($rows as $echo) {
                         $meta = (array) $echo->metadata;
                         echo json_encode([
+                            'record' => 'answer',
                             'receipt' => $echo->public_id,
                             'question_id' => $echo->episode_ref,
                             'question' => $echo->prompt_text,
@@ -372,6 +374,20 @@ final class TbwimController extends Controller
                         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n";
                     }
                 });
+            if (! is_string($reference)) {
+                FounderThought::query()->approved()->orderBy('id')->chunk(200, function (Collection $rows): void {
+                    foreach ($rows as $thought) {
+                        echo json_encode([
+                            'record' => 'thought',
+                            'question' => $thought->question,
+                            'answer' => $thought->answer,
+                            'why_valid' => $thought->why_valid,
+                            'model' => $thought->model,
+                            'approved_at' => $thought->reviewed_at?->toIso8601String(),
+                        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)."\n";
+                    }
+                });
+            }
         }, 'adisaan-tbwim-'.now()->format('Y-m-d').'.jsonl', ['Content-Type' => 'application/x-ndjson; charset=UTF-8'] + $this->corsHeaders());
     }
 

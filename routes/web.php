@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AdiSaanSiteController;
+use App\Http\Controllers\CaptureController;
 use App\Http\Controllers\TbwimController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,7 @@ Route::controller(TbwimController::class)->group(function (): void {
         Route::options('/api/agent/answer', 'agentAnswerPreflight')->name('tbwim.agent.answer.preflight');
         Route::get('/api/agent/answer/{receipt}', 'agentAnswerStatus')->where('receipt', '[0-9A-Za-z]{26}')->name('tbwim.agent.answer.status');
         Route::get('/api/agent/answers', 'agentAnswers')->name('tbwim.agent.answers');
+        Route::post('/api/capture/thought', [CaptureController::class, 'store'])->name('tbwim.capture.thought');
         Route::get('/api/dataset.jsonl', 'dataset')->name('tbwim.dataset');
         Route::get('/api/spending', 'spending')->name('tbwim.spending');
         Route::get('/.well-known/agent.json', 'agentManifest')->name('tbwim.agent.manifest');

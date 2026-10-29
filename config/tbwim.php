@@ -109,6 +109,27 @@ return [
         'model' => env('TBWIM_VOICE_MODEL', 'muse-voice-transcribe-1.0'),
     ],
 
+    /*
+     * Founder capture: Adrian's phone thoughts (Telegram today, WhatsApp
+     * later as a second driver) land as private founder echoes, get
+     * transcribed by the voice pipeline, then Muse distils one question,
+     * one answer and the why into a draft for human review.
+     */
+    'capture' => [
+        // Shared secret the platform's Telegram forward must present.
+        'intake_secret' => env('TBWIM_CAPTURE_SECRET'),
+        // Telegram user ids allowed to capture, comma separated.
+        'founder_ids' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('TELEGRAM_FOUNDER_IDS', ''))
+        ))),
+        'max_bytes' => 40 * 1024 * 1024,
+    ],
+
+    'extraction' => [
+        'model' => env('TBWIM_EXTRACTION_MODEL', 'muse-spark-1.3'),
+    ],
+
     'poster' => [
         'prompt' => 'Cinematic poster illustration for the community question ":question" (:lead). Deep green (#073209) and warm cream (#F4F0E8) palette, hopeful human imagination theme, one dreamer silhouette looking at a rising horizon, painterly, no text, no words, no letters, no watermark, no logo.',
     ],
