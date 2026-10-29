@@ -19,12 +19,24 @@ final class ThoughtExtractionTest extends TestCase
     public function test_parse_accepts_a_well_formed_triple(): void
     {
         $parsed = app(ThoughtExtractor::class)->parse(json_encode([
-            'question' => 'What compounds fastest?',
+            'question' => 'What is the best way I imagine to compound fastest?',
             'answer' => implode(' ', array_fill(0, 40, 'patient')),
             'why_valid' => implode(' ', array_fill(0, 40, 'grounded')),
         ]));
 
-        $this->assertSame('What compounds fastest?', $parsed['question']);
+        $this->assertSame('What is the best way I imagine to compound fastest?', $parsed['question']);
+    }
+
+    public function test_parse_rejects_a_question_outside_the_tbwim_frame(): void
+    {
+        $parsed = app(ThoughtExtractor::class)->parse(json_encode([
+            'question' => 'How would I structure a team?',
+            'answer' => implode(' ', array_fill(0, 40, 'patient')),
+            'why_valid' => implode(' ', array_fill(0, 40, 'grounded')),
+        ]));
+
+        $this->assertArrayHasKey('error', $parsed);
+        $this->assertStringContainsString('best way I imagine', (string) $parsed['error']);
     }
 
     public function test_parse_rejects_a_question_without_a_mark(): void
@@ -43,7 +55,7 @@ final class ThoughtExtractionTest extends TestCase
         config()->set('tbwim.meta.api_key', 'test-key');
         config()->set('tbwim.meta.monthly_limit_usd', 5);
         Http::fake(['api.meta.ai/*' => Http::response(['model' => 'muse-spark-1.3', 'choices' => [['message' => ['content' => json_encode([
-            'question' => 'What compounds fastest?',
+            'question' => 'What is the best way I imagine to compound fastest?',
             'answer' => implode(' ', array_fill(0, 40, 'patient')),
             'why_valid' => implode(' ', array_fill(0, 40, 'grounded')),
         ])]]], 'usage' => ['prompt_tokens' => 500, 'completion_tokens' => 60]])]);
@@ -58,7 +70,7 @@ final class ThoughtExtractionTest extends TestCase
 
         $thought = FounderThought::query()->firstOrFail();
         $this->assertSame('draft', $thought->status);
-        $this->assertSame('What compounds fastest?', $thought->question);
+        $this->assertSame('What is the best way I imagine to compound fastest?', $thought->question);
     }
 
     public function test_job_skips_an_echo_that_already_has_a_draft(): void
@@ -104,7 +116,7 @@ final class ThoughtExtractionTest extends TestCase
         ]);
         FounderThought::create([
             'echo_submission_id' => $echo->id, 'source_type' => 'text',
-            'question' => 'What compounds fastest?', 'answer' => 'Patience.',
+            'question' => 'What is the best way I imagine to compound fastest?', 'answer' => 'Patience.',
             'why_valid' => 'Lived and reasoned.', 'status' => 'approved',
             'reviewed_at' => now(),
         ]);

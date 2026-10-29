@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 final class ThoughtExtractor
 {
-    public const PROMPT_VERSION = 'thought-v1-meta';
+    public const PROMPT_VERSION = 'thought-v2-tbwim';
 
     public const INSTRUCTIONS = <<<'PROMPT'
 You read one founder's recorded thought and distil it into the triple the human imagination database keeps: the question, the answer, the why.
@@ -26,7 +26,7 @@ Plain words, short sentences, no corporate jargon, no hype. The answer keeps the
 ## WHAT TO WRITE
 One JSON object and nothing else:
 {"question": "the one question this thought answers", "answer": "the distilled answer", "why_valid": "why this answer is valid and belongs in the database"}
-The question is a single sentence ending in a question mark, in the thought's own language. The answer is 30 to 150 words drawn only from what was said. The why_valid is 30 to 120 words: what makes the answer hold up (lived experience, reasoning, evidence in the thought) and why it deserves its place beside other human answers.
+The question is a single sentence ending in a question mark, and it always starts with the brand frame `What is the best way I imagine`, then the topic in the thought's own language. Example: `What is the best way I imagine to structure a small team?` Never write the question any other way. The answer is 30 to 150 words drawn only from what was said. The why_valid is 30 to 120 words: what makes the answer hold up (lived experience, reasoning, evidence in the thought) and why it deserves its place beside other human answers.
 
 ## JSON HYGIENE
 Escape every double quote inside a string. No literal line breaks inside a string, no trailing commas, no text outside the object.
@@ -78,6 +78,9 @@ PROMPT;
         }
         if (! str_ends_with($question, '?')) {
             return ['error' => 'the question must be one sentence ending in a question mark'];
+        }
+        if (preg_match('/^what is the best way i imagine\b/i', $question) !== 1) {
+            return ['error' => 'the question must start with "What is the best way I imagine"'];
         }
         if (mb_strlen($question) > 280) {
             return ['error' => 'the question must be at most 280 characters'];
