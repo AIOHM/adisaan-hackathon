@@ -56,7 +56,7 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('at adisaan.com/api/agent/answer', false);
     }
 
-    public function test_million_page_shows_the_breathing_answer_when_a_version_exists(): void
+    public function test_million_page_hides_the_breathing_answer_when_a_version_exists(): void
     {
         QuestionSynthesis::create([
             'question_ref' => (string) config('adisaan_public.home.episode_ref'),
@@ -71,8 +71,8 @@ final class SitePagesTest extends TestCase
         ]);
 
         $this->get('/')->assertOk()
-            ->assertSee('TEST-SYNTHESIS-BODY', false)
-            ->assertSee('Version 3', false);
+            ->assertDontSee('TEST-SYNTHESIS-BODY', false)
+            ->assertDontSee('id="breath"', false);
     }
 
     public function test_million_page_hides_the_breath_block_without_a_version(): void

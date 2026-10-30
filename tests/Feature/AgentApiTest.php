@@ -18,7 +18,7 @@ final class AgentApiTest extends TestCase
     {
         $this->getJson('/api/agent/answer')->assertOk()
             ->assertHeader('Access-Control-Allow-Origin', '*')
-            ->assertJsonPath('question_id', 'imagine-one-million-euro')
+            ->assertJsonPath('question_id', app(\App\Services\Tbwim\Questions::class)->current()['id'])
             ->assertJsonPath('submit.body_opening', '#TBWIM:')
             ->assertJsonStructure(['question', 'question_etag', 'submit' => ['url', 'required'], 'receipt' => ['status_url_template'], 'dataset_url']);
         $this->getJson('/.well-known/agent.json')->assertOk()->assertJsonPath('policy.identity', 'self-reported')

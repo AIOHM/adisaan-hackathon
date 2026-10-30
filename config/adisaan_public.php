@@ -209,7 +209,7 @@ return [
             // Revealed on upload rather than on a countdown — the clock was
             // for question one's premiere and there is nothing to count down
             // to here.
-            'question_release_at' => '2026-11-01T00:00:00+02:00',
+            'question_release_at' => '2026-10-30T00:00:00+02:00',
             'answer_reveal_at' => '2026-11-02T00:00:00+02:00',
             'answer_video' => '/question/answer-video/start-when-not-ready',
             'answer_why_video' => '/question/answer-video/start-when-not-ready?part=why',
