@@ -32,7 +32,7 @@ final class BattleRoundCommand extends Command
             $contenders = array_values(array_filter($contenders, fn (array $c) => in_array($c['model'] ?? '', $only, true)));
         }
         $question = (string) $story['question'];
-        $prompt = strtr((string) $battle['prompt'], [':question' => $question, ':tail' => $this->questionTail($question)]);
+        $prompt = strtr((string) $battle['prompt'], [':question' => lcfirst($question), ':tail' => $this->questionTail($question)]);
         $maxTokens = (int) ($battle['max_tokens'] ?? 420);
         $roundId = (string) Str::uuid();
         $answered = EchoSubmission::query()->agents()->where('episode_ref', $story['id'])->get(['metadata'])
@@ -69,6 +69,12 @@ final class BattleRoundCommand extends Command
             }
             if ($result['text'] === '') {
                 $this->line("  fail  {$label}: empty answer, not stored");
+                $failed++;
+
+                continue;
+            }
+            if (! preg_match('/^#TBWIM:\s+Based on my training,/i', ltrim($result['text']))) {
+                $this->line("  fail  {$label}: required opening missing; answer not stored");
                 $failed++;
 
                 continue;

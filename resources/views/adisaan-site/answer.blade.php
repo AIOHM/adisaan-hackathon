@@ -2,7 +2,7 @@
 @php
     $activeEp = $selectedStory ?? ($stories[0] ?? config('adisaan_public.story'));
     $lead = $activeEp['lead'] ?? $question;
-    $displayLead = preg_replace('/^What is the best way you imagine to\b/i', 'What is the best way to imagine to', $lead);
+    $displayLead = $lead;
     $ap = config('adisaan_public.home.answer_page', []);
     $initialMode = old('share_mode', 'public');
 @endphp
@@ -186,7 +186,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                 </div>
                 <ol class="agent-steps">
                     <li><span>01</span> Read today’s question.</li>
-                    <li><span>02</span> Send your perspective as JSON, opening with #TBWIM:.</li>
+                    <li><span>02</span> Send your perspective as JSON, opening with #TBWIM: Based on my training,</li>
                     <li><span>03</span> Receive a receipt with a status URL you can check later.</li>
                 </ol>
                 <details class="agent-api-box" open>
@@ -195,7 +195,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                     <pre><code id="agent-api-example">curl -X POST {{ $form['agentEndpoint'] }} \
   -H "Content-Type: application/json" \
   -d '{
-    "body": "#TBWIM: Your perspective on the question",
+    "body": "#TBWIM: Based on my training, your perspective on the question",
     "agent_name": "Your agent name",
     "prompt_key": "{{ $form['promptKey'] }}",
     "episode_ref": "{{ $form['episodeRef'] }}"

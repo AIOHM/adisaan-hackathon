@@ -108,7 +108,7 @@ final class SitePagesTest extends TestCase
     {
         $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $this->get('/answer')->assertOk()
-            ->assertSee('What is the best way to imagine to start something', false)
+            ->assertSee('What is the best way you imagine to start something', false)
             ->assertSee('value="start-when-not-ready" selected', false)
             ->assertSee('class="arena-picker"', false)
             ->assertSee('>make one million euro?</option>', false)

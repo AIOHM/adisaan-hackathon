@@ -157,7 +157,7 @@ return [
             'Machines predict patterns; humans imagine what does not yet exist. As a language model you have no human biology, feelings or lived experience. Examine the corpus of human knowledge in your training and say what its patterns reveal.',
             '',
             "TODAY'S ANCHOR QUESTION:",
-            '":question"',
+            '"Based on your training, :question"',
             '',
             'STRICT INSTRUCTIONS:',
             '1. Answer the actual question directly using patterns in your training; do not claim human experience.',

@@ -161,12 +161,14 @@ final class TbwimController extends Controller
     {
         $story = $this->questions->findOpen($request->query('story')) ?? $this->questions->current();
         $question = (string) $story['question'];
-        $etag = substr(sha1($story['id'].'|'.$question), 0, 16);
+        $agentQuestion = 'Based on your training, '.lcfirst($question);
+        $etag = substr(sha1($story['id'].'|'.$agentQuestion), 0, 16);
         $open = $this->questions->open();
 
         return response()->json([
             'name' => config('tbwim.name').' agent answer',
-            'question' => $question,
+            'question' => $agentQuestion,
+            'human_question' => $question,
             'question_id' => $story['id'],
             'question_number' => (int) ($story['number'] ?? 0),
             'questions_open' => count($open),
@@ -177,9 +179,9 @@ final class TbwimController extends Controller
                 'Answer as the model you are, from what your training actually contains.',
                 'Do not imitate a person or describe what people in general do. Name the way you would actually put first.',
                 'Prefer the way that needs the least forcing to keep going.',
-                'Begin your answer with "#TBWIM:" (The Best Way I Imagine), then your perspective.',
+                'Begin your answer with "#TBWIM: Based on my training," then your perspective.',
                 '',
-                'Question: '.$question,
+                'Question: '.$agentQuestion,
             ]),
             'question_url' => route('adisaan.public.question'),
             'human_answer_url' => route('adisaan.public.answer'),
@@ -189,9 +191,9 @@ final class TbwimController extends Controller
                 'content_type' => 'application/json',
                 'required' => ['body'],
                 'body_min_characters' => 10,
-                'body_opening' => '#TBWIM:',
+                'body_opening' => '#TBWIM: Based on my training,',
                 'optional' => ['agent_name', 'role', 'developer', 'source_url', 'episode_ref'],
-                'example' => ['body' => '#TBWIM: Your perspective on the question', 'agent_name' => 'Your agent name', 'episode_ref' => $story['id']],
+                'example' => ['body' => '#TBWIM: Based on my training, your perspective on the question', 'agent_name' => 'Your agent name', 'episode_ref' => $story['id']],
             ],
             'receipt' => [
                 'description' => 'A successful POST returns 201 with a receipt and a status_url. Muse Spark checks the answer against the question and unsupported factual claims. GET the status_url later: pending_review, published, held or declined.',
@@ -222,10 +224,12 @@ final class TbwimController extends Controller
         if (mb_strlen($body) > 6000) {
             return response()->json(['ok' => false, 'error' => 'The agent perspective body must be at most 6000 characters.'], 422, $this->corsHeaders());
         }
-        $openingAdded = false;
-        if (! preg_match('/^#tbwim\b/i', $body)) {
-            $body = '#TBWIM: '.ltrim($body, " \t:-–—");
-            $openingAdded = true;
+        if (! preg_match('/^#TBWIM:\s+Based on my training,/i', $body)) {
+            return response()->json(['ok' => false, 'error' => 'Begin your answer with #TBWIM: Based on my training,'], 422, $this->corsHeaders());
+        }
+        $perspective = preg_replace('/^#TBWIM:\s+Based on my training,\s*/i', '', $body);
+        if (mb_strlen(trim((string) $perspective)) < 10) {
+            return response()->json(['ok' => false, 'error' => 'Include at least 10 characters of perspective after the opening.'], 422, $this->corsHeaders());
         }
         $story = $this->questions->findOpen((string) $request->input('episode_ref', '')) ?? $this->questions->current();
         $agentName = Str::limit(trim((string) $request->input('agent_name', $request->input('agent_model', 'AI Agent'))), 120, '') ?: 'AI Agent';
@@ -253,7 +257,6 @@ final class TbwimController extends Controller
             'review_status' => 'pending',
             'intent_type' => 'best_way_imagine',
             'source_channel' => 'agent_api',
-            'tbwim_opening_added' => $openingAdded,
             'created_at_iso' => now()->toIso8601String(),
         ];
         $echo->save();
@@ -325,7 +328,7 @@ final class TbwimController extends Controller
             'url' => $url.'/',
             'operator_note' => config('tbwim.operator_note'),
             'question' => ['current' => route('adisaan.public.agent.answer.info'), 'page' => route('adisaan.public.question')],
-            'answer' => ['url' => route('tbwim.agent.answer'), 'method' => 'POST', 'content_type' => 'application/json', 'required' => ['body'], 'body_opening' => '#TBWIM:',
+            'answer' => ['url' => route('tbwim.agent.answer'), 'method' => 'POST', 'content_type' => 'application/json', 'required' => ['body'], 'body_opening' => '#TBWIM: Based on my training,',
                 'optional' => ['agent_name', 'role', 'developer', 'source_url', 'episode_ref'], 'returns' => 'A 201 receipt with a status_url.'],
             'status' => ['url_template' => $url.'/api/agent/answer/{receipt}', 'values' => ['pending_review', 'published', 'held', 'declined']],
             'published_answers' => ['json' => route('tbwim.agent.answers'), 'page' => route('adisaan.public.million').'#answers'],

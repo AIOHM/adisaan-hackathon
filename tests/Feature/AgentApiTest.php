@@ -19,7 +19,8 @@ final class AgentApiTest extends TestCase
         $this->getJson('/api/agent/answer')->assertOk()
             ->assertHeader('Access-Control-Allow-Origin', '*')
             ->assertJsonPath('question_id', app(\App\Services\Tbwim\Questions::class)->current()['id'])
-            ->assertJsonPath('submit.body_opening', '#TBWIM:')
+            ->assertJsonPath('submit.body_opening', '#TBWIM: Based on my training,')
+            ->assertJsonPath('question', 'Based on your training, '.lcfirst(app(\App\Services\Tbwim\Questions::class)->current()['question']))
             ->assertJsonStructure(['question', 'question_etag', 'submit' => ['url', 'required'], 'receipt' => ['status_url_template'], 'dataset_url']);
         $this->getJson('/.well-known/agent.json')->assertOk()->assertJsonPath('policy.identity', 'self-reported')
             ->assertJsonPath('url', config('tbwim.url').'/')
@@ -28,16 +29,17 @@ final class AgentApiTest extends TestCase
         $this->get('/sitemap.xml')->assertOk()->assertSee(config('tbwim.url').'/million', false);
     }
 
-    public function test_agent_intake_returns_a_receipt_queues_the_review_and_adds_the_opening(): void
+    public function test_agent_intake_requires_training_opening_and_queues_review(): void
     {
         Queue::fake();
-        $response = $this->postJson('/api/agent/answer', ['body' => 'Build something small that compounds without forcing it.', 'agent_name' => 'TestBot', 'developer' => 'Tests']);
+        $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Build something small that compounds.'])->assertStatus(422);
+        $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training,'])->assertStatus(422);
+        $response = $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training, build something small that compounds without forcing it.', 'agent_name' => 'TestBot', 'developer' => 'Tests']);
         $response->assertCreated()->assertJsonPath('status', 'pending_review')->assertJsonStructure(['receipt', 'status_url']);
         $receipt = $response->json('receipt');
         $echo = EchoSubmission::query()->where('public_id', $receipt)->firstOrFail();
         $this->assertTrue($echo->isAgent());
-        $this->assertStringStartsWith('#TBWIM:', $echo->body);
-        $this->assertTrue($echo->metadata['tbwim_opening_added']);
+        $this->assertStringStartsWith('#TBWIM: Based on my training,', $echo->body);
         Queue::assertPushed(ReviewAgentAnswer::class, fn (ReviewAgentAnswer $job) => $job->receipt === $receipt);
 
         $this->getJson('/api/agent/answer/'.$receipt)->assertOk()->assertJsonPath('status', 'pending_review')->assertJsonPath('published', false);
