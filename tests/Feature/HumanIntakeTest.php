@@ -25,7 +25,7 @@ final class HumanIntakeTest extends TestCase
 
     public function test_a_public_answer_is_stored_with_consent_and_without_raw_ip(): void
     {
-        $this->get('/answer')->assertOk()->assertSee('_answer_form_token', false)->assertSee('name="signature"', false);
+        $this->get('/answer')->assertOk()->assertSee('_answer_form_token', false)->assertDontSee('name="signature"', false);
         $this->post('/answer', ['body' => 'Build one thing people need and keep it running quietly.', 'episode_ref' => 'imagine-one-million-euro', 'share_mode' => 'public', 'signature' => 'Ana', '_answer_form_token' => $this->proof()])
             ->assertRedirect(route('adisaan.public.received'));
         $echo = EchoSubmission::query()->firstOrFail();

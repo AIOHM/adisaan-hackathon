@@ -110,6 +110,10 @@ final class SitePagesTest extends TestCase
         $this->get('/answer')->assertOk()
             ->assertSee('What is the best way to imagine to start something', false)
             ->assertSee('value="start-when-not-ready" selected', false)
+            ->assertSee('class="arena-picker"', false)
+            ->assertSee('>make one million euro?</option>', false)
+            ->assertDontSee('Display name (optional)')
+            ->assertDontSee('Recordings wait for review.')
             ->assertSee('value="imagine-one-million-euro"', false)
             ->assertDontSee('value="know-when-to-stop"', false);
         $this->get('/answer?story=imagine-one-million-euro')->assertOk()

@@ -8,19 +8,15 @@
 @endphp
 @section('title', 'Answer: ' . $lead)
 @section('description', 'Answer AdiSaan’s question. Human perspectives and AI-agent submissions are kept separate.')
+@push('styles')
+<link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261030-analysis">
+@endpush
 @section('content')
 <section class="home-section home-section--dark answer-page" id="answer" aria-labelledby="answer-heading">
     <div class="container">
         <div class="answer-page__intro">
             <h1 id="answer-heading" class="reveal" style="--i:1">{{ $displayLead }}</h1>
-            <form class="answer-question-picker" action="{{ route('adisaan.public.answer') }}" method="get">
-                <label for="answer-question">Choose a question</label>
-                <div><select id="answer-question" name="story">
-                    @foreach($stories as $option)
-                        <option value="{{ $option['id'] }}" @selected(($activeEp['id'] ?? null) === $option['id'])>{{ $option['question'] }}</option>
-                    @endforeach
-                </select><button type="submit">Choose</button></div>
-            </form>
+            @include('adisaan-site.partials.arena-question-picker', ['pickerRoute' => 'adisaan.public.answer', 'pickerId' => 'answer-question', 'pickerSelectedId' => $activeEp['id'] ?? null])
             <p class="answer-page__episode reveal" style="--i:2">
                 <a class="home-link" href="{{ route('adisaan.public.question') }}">← See the question and context</a>
             </p>
@@ -156,13 +152,9 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                         </label>
                     </fieldset>
 
-                    <label for="answer-signature" class="one-form__label">Display name (optional)</label>
-                    <input id="answer-signature" name="signature" type="text" maxlength="60" value="{{ old('signature') }}" placeholder="Leave blank to answer anonymously">
-
                     <button type="submit" class="btn-primary one-form__send" style="margin-top: 16px;">
                         <span>{{ $initialMode === 'public' ? ($ap['send_label'] ?? 'Send My Perspective') : ($ap['send_private_label'] ?? 'Send privately') }}</span>
                     </button>
-                    <p class="one-form__note">Recordings wait for review. <a href="{{ route('adisaan.public.privacy') }}">Privacy ↗</a></p>
                 </form>
                 </div>
             </div>
