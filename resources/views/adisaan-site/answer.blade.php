@@ -147,10 +147,8 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                         </label>
                     </fieldset>
 
-                    {{-- No name, no email (Adrian, 2026-10-26). The ask is one
-                         question, the lowest this site has ever made. Identity
-                         is offered after the answer, on the thank-you page,
-                         where leaving a name claims it and its tokens. --}}
+                    <label for="answer-signature" class="one-form__label">Display name (optional)</label>
+                    <input id="answer-signature" name="signature" type="text" maxlength="60" value="{{ old('signature') }}" placeholder="Leave blank to answer anonymously">
 
                     <button type="submit" class="btn-primary one-form__send" style="margin-top: 16px;">
                         <span>{{ $initialMode === 'public' ? ($ap['send_label'] ?? 'Send My Perspective') : ($ap['send_private_label'] ?? 'Send privately') }}</span>

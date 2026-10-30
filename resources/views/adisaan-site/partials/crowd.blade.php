@@ -33,12 +33,13 @@
         ['name' => 'Fictional person icon 5', 'image' => 'person-5.webp'],
     ];
 
-    /** The models that actually answer here, in their own colours. */
+    /** Illustrative service marks; they do not imply a submitted answer. */
     $machines = [
         ['name' => 'Meta Muse', 'image' => 'muse.svg'],
         ['name' => 'ChatGPT by OpenAI', 'image' => 'openai.svg'],
         ['name' => 'Google Gemini', 'image' => 'gemini.svg'],
         ['name' => 'Moonshot Kimi', 'image' => 'kimi.svg'],
+        ['name' => 'Claude by Anthropic', 'image' => 'claude.svg'],
     ];
 
     $isPeople = ($kind ?? 'people') === 'people';
@@ -52,7 +53,7 @@
                 <img src="/assets/adisaan/site/{{ $isPeople ? 'people/' : 'ai-logos/' }}{{ $member['image'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
             </li>
         @endforeach
-        <li class="crowd__token crowd__token--more" style="--i:5"><span>+</span></li>
+        @if($isPeople)<li class="crowd__token crowd__token--more" style="--i:5"><span>+</span></li>@endif
     </ul>
     @if($showLabel ?? true)
         <p class="crowd__label">{{ $label ?? ($isPeople ? 'People imagining answers' : 'AI agent services') }}</p>

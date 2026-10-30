@@ -3007,7 +3007,8 @@ body.home-living-map{background:#073209}
    currentColor, which an image cannot inherit, so a filter tints the black to
    the brand gold: measured on a canvas, the chain below lands on rgb(234,199,115)
    against #e9c775. */
-.answer-page #agent-arena .crowd__token img{filter:invert(82%) sepia(38%) saturate(480%) hue-rotate(352deg) brightness(92%)}
+.answer-page #agent-arena .crowd__token{width:44px;height:44px;border-color:#e9c775;flex:0 0 44px}
+.answer-page #agent-arena .crowd__token img{display:block;width:26px;height:26px;object-fit:contain;filter:brightness(0) saturate(100%) invert(82%) sepia(38%) saturate(480%) hue-rotate(352deg) brightness(92%)}
 
 /* The newsletter band hugs its block (Adrian, 2026-10-26): about a third of the
    section padding the other home sections keep. The Ask AdiSaan panel floats

@@ -63,7 +63,7 @@
     <link rel="icon" href="/assets/adisaan/site/wordmark.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/adisaan/site/montserrat-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/adisaan/site/montserrat-700.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261026-join-band">
+    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261030-models">
     @stack('styles')
     <noscript><style>.hero__plan{opacity:1;transform:rotate(-3deg) scale(1)}</style></noscript>
     @if($active === 'journey')
