@@ -12,8 +12,13 @@
 .arena-picker select:focus-visible,.arena-picker button:focus-visible{outline:3px solid #e9c775;outline-offset:3px}
 @media(max-width:600px){.arena-picker__controls{flex-direction:column}.arena-picker button{align-self:center;min-width:120px}}
 .arena-page .arena-brand{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2vw,20px);padding-block:8px}
-.arena-page .arena-brand img{display:block;width:clamp(140px,18vw,220px);height:auto}
-.arena-page .arena-brand span{font-size:clamp(26px,3.3vw,39px);font-weight:800;letter-spacing:.03em;color:#f4f0e8;line-height:1}
+.arena-page .arena-brand img{display:block;width:clamp(170px,23vw,280px);height:auto}
+.arena-page .arena-brand span{font-family:AdiSaanPusab,Arial,sans-serif;font-size:clamp(32px,4.2vw,52px);font-weight:400;letter-spacing:-.04em;color:#f4f0e8;line-height:1}
 .arena-page .duel__more{display:inline-block;margin-top:10px;color:#e9c775;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .arena-page .duel__more:focus-visible{outline:2px solid #e9c775;outline-offset:4px}
-@media(max-width:480px){.arena-page .arena-brand{gap:10px}.arena-page .arena-brand img{width:132px}.arena-page .arena-brand span{font-size:26px}}
+@media(max-width:480px){.arena-page .arena-brand{gap:10px}.arena-page .arena-brand img{width:clamp(140px,43vw,200px)}.arena-page .arena-brand span{font-size:clamp(27px,8vw,38px)}}
+
+.arena-insights{max-width:750px;margin:48px auto 0;text-align:center}
+.arena-insights__eyebrow{color:#e9c775;font-size:14px;font-weight:700;letter-spacing:.04em}
+.arena-insights h4{margin:12px 0 16px;color:#f4f0e8;font-size:clamp(24px,3vw,34px);line-height:1.2}
+.arena-insights p:last-child{margin:0 auto;color:#f4f0e8;font-size:clamp(16px,1.7vw,19px);line-height:1.7}

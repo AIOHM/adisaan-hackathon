@@ -100,7 +100,7 @@ return [
 
     'synthesis' => [
         'model' => env('TBWIM_SYNTHESIS_MODEL', 'muse-spark-1.3'),
-        'min_voices' => (int) env('TBWIM_SYNTHESIS_MIN_VOICES', 5),
+        'min_voices' => (int) env('TBWIM_SYNTHESIS_MIN_VOICES', 10),
         'min_words' => 60,
         'max_words' => 120,
     ],

@@ -925,7 +925,7 @@ final class AdiSaanSiteController extends Controller
         $state['versions'] = $rows->count();
         $state['latest'] = $rows->isNotEmpty() ? $shape($rows->first()) : null;
         $state['earlier'] = $rows->slice(1)->map($shape)->values()->all();
-        $state['site_count'] = EchoSubmission::query()->countable()->humans()->where('episode_ref', $questionRef)->count();
+        $state['site_count'] = EchoSubmission::query()->publiclyVisible()->humans()->where('episode_ref', $questionRef)->count();
 
         return $state;
     }

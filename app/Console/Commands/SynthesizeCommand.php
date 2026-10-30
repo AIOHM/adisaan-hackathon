@@ -14,24 +14,40 @@ use Illuminate\Support\Facades\DB;
 /** The breathing answer: when new human voices arrived, write the next version from all of them in one call. */
 final class SynthesizeCommand extends Command
 {
-    protected $signature = 'tbwim:synthesize {--question= : Question id (default: the current one)} {--min-voices=} {--force} {--dry-run}';
+    protected $signature = 'tbwim:synthesize {--question= : Question id (default: the current one)} {--all : Process every open question} {--min-voices=} {--force} {--dry-run}';
 
     protected $description = 'Compile the human voices on a question into a new version of the breathing answer';
 
     public function handle(QuestionSynthesizer $synthesizer, Questions $questions): int
     {
+        if ($this->option('all')) {
+            $status = self::SUCCESS;
+            foreach ($questions->open() as $story) {
+                $status = max($status, $this->synthesizeQuestion($synthesizer, $story));
+            }
+
+            return $status;
+        }
+
         $story = $questions->find((string) $this->option('question')) ?? $questions->current();
+
+        return $this->synthesizeQuestion($synthesizer, $story);
+    }
+
+    private function synthesizeQuestion(QuestionSynthesizer $synthesizer, array $story): int
+    {
         $ref = (string) $story['id'];
         $question = (string) $story['question'];
-        $minVoices = max(1, (int) ($this->option('min-voices') ?: config('tbwim.synthesis.min_voices', 5)));
+        $minVoices = max(1, (int) ($this->option('min-voices') ?: config('tbwim.synthesis.min_voices', 10)));
 
-        $site = EchoSubmission::query()->countable()->humans()->where('episode_ref', $ref)->where('consent_quote', true)
+        $site = EchoSubmission::query()->publiclyVisible()->humans()->where('episode_ref', $ref)
             ->orderBy('created_at')->orderBy('id')->get(['id', 'body', 'synthesized_at'])
-            ->filter(fn (EchoSubmission $e) => mb_strlen(trim((string) $e->body)) >= 40)->values();
+            ->filter(fn (EchoSubmission $e) => trim((string) $e->body) !== '')->values();
         $last = QuestionSynthesis::query()->forQuestion($ref)->newestFirst()->first();
         $total = $site->count();
         $new = $site->whereNull('synthesized_at')->count();
         $nextVersion = ($last?->version ?? 0) + 1;
+        $previousBody = $last?->prompt_version === QuestionSynthesizer::PROMPT_VERSION ? $last->body : null;
 
         $this->info('Question: '.$ref);
         $this->line('  '.$question);
@@ -41,19 +57,19 @@ final class SynthesizeCommand extends Command
 
             return self::SUCCESS;
         }
-        if ($new === 0 && ! $this->option('force')) {
-            $this->info('No new voice since the last version. Nothing written.');
+        if ($total - (int) (($last?->prompt_version === QuestionSynthesizer::PROMPT_VERSION) ? $last->voices_site : 0) < $minVoices && ! $this->option('force')) {
+            $this->info('The next voice milestone has not been reached. Nothing written.');
 
             return self::SUCCESS;
         }
         $voices = $site->map(fn (EchoSubmission $e) => ['circle' => 'site', 'text' => (string) $e->body])->all();
         if ($this->option('dry-run')) {
-            $this->line($synthesizer->buildPrompt($question, $voices, $last?->body, $nextVersion));
+            $this->line($synthesizer->buildPrompt($question, $voices, $previousBody, $nextVersion));
 
             return self::SUCCESS;
         }
         try {
-            $result = $synthesizer->synthesize($question, $voices, $last?->body, $nextVersion);
+            $result = $synthesizer->synthesize($question, $voices, $previousBody, $nextVersion);
         } catch (\Throwable $e) {
             $this->error('Synthesis failed, nothing written: '.$e->getMessage());
 

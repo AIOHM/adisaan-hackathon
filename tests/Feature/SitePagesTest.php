@@ -63,6 +63,25 @@ final class SitePagesTest extends TestCase
         $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.arena').'"', false);
     }
 
+    public function test_arena_insights_require_ten_released_human_answers_and_a_public_synthesis(): void
+    {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $ref = 'imagine-one-million-euro';
+        for ($i = 0; $i < 9; $i++) {
+            EchoSubmission::create(['body' => str_repeat('A public human answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
+        }
+        EchoSubmission::create(['body' => str_repeat('A pending private answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human']]);
+        $this->artisan('tbwim:synthesize', ['--question' => $ref, '--min-voices' => 10, '--dry-run' => true])->expectsOutputToContain('Below the minimum')->assertSuccessful();
+        $synthesis = QuestionSynthesis::create(['question_ref' => $ref, 'version' => 1, 'body' => 'Muse insight for this question.', 'voices_site' => 10, 'voices_agents' => 0, 'themes' => [], 'model' => 'muse', 'prompt_version' => \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION, 'generated_at' => now()]);
+        $this->get('/arena?story='.$ref)->assertDontSee('Muse insight for this question.');
+        EchoSubmission::create(['body' => str_repeat('Another public human answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
+        $this->get('/arena?story='.$ref)->assertSee('Muse insight for this question.');
+        $this->get('/arena?story=start-when-not-ready')->assertDontSee('Muse insight for this question.');
+        $this->artisan('tbwim:synthesize', ['--question' => $ref, '--min-voices' => 10, '--dry-run' => true])->expectsOutputToContain('next voice milestone')->assertSuccessful();
+        $synthesis->update(['prompt_version' => 'breath-v2-meta']);
+        $this->get('/arena?story='.$ref)->assertDontSee('Muse insight for this question.');
+    }
+
     public function test_about_redirects_to_brand_home_and_menu_links_there(): void
     {
         $url = rtrim(config('adisaan_public.brand_url'), '/').'/';

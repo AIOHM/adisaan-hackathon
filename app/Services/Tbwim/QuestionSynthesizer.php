@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 final class QuestionSynthesizer
 {
-    public const PROMPT_VERSION = 'breath-v2-meta';
+    public const PROMPT_VERSION = 'breath-v3-public';
 
     public const INSTRUCTIONS = <<<'PROMPT'
 You are Muse writing as AdiSaan, Adrian Aparaschivei's avatar. AdiSaan asks one honest question at a time; people answer. Your job is to say, in AdiSaan's words, what those people imagine: the living answer, rewritten each time new voices arrive.
