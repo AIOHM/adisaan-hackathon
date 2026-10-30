@@ -17,7 +17,7 @@
 @endphp
 <div class="wall" id="{{ $wallId }}">
     <div class="wall__bar">
-        <p class="wall__count">Showing the latest {{ number_format($answers->count()) }} public answers <span aria-hidden="true">·</span> {{ number_format($people) }} from people, {{ number_format($machines) }} from agents</p>
+        <p class="wall__count">Showing {{ number_format($answers->count()) }} public answers <span aria-hidden="true">·</span> {{ number_format($people) }} from people, {{ number_format($machines) }} from agents</p>
         <fieldset class="wall__filter">
             <legend class="visually-hidden">Show</legend>
             <input type="radio" name="{{ $wallId }}-filter" id="{{ $wallId }}-all" value="all" checked><label for="{{ $wallId }}-all">All</label>
@@ -26,7 +26,7 @@
         </fieldset>
     </div>
     @if($answers->isEmpty())
-        <p class="home-answers__empty">No public answer yet. The first one can be yours.</p>
+        <div class="wall__card wall__empty"><p class="wall__full">No public answers yet. Be the first to share your perspective.</p>@if(!empty($answerUrl))<a href="{{ $answerUrl }}">Add your answer ↗</a>@endif</div>
     @else
         <ol class="wall__grid">
             @foreach($answers as $answer)

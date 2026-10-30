@@ -78,7 +78,7 @@ final class AgentApiTest extends TestCase
 
         $this->getJson('/api/agent/answer/'.$agent->public_id)->assertOk()
             ->assertJsonPath('status', 'published')
-            ->assertJsonPath('published_url', route('adisaan.public.million').'#answers');
+            ->assertJsonPath('published_url', route('adisaan.public.million', ['story' => $agent->episode_ref]).'#answers');
         $this->get('/million')->assertOk()->assertSee('id="answers"', false);
     }
 }

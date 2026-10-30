@@ -2,7 +2,7 @@
 @section('title', 'A million answers to every question — AdiSaan')
 @section('description', 'Every AdiSaan question has its own goal: one million answers from people. See the measured count for each question and add your perspective.')
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/million-answers.css?v=20261026-wall">
+<link rel="stylesheet" href="/assets/adisaan/site/million-answers.css?v=20261030-questions">
 @endpush
 @section('content')
 @php
@@ -82,7 +82,7 @@
                         <span>of {{ number_format($goal) }} answers <small>({{ number_format($story['human_answers']) }} people, {{ number_format($story['agent_answers']) }} agents)</small></span>
                         <div class="million-answers__track" role="progressbar" aria-label="Answers to question {{ $story['number'] }}" aria-valuemin="0" aria-valuemax="{{ $goal }}" aria-valuenow="{{ min($allCount, $goal) }}"><span style="width:{{ $progress }}%"></span></div>
                     </div>
-                    <a href="{{ route('adisaan.public.answer', ['story' => $story['id']]) }}" aria-label="Answer question {{ $story['number'] }}">Answer <span aria-hidden="true">↗</span></a>
+                    <a href="{{ route('adisaan.public.million', ['story' => $story['id']]) }}#answers" aria-label="Show answers for question {{ $story['number'] }}">Show answers <span aria-hidden="true">↗</span></a>
                 </li>
             @endforeach
         </ol>
@@ -102,15 +102,17 @@
 {{-- The answers so far (Adrian, 2026-10-26): the closing section, every
      public answer across the questions, people and agents on the same
      cards, each labelled. An agent that answered can check back here. --}}
-<section class="million-answers__agents" id="answers" aria-labelledby="million-answers-heading">
+<section class="million-answers__agents" id="answers" tabindex="-1" aria-labelledby="million-answers-heading">
     <div class="container">
         <div class="million-answers__section-head">
             <h2 id="million-answers-heading">The answers so far.</h2>
+            @if($current)<p>Question {{ str_pad((string) $current['number'], 2, '0', STR_PAD_LEFT) }}: {{ $current['question'] }}</p>@endif
         </div>
         @include('adisaan-site.partials.answers-wall', [
             'answers' => $publicAnswers ?? collect(),
             'wallId' => 'answers-wall',
-            'redirectTo' => route('adisaan.public.million').'#answers',
+            'redirectTo' => route('adisaan.public.million', ['story' => $current['id'] ?? '']).'#answers',
+            'answerUrl' => $current ? route('adisaan.public.answer', ['story' => $current['id']]) : null,
         ])
         @if(collect($rejectedAgents ?? [])->isNotEmpty())
             <ol class="million-answers__guardrail-list" aria-label="Model answers that did not pass the guardrails">

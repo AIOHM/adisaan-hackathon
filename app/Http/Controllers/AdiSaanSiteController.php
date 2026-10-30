@@ -399,6 +399,13 @@ final class AdiSaanSiteController extends Controller
     {
         $shared = $this->shared('million');
         $episode = $this->currentEpisode($shared['stories'], config('adisaan_public.home.episode_ref'));
+        $requested = (string) $request->query('story', '');
+        foreach ($shared['stories'] as $story) {
+            if (($story['id'] ?? null) === $requested) {
+                $episode = $story;
+                break;
+            }
+        }
 
         $home = config('adisaan_public.home', []);
 
@@ -408,8 +415,8 @@ final class AdiSaanSiteController extends Controller
             'homeEpisode' => $episode,
             'breath' => $this->breathState($episode['id'] ?? null, $home['date_format'] ?? 'j M Y'),
             'arena' => $this->loadArena($shared['stories']),
-            'publicAnswers' => $this->loadPublicPerspectives(null),
-            'rejectedAgents' => $this->loadRejectedAgentAnswers(null, 24),
+            'publicAnswers' => $this->loadPublicPerspectives($episode['id'] ?? null, true),
+            'rejectedAgents' => $this->loadRejectedAgentAnswers($episode['id'] ?? null, 24),
         ]);
     }
 
@@ -751,7 +758,7 @@ final class AdiSaanSiteController extends Controller
         return $arena;
     }
 
-    private function loadPublicPerspectives(?string $questionRef = null): Collection
+    private function loadPublicPerspectives(?string $questionRef = null, bool $all = false): Collection
     {
         $votedIds = array_map('intval', (array) request()->session()->get('adisaan_voted_echoes', []));
 
@@ -769,7 +776,7 @@ final class AdiSaanSiteController extends Controller
             })
             ->whereNotNull('created_at')
             ->orderByDesc('created_at')
-            ->take(24)
+            ->when(! $all, static fn ($query) => $query->take(24))
             ->get()
             ->filter(static fn (EchoSubmission $echo): bool => (($echo->metadata['respondent_type'] ?? '') !== 'agent') || self::agentPublished($echo))
             ->map(function (EchoSubmission $echo) use ($votedIds): array {
@@ -797,7 +804,7 @@ final class AdiSaanSiteController extends Controller
             })
             ->sortByDesc('votes')
             ->values()
-            ->take(8);
+            ->when(! $all, static fn (Collection $answers) => $answers->take(8));
     }
 
     private static function agentPublished(EchoSubmission $echo): bool

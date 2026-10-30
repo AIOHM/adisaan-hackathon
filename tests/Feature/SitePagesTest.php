@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\QuestionSynthesis;
+use App\Models\EchoSubmission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,6 +17,20 @@ final class SitePagesTest extends TestCase
     {
         $this->get('/')->assertOk()
             ->assertSee('A million answers.', false);
+    }
+
+    public function test_selecting_a_question_shows_only_its_public_answers(): void
+    {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        EchoSubmission::create(['body' => 'First question answer.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
+        EchoSubmission::create(['body' => 'Private second answer.', 'episode_ref' => 'start-when-not-ready', 'status' => 'received', 'consent_quote' => false, 'metadata' => ['respondent_type' => 'human']]);
+
+        $this->get('/?story=start-when-not-ready')->assertOk()
+            ->assertSee('id="featured-question-heading">What is the best way you imagine to start something', false)
+            ->assertSee('No public answers yet. Be the first')
+            ->assertDontSee('First question answer.')
+            ->assertDontSee('Private second answer.');
+        $this->get('/?story=imagine-one-million-euro')->assertOk()->assertSee('First question answer.');
     }
 
     public function test_million_page_still_serves(): void
