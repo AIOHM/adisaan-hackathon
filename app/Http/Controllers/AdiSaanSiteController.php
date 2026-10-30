@@ -242,7 +242,7 @@ final class AdiSaanSiteController extends Controller
         $place = $this->cleanPlaceFields($request);
         $echo = new EchoSubmission;
         $echo->episode_ref = $episodeRef;
-        $echo->prompt_key = $this->slug($validated['prompt_key'] ?? null) ?? Str::slug((string) ($story['question'] ?? ''));
+        $echo->prompt_key = $this->slug($validated['prompt_key'] ?? null) ?? Str::limit(Str::slug((string) ($story['question'] ?? '')), 64, '');
         $echo->prompt_text = (string) ($story['question'] ?? config('adisaan_public.story.question'));
         $echo->body = $body;
         $echo->signature = $this->cleanSignature($validated['signature'] ?? null);
@@ -976,7 +976,7 @@ final class AdiSaanSiteController extends Controller
             'minimumLength' => config('echo_intake.body.minimum_length'),
             'maximumLength' => config('echo_intake.body.maximum_length'),
             'episodeRef' => $story['id'] ?? config('adisaan_public.story.episode_ref'),
-            'promptKey' => Str::slug($story['question'] ?? config('adisaan_public.story.question')),
+            'promptKey' => Str::limit(Str::slug($story['question'] ?? config('adisaan_public.story.question')), 64, ''),
             'agentEndpoint' => config('tbwim.url').'/api/agent/answer',
         ];
     }

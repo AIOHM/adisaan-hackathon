@@ -46,4 +46,17 @@ final class HumanIntakeTest extends TestCase
         $this->assertSame('quarantined', EchoSubmission::query()->firstOrFail()->status);
         $this->postJson('/answer', ['body' => 'An answer to a question that is not open yet.', 'episode_ref' => 'know-when-to-stop', '_answer_form_token' => $this->proof()])->assertStatus(422);
     }
+
+    public function test_second_question_form_supplies_a_valid_prompt_key(): void
+    {
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $html = $this->get('/answer?story=start-when-not-ready')->assertOk()->getContent();
+        $this->assertSame(1, preg_match('/name="prompt_key" value="([^"]+)"/', $html, $match));
+        $this->assertLessThanOrEqual(64, strlen($match[1]));
+        Carbon::setTestNow(Carbon::parse('2026-10-30 11:59:50', 'Europe/Bucharest'));
+        $proof = app(FormProofInspector::class)->issueToken('tbwim_answer');
+        Carbon::setTestNow(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->post('/answer', ['body' => 'When not ready, I wait for the current.', 'episode_ref' => 'start-when-not-ready', 'prompt_key' => $match[1], 'share_mode' => 'public', 'signature' => 'AdiSaan', '_answer_form_token' => $proof])->assertRedirect(route('adisaan.public.received'));
+        $this->assertSame('AdiSaan', EchoSubmission::query()->firstOrFail()->signature);
+    }
 }
