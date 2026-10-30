@@ -192,7 +192,7 @@ final class AdiSaanSiteController extends Controller
             'consent_followup' => ['nullable'],
             'share_mode' => ['nullable', 'in:public,private'],
             'episode_ref' => ['nullable', 'string', 'max:64'],
-            'prompt_key' => ['nullable', 'string', 'max:64'],
+            'prompt_key' => ['nullable', 'string', 'max:255'],
             'intent_type' => ['nullable', 'string', 'max:32'],
             'country_code' => ['nullable', 'string', 'max:2'],
             'city' => ['nullable', 'string', 'max:120'],
@@ -243,7 +243,7 @@ final class AdiSaanSiteController extends Controller
         $place = $this->cleanPlaceFields($request);
         $echo = new EchoSubmission;
         $echo->episode_ref = $episodeRef;
-        $echo->prompt_key = $this->slug($validated['prompt_key'] ?? null) ?? Str::limit(Str::slug((string) ($story['question'] ?? '')), 64, '');
+        $echo->prompt_key = Str::limit(Str::slug((string) ($validated['prompt_key'] ?? $story['question'] ?? '')), 255, '');
         $echo->prompt_text = (string) ($story['question'] ?? config('adisaan_public.story.question'));
         $echo->body = $body;
         $echo->signature = $this->cleanSignature($validated['signature'] ?? null);
@@ -1002,7 +1002,7 @@ final class AdiSaanSiteController extends Controller
             'minimumLength' => config('echo_intake.body.minimum_length'),
             'maximumLength' => config('echo_intake.body.maximum_length'),
             'episodeRef' => $story['id'] ?? config('adisaan_public.story.episode_ref'),
-            'promptKey' => Str::limit(Str::slug($story['question'] ?? config('adisaan_public.story.question')), 64, ''),
+            'promptKey' => Str::limit(Str::slug($story['question'] ?? config('adisaan_public.story.question')), 255, ''),
             'agentEndpoint' => config('tbwim.url').'/api/agent/answer',
         ];
     }

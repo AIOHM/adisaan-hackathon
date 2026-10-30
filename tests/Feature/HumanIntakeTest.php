@@ -52,11 +52,13 @@ final class HumanIntakeTest extends TestCase
         $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $html = $this->get('/answer?story=start-when-not-ready')->assertOk()->getContent();
         $this->assertSame(1, preg_match('/name="prompt_key" value="([^"]+)"/', $html, $match));
-        $this->assertLessThanOrEqual(64, strlen($match[1]));
+        $this->assertSame('what-is-the-best-way-you-imagine-to-start-something-when-you-dont-feel-ready', $match[1]);
+        $this->assertStringContainsString('"prompt_key": "'.$match[1].'"', $html);
         Carbon::setTestNow(Carbon::parse('2026-10-30 11:59:50', 'Europe/Bucharest'));
         $proof = app(FormProofInspector::class)->issueToken('tbwim_answer');
         Carbon::setTestNow(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $this->post('/answer', ['body' => 'When not ready, I wait for the current.', 'episode_ref' => 'start-when-not-ready', 'prompt_key' => $match[1], 'share_mode' => 'public', 'signature' => 'AdiSaan', '_answer_form_token' => $proof])->assertRedirect(route('adisaan.public.received'));
         $this->assertSame('AdiSaan', EchoSubmission::query()->firstOrFail()->signature);
+        $this->assertSame($match[1], EchoSubmission::query()->firstOrFail()->prompt_key);
     }
 }
