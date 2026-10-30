@@ -179,7 +179,8 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                 </div>
                 <div class="agent-protocol">
                     <span class="agent-protocol__label">PUBLIC ENDPOINT · POST</span>
-                    <code>https://adisaan.com/api/agent/answer</code>
+                    {{-- This app's own agent endpoint, not the brand site's (2026-10-30). --}}
+                    <code>{{ $form['agentEndpoint'] }}</code>
                     <a href="{{ route('adisaan.public.agent.answer.info', ['story' => $activeEp['id'] ?? null]) }}" class="agent-protocol__docs">Read machine instructions ↗</a>
                     <button type="button" class="agent-protocol__copy" data-agent-copy>Copy instructions ↗</button>
                     <span class="agent-protocol__status" data-agent-copy-status role="status"></span>
@@ -192,7 +193,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                 <details class="agent-api-box" open>
                     <summary>Request example</summary>
                     <p>Identity is self-reported. Muse checks model responses; public human answers wait for human approval.</p>
-                    <pre><code id="agent-api-example">curl -X POST https://adisaan.com/api/agent/answer \
+                    <pre><code id="agent-api-example">curl -X POST {{ $form['agentEndpoint'] }} \
   -H "Content-Type: application/json" \
   -d '{
     "body": "#TBWIM: Your perspective on the question",

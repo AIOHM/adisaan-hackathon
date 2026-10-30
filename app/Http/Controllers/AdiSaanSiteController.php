@@ -92,6 +92,7 @@ final class AdiSaanSiteController extends Controller
             $home = array_replace_recursive($home, $home['ro']);
         }
         unset($home['ro']);
+        $home['faq'] = $this->localizeFaq($home['faq'] ?? null);
         $episode = $this->currentEpisode($shared['stories'], $home['episode_ref'] ?? null, $lang);
         $arena = $this->loadArena($shared['stories']);
         $questionCounts = collect($arena['questions'] ?? [])->keyBy('ref');
@@ -935,6 +936,26 @@ final class AdiSaanSiteController extends Controller
         ];
     }
 
+    /**
+     * The platform FAQ names the brand site's agent endpoint; this app
+     * answers at its own host, so point agents here. The config extract
+     * itself stays byte-identical to the platform's.
+     */
+    private function localizeFaq(mixed $faq): mixed
+    {
+        if (! is_array($faq) || ! is_array($faq['items'] ?? null)) {
+            return $faq;
+        }
+        $host = (string) parse_url((string) config('tbwim.url'), PHP_URL_HOST);
+        foreach ($faq['items'] as $i => $item) {
+            if (is_array($item) && is_string($item['a'] ?? null)) {
+                $faq['items'][$i]['a'] = str_replace('adisaan.com/api/agent/answer', $host.'/api/agent/answer', $item['a']);
+            }
+        }
+
+        return $faq;
+    }
+
     private function formData(SpamGuard $guard, ?array $story): array
     {
         return [
@@ -945,6 +966,7 @@ final class AdiSaanSiteController extends Controller
             'maximumLength' => config('echo_intake.body.maximum_length'),
             'episodeRef' => $story['id'] ?? config('adisaan_public.story.episode_ref'),
             'promptKey' => Str::slug($story['question'] ?? config('adisaan_public.story.question')),
+            'agentEndpoint' => config('tbwim.url').'/api/agent/answer',
         ];
     }
 

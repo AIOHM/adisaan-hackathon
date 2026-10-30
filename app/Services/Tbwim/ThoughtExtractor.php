@@ -45,7 +45,7 @@ PROMPT;
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => self::INSTRUCTIONS],
                 ['role' => 'user', 'content' => $prompt],
-            // Reasoning eats output tokens too (measured on review and
+                // Reasoning eats output tokens too (measured on review and
                 // synthesis): 2048 comes back empty, 4096 leaves room.
             ], (string) config('tbwim.extraction.model'), 4096, 0.3);
             $lastResponse = $result['text'];

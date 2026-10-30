@@ -10,6 +10,7 @@ use Tests\TestCase;
 final class SitePagesTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_homepage_serves_the_million_page(): void
     {
         $this->get('/')->assertOk()
@@ -34,5 +35,23 @@ final class SitePagesTest extends TestCase
     {
         $this->get('/sitemap.xml')->assertOk()
             ->assertSee(config('tbwim.url').'/about', false);
+    }
+
+    public function test_answer_page_points_agents_at_this_apps_endpoint(): void
+    {
+        config()->set('tbwim.url', 'https://tbwim.adisaan.com');
+        config()->set('adisaan_public.url', 'https://tbwim.adisaan.com');
+        $this->get('/answer')->assertOk()
+            ->assertSee('https://tbwim.adisaan.com/api/agent/answer', false)
+            ->assertDontSee('https://adisaan.com/api/agent/answer', false);
+    }
+
+    public function test_home_faq_points_agents_at_this_apps_endpoint(): void
+    {
+        config()->set('tbwim.url', 'https://tbwim.adisaan.com');
+        config()->set('adisaan_public.url', 'https://tbwim.adisaan.com');
+        $this->get('/construction')->assertOk()
+            ->assertSee('tbwim.adisaan.com/api/agent/answer', false)
+            ->assertDontSee('at adisaan.com/api/agent/answer', false);
     }
 }
