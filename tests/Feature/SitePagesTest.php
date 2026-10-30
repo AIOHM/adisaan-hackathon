@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\QuestionSynthesis;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -53,5 +54,32 @@ final class SitePagesTest extends TestCase
         $this->get('/construction')->assertOk()
             ->assertSee('tbwim.adisaan.com/api/agent/answer', false)
             ->assertDontSee('at adisaan.com/api/agent/answer', false);
+    }
+
+    public function test_million_page_shows_the_breathing_answer_when_a_version_exists(): void
+    {
+        QuestionSynthesis::create([
+            'question_ref' => (string) config('adisaan_public.home.episode_ref'),
+            'version' => 3,
+            'body' => 'Every voice imagines a slower morning. TEST-SYNTHESIS-BODY.',
+            'voices_site' => 7,
+            'voices_agents' => 0,
+            'themes' => [['theme' => 'Slowness', 'voices' => 7]],
+            'model' => 'muse-spark-1.3',
+            'prompt_version' => 'v1',
+            'generated_at' => now(),
+        ]);
+
+        $this->get('/')->assertOk()
+            ->assertSee('TEST-SYNTHESIS-BODY', false)
+            ->assertSee('Version 3', false);
+    }
+
+    public function test_million_page_hides_the_breath_block_without_a_version(): void
+    {
+        $this->assertSame(0, QuestionSynthesis::count());
+
+        $this->get('/')->assertOk()
+            ->assertDontSee('id="breath"', false);
     }
 }

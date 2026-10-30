@@ -400,9 +400,13 @@ final class AdiSaanSiteController extends Controller
         $shared = $this->shared('million');
         $episode = $this->currentEpisode($shared['stories'], config('adisaan_public.home.episode_ref'));
 
+        $home = config('adisaan_public.home', []);
+
         return view('adisaan-site.million', $shared + [
             'livingMap' => $this->loadLivingMap(),
+            'home' => $home,
             'homeEpisode' => $episode,
+            'breath' => $this->breathState($episode['id'] ?? null, $home['date_format'] ?? 'j M Y'),
             'arena' => $this->loadArena($shared['stories']),
             'publicAnswers' => $this->loadPublicPerspectives(null),
             'rejectedAgents' => $this->loadRejectedAgentAnswers(null, 24),
