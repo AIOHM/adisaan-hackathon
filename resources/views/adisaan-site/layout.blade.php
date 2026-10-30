@@ -63,7 +63,7 @@
     <link rel="icon" href="/assets/adisaan/site/wordmark.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/adisaan/site/montserrat-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/adisaan/site/montserrat-700.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261030-models">
+    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261030-questions-exit">
     @stack('styles')
     <noscript><style>.hero__plan{opacity:1;transform:rotate(-3deg) scale(1)}</style></noscript>
     @if($active === 'journey')
@@ -223,11 +223,20 @@
     <div class="container footer__bottom">
         <span>© {{ now()->year }} AdiSaan</span>
         <span>Supported by <a href="https://ohm.events/">OHM Events</a> · Built with <a href="https://aiohm.org/">AIOHM</a></span>
-        <span><a href="{{ route('adisaan.public.members') }}">{{ !empty($memberUnlocked) ? 'Members Sanctuary' : 'Members' }}</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
+        <span><a href="{{ route('adisaan.public.manifesto') }}">Manifesto</a> · <a href="{{ route('adisaan.public.members') }}">{{ !empty($memberUnlocked) ? 'Members Sanctuary' : 'Members' }}</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
     </div>
 </footer>
 <div class="toast" role="status" aria-live="polite" hidden></div>
 @include('adisaan-site.partials.analytics-consent')
 @include('adisaan-site.partials.ambassador-companion')
+<dialog class="manifesto-exit" aria-labelledby="manifesto-exit-title" aria-describedby="manifesto-exit-description">
+    <button class="manifesto-exit__close" type="button" aria-label="Close">×</button>
+    <p class="manifesto-exit__label">A thought before you go</p>
+    <h2 id="manifesto-exit-title">Every question opens a new way forward.</h2>
+    <p id="manifesto-exit-description">Discover the idea behind AdiSaan and the journey we are building together.</p>
+    <a href="{{ route('adisaan.public.manifesto') }}">Read the manifesto <span aria-hidden="true">↗</span></a>
+    <button type="button" class="manifesto-exit__later">Maybe later</button>
+</dialog>
+<script src="/assets/adisaan/site/manifesto-exit.js?v=20261030" defer></script>
 </body>
 </html>

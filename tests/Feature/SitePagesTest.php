@@ -62,6 +62,21 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('https://adisaan.com/api/agent/answer', false);
     }
 
+    public function test_answer_page_selects_latest_open_question_and_allows_choosing_an_earlier_one(): void
+    {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->get('/answer')->assertOk()
+            ->assertSee('What is the best way to imagine to start something', false)
+            ->assertSee('value="start-when-not-ready" selected', false)
+            ->assertSee('value="imagine-one-million-euro"', false)
+            ->assertDontSee('value="know-when-to-stop"', false);
+        $this->get('/answer?story=imagine-one-million-euro')->assertOk()
+            ->assertSee('value="imagine-one-million-euro" selected', false)
+            ->assertSee('name="episode_ref" value="imagine-one-million-euro"', false);
+        $this->get('/answer?story=know-when-to-stop')->assertOk()
+            ->assertSee('name="episode_ref" value="start-when-not-ready"', false);
+    }
+
     public function test_home_faq_points_agents_at_this_apps_endpoint(): void
     {
         config()->set('tbwim.url', 'https://tbwim.adisaan.com');

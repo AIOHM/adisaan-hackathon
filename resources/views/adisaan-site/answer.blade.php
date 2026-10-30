@@ -2,6 +2,7 @@
 @php
     $activeEp = $selectedStory ?? ($stories[0] ?? config('adisaan_public.story'));
     $lead = $activeEp['lead'] ?? $question;
+    $displayLead = preg_replace('/^What is the best way you imagine to\b/i', 'What is the best way to imagine to', $lead);
     $ap = config('adisaan_public.home.answer_page', []);
     $initialMode = old('share_mode', 'public');
 @endphp
@@ -11,7 +12,15 @@
 <section class="home-section home-section--dark answer-page" id="answer" aria-labelledby="answer-heading">
     <div class="container">
         <div class="answer-page__intro">
-            <h1 id="answer-heading" class="reveal" style="--i:1">{{ $lead }}</h1>
+            <h1 id="answer-heading" class="reveal" style="--i:1">{{ $displayLead }}</h1>
+            <form class="answer-question-picker" action="{{ route('adisaan.public.answer') }}" method="get">
+                <label for="answer-question">Choose a question</label>
+                <div><select id="answer-question" name="story">
+                    @foreach($stories as $option)
+                        <option value="{{ $option['id'] }}" @selected(($activeEp['id'] ?? null) === $option['id'])>{{ $option['question'] }}</option>
+                    @endforeach
+                </select><button type="submit">Choose</button></div>
+            </form>
             <p class="answer-page__episode reveal" style="--i:2">
                 <a class="home-link" href="{{ route('adisaan.public.question') }}">← See the question and context</a>
             </p>

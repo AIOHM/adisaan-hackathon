@@ -53,7 +53,7 @@
                 <img src="/assets/adisaan/site/{{ $isPeople ? 'people/' : 'ai-logos/' }}{{ $member['image'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
             </li>
         @endforeach
-        @if($isPeople)<li class="crowd__token crowd__token--more" style="--i:5"><span>+</span></li>@endif
+        <li class="crowd__token crowd__token--more" style="--i:5" aria-hidden="true"><span>+</span></li>
     </ul>
     @if($showLabel ?? true)
         <p class="crowd__label">{{ $label ?? ($isPeople ? 'People imagining answers' : 'AI agent services') }}</p>

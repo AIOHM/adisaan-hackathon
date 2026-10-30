@@ -147,14 +147,15 @@ final class AdiSaanSiteController extends Controller
     public function answer(Request $request, SpamGuard $guard): View
     {
         $reference = $request->query('story') ?? $request->session()->getOldInput('episode_ref');
-        $stories = (array) config('adisaan_public.stories', []);
+        $shared = $this->shared('answer');
+        $stories = $shared['stories'];
         $selectedStory = is_string($reference) ? collect($stories)
             ->first(static fn (array $story): bool => ($story['id'] ?? null) === $reference && ($story['question_published'] ?? false) === true) : null;
         if (! $selectedStory) {
-            $selectedStory = collect($stories)->firstWhere('id', config('adisaan_public.home.episode_ref')) ?? ($stories[0] ?? null);
+            $selectedStory = collect($stories)->firstWhere('id', $this->questions->current()['id'] ?? null) ?? ($stories[0] ?? null);
         }
 
-        return view('adisaan-site.answer', $this->shared('answer') + [
+        return view('adisaan-site.answer', $shared + [
             'livingMap' => $this->loadLivingMap(),
             'selectedStory' => $selectedStory,
             'question' => $selectedStory['question'] ?? config('adisaan_public.story.question'),
