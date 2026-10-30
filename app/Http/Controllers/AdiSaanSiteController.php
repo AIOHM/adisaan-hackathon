@@ -396,6 +396,31 @@ final class AdiSaanSiteController extends Controller
         return redirect()->to(route('adisaan.public.received').'#why')->with('why_saved', $awarded);
     }
 
+    public function arena(Request $request): View
+    {
+        $shared = $this->shared('arena');
+        $requested = (string) $request->query('story', '');
+        $stories = collect($shared['stories']);
+        $episode = $stories->firstWhere('id', $requested)
+            ?? $stories->firstWhere('id', $this->questions->current()['id'])
+            ?? $stories->first();
+        $ref = $episode['id'] ?? null;
+        $home = config('adisaan_public.home', []);
+        $counts = collect($this->loadArena($shared['stories'])['questions'] ?? [])->keyBy('ref');
+        $perspectives = $ref ? $this->loadPublicPerspectives($ref, true) : collect();
+
+        return view('adisaan-site.arena', $shared + [
+            'livingMap' => $this->loadLivingMap(),
+            'home' => $home,
+            'homeEpisode' => $episode,
+            'breath' => $this->breathState($ref, $home['date_format'] ?? 'j M Y'),
+            'battleHuman' => $perspectives->where('is_agent', false)->take(5)->values(),
+            'battleMachines' => $perspectives->where('is_agent', true)->take(5)->values(),
+            'rejectedAgents' => $this->loadRejectedAgentAnswers($ref, 5),
+            'perspectiveSplit' => $counts->get($ref, ['people' => 0, 'machines' => 0]),
+        ]);
+    }
+
     public function million(Request $request): View
     {
         $shared = $this->shared('million');

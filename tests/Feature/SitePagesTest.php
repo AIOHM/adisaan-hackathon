@@ -39,6 +39,20 @@ final class SitePagesTest extends TestCase
             ->assertSee('A million answers.', false);
     }
 
+    public function test_arena_selects_open_questions_and_only_shows_their_public_answers(): void
+    {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        EchoSubmission::create(['body' => 'A public first question answer.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
+        EchoSubmission::create(['body' => 'A private second question answer.', 'episode_ref' => 'start-when-not-ready', 'status' => 'received', 'consent_quote' => false, 'metadata' => ['respondent_type' => 'human']]);
+
+        $this->get('/arena')->assertOk()->assertSee('No public answers are available yet.')
+            ->assertDontSee('A public first question answer.')->assertDontSee('A private second question answer.')
+            ->assertSee('value="start-when-not-ready" selected', false)->assertDontSee('value="know-when-to-stop"', false);
+        $this->get('/arena?story=imagine-one-million-euro')->assertOk()
+            ->assertSee('A public first question answer.')->assertDontSee('A private second question answer.');
+        $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.arena').'"', false);
+    }
+
     public function test_about_redirects_to_brand_home_and_menu_links_there(): void
     {
         $url = rtrim(config('adisaan_public.brand_url'), '/').'/';

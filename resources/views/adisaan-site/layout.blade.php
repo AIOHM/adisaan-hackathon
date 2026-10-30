@@ -187,6 +187,7 @@
     <div class="@unless($compactHeader)container @endunless tabs__inner">
         <a href="{{ route('adisaan.public.question') }}" @if($active === 'question') aria-current="page" @endif>Question</a>
         <a href="{{ route('adisaan.public.answer') }}" @if($active === 'answer') aria-current="page" @endif>Answer</a>
+        <a href="{{ route('adisaan.public.arena') }}" @if($active === 'arena') aria-current="page" @endif>Arena</a>
         {{-- The two million pages as one tab with a menu under it, the same
              shape as Members below. Reuses that component's classes
              rather than styling a second dropdown: one pattern, one set of

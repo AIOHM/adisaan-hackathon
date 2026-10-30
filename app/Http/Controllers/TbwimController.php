@@ -431,7 +431,7 @@ final class TbwimController extends Controller
     {
         $url = (string) config('tbwim.url');
         $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        foreach (['', '/question', '/answer', '/million', '/privacy'] as $path) {
+        foreach (['', '/question', '/answer', '/arena', '/million', '/privacy'] as $path) {
             $xml .= '<url><loc>'.htmlspecialchars($url.$path, ENT_XML1).'</loc></url>';
         }
 
