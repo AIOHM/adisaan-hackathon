@@ -37,9 +37,9 @@
     $machines = [
         ['name' => 'Meta Muse', 'image' => 'muse.svg'],
         ['name' => 'ChatGPT by OpenAI', 'image' => 'openai.svg'],
-        ['name' => 'Google Gemini', 'image' => 'gemini.svg'],
+        ['name' => 'Google Gemini', 'image' => 'gemini.svg', 'colorImage' => 'gemini-color.svg'],
         ['name' => 'Moonshot Kimi', 'image' => 'kimi.svg'],
-        ['name' => 'Claude by Anthropic', 'image' => 'claude.svg'],
+        ['name' => 'Claude by Anthropic', 'image' => 'claude.svg', 'colorImage' => 'claude-color.svg'],
     ];
 
     $isPeople = ($kind ?? 'people') === 'people';
@@ -50,7 +50,7 @@
     <ul class="crowd__ring" role="img" aria-label="{{ $label ?? ($isPeople ? 'People answering' : 'Models answering') }}">
         @foreach($members as $i => $member)
             <li class="crowd__token{{ $isPeople ? ' crowd__token--portrait' : ' crowd__token--logo' }}" style="--i:{{ $i }}" title="{{ $member['name'] }}">
-                <img src="/assets/adisaan/site/{{ $isPeople ? 'people/' : 'ai-logos/' }}{{ $member['image'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
+                <img src="/assets/adisaan/site/{{ $isPeople ? 'people/' : 'ai-logos/' }}{{ !$isPeople && !empty($brandColors) ? ($member['colorImage'] ?? $member['image']) : $member['image'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
             </li>
         @endforeach
         <li class="crowd__token crowd__token--more" style="--i:5" aria-hidden="true"><span>+</span></li>

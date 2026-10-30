@@ -51,8 +51,12 @@ final class SitePagesTest extends TestCase
             ->assertSee('value="start-when-not-ready" selected>start something when you don&#039;t feel ready?</option>', false)
             ->assertSee('>make one million euro?</option>', false)
             ->assertDontSee('value="know-when-to-stop"', false);
-        $this->get('/arena?story=imagine-one-million-euro')->assertOk()
-            ->assertSee('A public first question answer.')->assertDontSee('A private second question answer.');
+        $selected = $this->get('/arena?story=imagine-one-million-euro')->assertOk()
+            ->assertSee('A public first question answer.')->assertDontSee('A private second question answer.')
+            ->assertSee('ai-logos/gemini-color.svg', false)->assertSee('ai-logos/claude-color.svg', false);
+        $html = $selected->getContent();
+        $this->assertSame(1, substr_count($html, 'id="arena-question"'));
+        $this->assertGreaterThan(strpos($html, 'class="duel"'), strpos($html, 'id="arena-question"'));
         $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.arena').'"', false);
     }
 

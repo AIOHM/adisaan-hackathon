@@ -65,7 +65,11 @@
         {{-- The question once, not once per side. It is the same
              question — printing it twice was duplication at every width
              and four wrapped lines at this one. --}}
-        <p class="duel__q">{{ $q }}</p>
+        @if(!empty($arenaPicker))
+            @include('adisaan-site.partials.arena-question-picker')
+        @else
+            <p class="duel__q">{{ $q }}</p>
+        @endif
 
         <div class="duel__head">
             <div class="duel__side duel__side--human">
@@ -85,7 +89,7 @@
             </div>
 
             <div class="duel__side duel__side--machine">
-                @include('adisaan-site.partials.crowd', ['kind' => 'machines', 'label' => 'AI models answering', 'showLabel' => false])
+                @include('adisaan-site.partials.crowd', ['kind' => 'machines', 'label' => 'AI models answering', 'showLabel' => false, 'brandColors' => $arenaBrandColors ?? false])
                 <span class="duel__count">{{ $machines->count() }} public shown · {{ number_format($perspectiveSplit['machines'] ?? $machines->count()) }} received</span>
             </div>
         </div>
