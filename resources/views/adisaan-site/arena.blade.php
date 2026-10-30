@@ -1,16 +1,22 @@
 @extends('adisaan-site.layout')
 @section('title', 'AdiSaan Arena')
 @section('description', 'See how people and AI agents answer the same question in the AdiSaan Arena.')
+@push('styles')
+<link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261030-map">
+@endpush
 @section('content')
-<section class="home-section home-episode" aria-labelledby="arena-page-title">
+<section class="home-section home-section--dark home-episode arena-page" aria-labelledby="arena-page-title">
     <div class="container">
         <h1 id="arena-page-title" class="visually-hidden">AdiSaan Arena</h1>
         @if(count($stories ?? []) > 1)
             <form class="answer-question-picker" action="{{ route('adisaan.public.arena') }}" method="get">
-                <label for="arena-question">Choose a question</label>
+                <label for="arena-question">What is the best way you imagine to...</label>
                 <div><select id="arena-question" name="story">
                     @foreach($stories as $story)
-                        <option value="{{ $story['id'] }}" @selected(($homeEpisode['id'] ?? null) === $story['id'])>{{ $story['question'] }}</option>
+                        @php
+                            $optionText = preg_replace('/^what is the best way you imagine to\s+/iu', '', $story['question']);
+                        @endphp
+                        <option value="{{ $story['id'] }}" @selected(($homeEpisode['id'] ?? null) === $story['id'])>{{ $optionText }}</option>
                     @endforeach
                 </select><button type="submit">Choose</button></div>
             </form>

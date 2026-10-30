@@ -47,7 +47,10 @@ final class SitePagesTest extends TestCase
 
         $this->get('/arena')->assertOk()->assertSee('No public answers are available yet.')
             ->assertDontSee('A public first question answer.')->assertDontSee('A private second question answer.')
-            ->assertSee('value="start-when-not-ready" selected', false)->assertDontSee('value="know-when-to-stop"', false);
+            ->assertSee('What is the best way you imagine to...')
+            ->assertSee('value="start-when-not-ready" selected>start something when you don&#039;t feel ready?</option>', false)
+            ->assertSee('>make one million euro?</option>', false)
+            ->assertDontSee('value="know-when-to-stop"', false);
         $this->get('/arena?story=imagine-one-million-euro')->assertOk()
             ->assertSee('A public first question answer.')->assertDontSee('A private second question answer.');
         $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.arena').'"', false);

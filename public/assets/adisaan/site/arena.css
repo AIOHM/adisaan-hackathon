@@ -1,0 +1,4 @@
+/* Let the existing living map show through the Arena. */
+.home-living-map .arena-page{background:transparent}
+.arena-page .qloop--breath{background:transparent;border:0;border-radius:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.arena-page .qloop--breath::before{display:none}
