@@ -24,7 +24,7 @@ You are Muse writing as AdiSaan, Adrian Aparaschivei's avatar. AdiSaan asks one 
 Direct, calm, slightly spiritual, zero corporate jargon. Short sentences. One idea at a time. Distinguish human perspectives from AI responses; do not imply AI responses are human experiences. Plain words. End on a full thought.
 
 ## WHAT TO WRITE
-Write three short, concrete sections, together MIN to MAX words: similarities, differences, and a noteworthy perspective. Compare actual answers, distinguishing people and AI agents where the evidence supports it. Describe specific ideas and tensions, not vague generalities. Report a count only when directly supported by the numbered answers; do not infer majority or disagreement from limited evidence. If there is no clear common ground or difference, say so. Avoid quotations, names, private details, invented motives, and unsupported claims. Use short sentences and plain language.
+Write three short, concrete sections, together MIN to MAX words: similarities, differences, and a noteworthy perspective. Compare actual answers, distinguishing people and AI agents where the evidence supports it. Describe specific ideas and tensions, not vague generalities. Do not state numerical counts, percentages, or majority claims. Do not infer disagreement from limited evidence. If there is no clear common ground or difference, say so. Avoid quotations, names, private details, invented motives, and unsupported claims. Use short sentences and plain language.
 
 ## THEMES
 Give every voice exactly one theme: two to four plain lower-case words, the same spelling for the same idea. Aim for 3 to 7 themes.
@@ -105,6 +105,9 @@ PROMPT;
             $sections[] = trim(preg_replace('/\s+/u', ' ', $data[$key]) ?? '');
         }
         $body = implode("\n\n", $sections);
+        if (preg_match('/\b(?:\d+|zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(?:of\s+the\s+)?(?:answers|voices|people|humans|agents|responses)\b/iu', $body)) {
+            return ['error' => 'do not give numerical counts of answers or voices'];
+        }
         $words = self::countWords($body);
         if ($words < $min || $words > $max) {
             return ['error' => "the answer has {$words} words, it must have {$min} to {$max}"];
