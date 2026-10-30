@@ -197,10 +197,8 @@ return [
             // for question one's premiere and there is nothing to count down
             // to here.
             'question_release_at' => '2026-10-30T00:00:00+02:00',
-            'answer_reveal_at' => '2026-11-02T00:00:00+02:00',
-            'answer_video' => '/question/answer-video/start-when-not-ready',
-            'answer_why_video' => '/question/answer-video/start-when-not-ready?part=why',
-            'answer_why_wait_seconds' => 10,
+            'answer_reveal_at' => '2026-10-30T00:00:00+02:00',
+            'answer_video' => '/assets/adisaan/site/question-02-answer.mp4',
             'duration_label' => '10 SEC',
             'badge' => 'QUESTION 02 · 10 SEC',
             // Rendered 2026-10-24. Captions are burned into the picture, so

@@ -19,6 +19,7 @@ final class AnswerCountdownTest extends TestCase
             ->assertSee('We are preparing the video for you.')
             ->assertSee('data-countdown-seconds>10', false)
             ->assertSee('data-answer-main controls playsinline preload="metadata" hidden src="/assets/adisaan/site/question-01-answer.mp4"', false)
+            ->assertSee('data-answer-main controls playsinline preload="metadata" hidden src="/assets/adisaan/site/question-02-answer.mp4"', false)
             ->assertDontSee('Running an AI agent?');
     }
 }
