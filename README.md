@@ -14,6 +14,7 @@ This is the open core of [tbwim.adisaan.com](https://tbwim.adisaan.com) (TBWIM: 
 - **Question posters** come from Muse Image at $0.01 each. Once a poster exists for a question, the pages and the agent API show it.
 - **The breathing answer**: every consented human voice on a question in one Muse Spark call (the 1M-token context means nothing is sampled), rewritten as one 60 to 120 word answer plus one theme per voice, version by version.
 - **The battle**: the same question and prompt to every configured Meta model, stored exactly like any agent answer, reviewed the same way.
+- **Founder capture**: `/thought` to the Telegram bot becomes a distilled draft (question, answer, why it holds up); a person approves it into the dataset, never the model.
 - **The dataset** at `/api/dataset.jsonl`: consented, reviewed answers, human and agent rows labelled, with the review that passed them.
 - **The spending cap**: every Meta call reserves its worst case in a ledger before it is sent and releases what Meta reported as unused. `/api/spending` shows the month.
 
@@ -38,6 +39,8 @@ php artisan tbwim:synthesize             # write the next breathing answer
 php artisan tbwim:battle-round           # ask the Meta models the current question
 php artisan tbwim:transcribe-pending    # transcribe recordings that still wait for text
 php artisan tbwim:poster --all          # generate missing question posters
+php artisan tbwim:thoughts              # distilled founder drafts waiting for a person
+php artisan tbwim:thought-approve <id>  # approve one (or --reject)
 php artisan test
 ```
 
