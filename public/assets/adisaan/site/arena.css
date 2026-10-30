@@ -26,3 +26,7 @@
 /* Center the complete wordmark across the Arena content, independent of title width. */
 .home-episode.arena-page .qloop--breath .qloop__title--arena{display:flex;width:100%;max-width:none;justify-content:center;text-align:center}
 .arena-page .arena-brand{margin-inline:auto}
+
+/* Bring the Arena title closer to the navigation. */
+.home-episode.arena-page{padding-top:clamp(28px,4vw,48px)}
+.home-episode.arena-page .qloop--breath{margin-top:0;padding-top:12px}
