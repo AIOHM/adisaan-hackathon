@@ -1,5 +1,13 @@
 # Deploying the app as adisaan.com on a fresh VPS
 
+> Current production (2026-10-30): this app serves
+> tbwim.adisaan.com from `/var/www/tbwim.adisaan.com` (a git checkout
+> of this repo). adisaan.com itself is rendered by the private AIOHM
+> platform, so the DNS move below is historical. Rollback is a
+> redeploy of a previous ref, e.g.
+> `sudo bash /var/www/tbwim.adisaan.com/ops/deploy.sh 408c607`.
+> Last known-good: `b0d6373` (live), `408c607`.
+
 adisaan.com is behind Cloudflare, so the move is one DNS change and the
 rollback is the same change in reverse. The current site keeps running on the
 AIOHM platform until the record is switched; nothing is deleted there.
