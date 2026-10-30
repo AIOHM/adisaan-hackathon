@@ -91,7 +91,7 @@
         </div>
 
         <div class="duel__lists">
-            @foreach([['side' => 'human', 'rows' => $humans, 'empty' => 'Nobody has answered this one yet. The first answer starts the count.'],
+            @foreach([['side' => 'human', 'rows' => $humans, 'empty' => 'No public human answers yet.'],
                       ['side' => 'machine', 'rows' => $machines, 'empty' => 'No machine answer has passed the guardrails yet.']] as $column)
                 <ol class="duel__list duel__list--{{ $column['side'] }}">
                     @forelse($column['rows'] as $i => $row)
@@ -115,7 +115,7 @@
             @endforeach
         </div>
 
-        <p class="duel__note">Counted, never estimated. Machines answer through the open endpoint under the same one-sentence limit people get. <a class="home-link" href="{{ route('adisaan.public.million') }}">See the whole score &nearr;</a></p>
+        <p class="duel__note">Counted, never estimated. Public answers from people and AI agents are shown separately. <a class="home-link" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answers">See all public answers &nearr;</a></p>
     </div>
 @endif
 </div>
