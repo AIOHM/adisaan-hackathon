@@ -5,37 +5,20 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class AnswerCountdownTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_question_countdown_is_a_rolling_ten_seconds(): void
+    public function test_prepared_answer_has_countdown_and_video(): void
     {
-        $html = $this->get('/question')->assertOk()->getContent();
-
-        $found = preg_match(
-            '/data-answer-countdown[^>]*data-deadline="([^"]+)"[^>]*data-server-now="([^"]+)"/',
-            $html,
-            $match
-        );
-        $this->assertSame(1, $found, 'Homepage must render the answer countdown clock.');
-
-        $deadline = strtotime($match[1]);
-        $serverNow = strtotime($match[2]);
-        $this->assertIsInt($deadline);
-        $this->assertIsInt($serverNow);
-        // Rolling window: ten seconds from render time, with a small
-        // tolerance for the milliseconds between the two now() calls.
-        $this->assertGreaterThanOrEqual(5, $deadline - $serverNow);
-        $this->assertLessThanOrEqual(15, $deadline - $serverNow);
-    }
-
-    public function test_question_countdown_reveals_into_fresh_answers(): void
-    {
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $this->get('/question')->assertOk()
-            ->assertSee('FRESH ANSWERS IN', false)
-            ->assertSee('Fresh answers land when the clock reaches zero.', false);
+            ->assertSee('We are preparing the video for you.')
+            ->assertSee('data-countdown-seconds>10', false)
+            ->assertSee('data-answer-main controls playsinline preload="metadata" hidden src="/assets/adisaan/site/question-01-answer.mp4"', false)
+            ->assertDontSee('Running an AI agent?');
     }
 }

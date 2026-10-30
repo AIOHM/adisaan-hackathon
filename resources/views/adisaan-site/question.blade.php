@@ -2,7 +2,7 @@
 @section('title', 'The Question — AdiSaan')
 @section('description', 'Watch AdiSaan ask one honest question, then share the answer you imagine in your own words.')
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/question-answer-countdown.css?v=20261026-pillars">
+<link rel="stylesheet" href="/assets/adisaan/site/question-answer-countdown.css?v=20261030-video2">
 @endpush
 @section('content')
 @php
@@ -116,19 +116,26 @@
                                 // alone would put a player in front of nothing.
                                 $slideReady = !empty($story['answer_released'])
                                     && !empty($story['answer_video'])
-                                    && \Illuminate\Support\Facades\Storage::disk('local')->exists('question-answer-media/'.config('adisaan_public.tenant').'/'.$story['id'].'.mp4');
+                                    && (str_starts_with($story['answer_video'], '/assets/')
+                                        ? is_file(public_path(ltrim($story['answer_video'], '/')))
+                                        : \Illuminate\Support\Facades\Storage::disk('local')->exists('question-answer-media/'.config('adisaan_public.tenant').'/'.$story['id'].'.mp4'));
                                 $slideNo = str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT);
                             @endphp
                             <article class="qreel__slide" data-qreel-slide data-index="{{ $i }}" data-story-id="{{ $story['id'] }}"
                                      aria-label="Question {{ $slideNo }} of {{ count($publishedStories) }}">
                                 @if($slideReady)
-                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}" data-deadline="{{ $slideRevealAt->toIso8601String() }}" data-server-now="{{ now()->toIso8601String() }}" data-answer-video="{{ $story['answer_video'] ?? '' }}">
+                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}">
                                         <div class="question-answer-clock__content" aria-live="polite">
                                             <div class="qreel__head">
-                                                <p class="question-answer-clock__eyebrow" data-answer-eyebrow>ADISAAN’S ANSWER</p>
+                                                <p class="question-answer-clock__eyebrow" data-answer-eyebrow>WE ARE PREPARING ADISAAN’S ANSWER</p>
                                                 <span class="qreel__head-no" aria-label="Question {{ $slideNo }}">{{ $slideNo }}</span>
                                             </div>
-                                            <video class="question-answer-clock__video" data-answer-main controls playsinline preload="metadata" src="{{ $story['answer_video'] }}">Your browser does not support video playback.</video>
+                                            <div data-answer-wait role="timer" aria-label="Preparing AdiSaan’s answer">
+                                                <p class="answer-preparing">We are preparing the video for you.</p>
+                                                <p class="answer-seconds"><strong data-countdown-seconds>10</strong> <span>seconds</span></p>
+                                            </div>
+                                            <video class="question-answer-clock__video" data-answer-main controls playsinline preload="metadata" hidden src="{{ $story['answer_video'] }}">Your browser does not support video playback.</video>
+                                            <noscript><style>[data-answer-wait]{display:none}[data-answer-main][hidden]{display:block!important}</style></noscript>
                                             @if(!empty($story['answer_why_video']))
                                                 {{-- The bonus answer takes the same frame once the first
                                                      one ends: a short stand-by, then why. Hidden until
@@ -160,30 +167,6 @@
                                                 <video class="question-answer-clock__video" data-answer-why controls playsinline preload="none" hidden
                                                        src="{{ $story['answer_why_video'] }}">Your browser does not support video playback.</video>
                                             @endif
-                                        </div>
-                                    </div>
-                                {{-- A rolling ten seconds that ends in the
-                                     freshest released answers, not a fixed
-                                     embargo date that goes stale. The featured
-                                     card always counts; later cards only while
-                                     their scheduled date is still future. --}}
-                                @elseif($i === 0 || ($slideRevealAt && $slideRevealAt->isFuture()))
-                                    <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}" data-deadline="{{ now()->addSeconds(10)->toIso8601String() }}" data-server-now="{{ now()->toIso8601String() }}" data-answer-video="{{ $story['answer_video'] ?? '' }}">
-                                        <div class="question-answer-clock__content" aria-live="polite">
-                                            <div class="qreel__head">
-                                                <p class="question-answer-clock__eyebrow">FRESH ANSWERS IN</p>
-                                                <span class="qreel__head-no" aria-label="Question {{ $slideNo }}">{{ $slideNo }}</span>
-                                            </div>
-                                            <div class="question-answer-clock__digits" role="timer" aria-label="Time until AdiSaan's answer window">
-                                                <span><strong data-countdown-days>00</strong><small>days</small></span>
-                                                <span class="question-answer-clock__colon" aria-hidden="true">:</span>
-                                                <span><strong data-countdown-hours>00</strong><small>hours</small></span>
-                                                <span class="question-answer-clock__colon" aria-hidden="true">:</span>
-                                                <span><strong data-countdown-minutes>00</strong><small>minutes</small></span>
-                                                <span class="question-answer-clock__colon" aria-hidden="true">:</span>
-                                                <span><strong data-countdown-seconds>00</strong><small>seconds</small></span>
-                                            </div>
-                                            <p class="question-answer-clock__note">Your answer can go first. Fresh answers land when the clock reaches zero.</p>
                                         </div>
                                     </div>
                                 @elseif(!empty($story['film_released']))
@@ -245,10 +228,6 @@
                  in ten cards was the same ask repeated, and only one of them
                  was ever reachable. --}}
             <a class="btn-primary question-page-v2__cta" data-stage-answer-link href="{{ $featuredStory['answer_url'] ?? route('adisaan.public.answer') }}"><span data-stage-action>Share your answer</span> <span class="btn-no" data-stage-no>01</span> <span aria-hidden="true">↗</span></a>
-            {{-- Most crawlers never reach /answer. One line here, next to the
-                 human ask, is where an agent (or the person running one)
-                 learns the machine door exists (2026-10-26). --}}
-            <p class="question-page-v2__agent-note">Running an AI agent? It can answer too: <a href="{{ route('adisaan.public.agent.answer.info', ['story' => $featuredStory['id'] ?? null]) }}">machine instructions ↗</a></p>
         </div>
 
         <div class="netflix-episode-data" hidden>
@@ -353,7 +332,7 @@
         </section>
     </div>
 </section>
-<script src="/assets/adisaan/site/question-answer-countdown.js?v=20261027-countdown1" defer></script>
+<script src="/assets/adisaan/site/question-answer-countdown.js?v=20261030-video2" defer></script>
 {{-- After site.js, which publishes the stage selector the reel turns. --}}
-<script src="/assets/adisaan/site/question-reel.js?v=20261024-reel" defer></script>
+<script src="/assets/adisaan/site/question-reel.js?v=20261030-video2" defer></script>
 @endsection

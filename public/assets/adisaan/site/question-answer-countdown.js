@@ -1,58 +1,46 @@
 (() => {
-  const clock = document.querySelector('[data-answer-countdown]');
-  if (!clock) return;
+  const reel = document.querySelector('[data-qreel]');
+  if (!reel) return;
+  const clocks = Array.from(reel.querySelectorAll('[data-answer-countdown]'));
+  let visible = false;
+  const states = new Map();
 
-  const deadline = Date.parse(clock.dataset.deadline || '');
-  const serverNow = Date.parse(clock.dataset.serverNow || '');
-  if (!Number.isFinite(deadline) || !Number.isFinite(serverNow)) return;
-
-  // Keep the shared release time even if a visitor's device clock is wrong.
-  // Days is optional: it only exists while the wait is long enough to need
-  // it, and the clock still works on a page that does not show one.
-  const dayDigit = clock.querySelector('[data-countdown-days]');
-  const digits = ['hours', 'minutes', 'seconds'].map((part) => clock.querySelector(`[data-countdown-${part}]`));
-  if (digits.some((digit) => !digit)) return;
-  const content = clock.querySelector('.question-answer-clock__content');
-  const serverAtLoad = serverNow;
-  const elapsed = () => performance.now();
-  const startedAt = elapsed();
-  let reloading = false;
-
-  // Zero means reveal: the page reloads into the freshest released
-  // answers, the same one-reload pattern the film countdown below uses.
-  // The released answers are server-rendered, so markup from before the
-  // moment cannot show them without a fresh page.
-  const revealAnswers = () => {
-    if (reloading) return;
-    reloading = true;
-    const note = content ? content.querySelector('.question-answer-clock__note') : null;
-    if (note) note.textContent = 'Revealing the latest answers…';
-    window.setTimeout(() => window.location.reload(), 1500);
+  const update = () => {
+    clocks.forEach((clock) => {
+      const slide = clock.closest('[data-qreel-slide]');
+      const wait = clock.querySelector('[data-answer-wait]');
+      const video = clock.querySelector('[data-answer-main]');
+      const digit = clock.querySelector('[data-countdown-seconds]');
+      if (!slide || !wait || !video || !digit) return;
+      let state = states.get(clock);
+      if (!state) { state = { timer: null, done: false }; states.set(clock, state); }
+      if (!visible || slide.dataset.pos !== 'active') {
+        if (state.timer) { clearInterval(state.timer); state.timer = null; digit.textContent = '10'; }
+        return;
+      }
+      if (state.done || state.timer) return;
+      const start = performance.now();
+      state.timer = setInterval(() => {
+        const remaining = Math.max(0, Math.ceil(10 - (performance.now() - start) / 1000));
+        digit.textContent = String(remaining).padStart(2, '0');
+        if (remaining > 0) return;
+        clearInterval(state.timer);
+        state.timer = null;
+        state.done = true;
+        wait.hidden = true;
+        video.hidden = false;
+        const eyebrow = clock.querySelector('[data-answer-eyebrow]');
+        if (eyebrow) eyebrow.textContent = 'ADISAAN’S ANSWER';
+        window.dispatchEvent(new Event('resize'));
+        video.play().catch(() => {});
+      }, 200);
+    });
   };
-
-  const render = () => {
-    const remaining = Math.max(0, Math.ceil((deadline - serverAtLoad - (elapsed() - startedAt)) / 1000));
-    // With a days box, hours roll over at 24 — "151 hours" is a number
-    // nobody converts in their head. Without one, hours keep counting up so
-    // a short wait still reads correctly on a page that has no days box.
-    const hours = dayDigit ? Math.floor(remaining / 3600) % 24 : Math.floor(remaining / 3600);
-    const minutes = Math.floor((remaining % 3600) / 60);
-    const seconds = remaining % 60;
-    if (dayDigit) dayDigit.textContent = String(Math.floor(remaining / 86400)).padStart(2, '0');
-    digits[0].textContent = String(hours).padStart(2, '0');
-    digits[1].textContent = String(minutes).padStart(2, '0');
-    digits[2].textContent = String(seconds).padStart(2, '0');
-    if (remaining === 0) {
-      clearInterval(tick);
-      revealAnswers();
-    }
-  };
-  const tick = setInterval(render, 1000);
-  render();
-
-  document.addEventListener('aiohm:story-selected', (event) => {
-    clock.hidden = event.detail?.id !== clock.dataset.storyId;
-  });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => { visible = entries[0].isIntersecting; update(); }, { threshold: 0.25 }).observe(reel);
+  } else { visible = true; }
+  document.addEventListener('aiohm:story-selected', update);
+  window.addEventListener('load', update);
 })();
 
 /* The bonus answer.

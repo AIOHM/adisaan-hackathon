@@ -35,23 +35,10 @@ return [
             'video' => '/assets/adisaan/site/question-01-one-million-euro.mp4',
             'poster' => '/assets/adisaan/site/question-01-one-million-euro-poster.jpg',
             'captions' => '/assets/adisaan/site/question-01-one-million-euro.vtt?v=20261023',
-            // The recorded response stays on tenant-private storage until this shared release time.
-            // Launch schedule, Adrian 2026-10-25. Bucharest is UTC+2 in
-            // November; the +03:00 on the old value was summer time.
-            //
-            // The card is visible now with a countdown on the film: this is
-            // the question the launch is for, and hiding it would leave the
-            // site with nothing to show for six days.
             'question_release_at' => '2026-10-01T00:00:00+03:00',
-            // The film is up: the question is asked, and the week before
-            // launch is for people to answer it. What 1 November opens is
-            // AdiSaan's own answer.
             'film_release_at' => '2026-10-01T00:00:00+03:00',
-            'answer_reveal_at' => '2026-11-01T00:00:00+02:00',
-            'answer_video' => '/question/answer-video/imagine-one-million-euro',
-            // The bonus answer, released a minute after the first one ends.
-            'answer_why_video' => '/question/answer-video/imagine-one-million-euro?part=why',
-            'answer_why_wait_seconds' => 10,
+            'answer_reveal_at' => '2026-10-30T00:00:00+02:00',
+            'answer_video' => '/assets/adisaan/site/question-01-answer.mp4',
         ],
         [
             'id' => 'premiere-how-you-deal-with-ai',

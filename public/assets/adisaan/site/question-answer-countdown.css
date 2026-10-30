@@ -379,3 +379,8 @@
 .home-episode__act{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px 22px}
 .home-episode__act .home-link{font-size:16px;font-weight:600;color:#e9c775}
 @media(max-width:560px){.home-episode__act{flex-direction:column;gap:14px}}
+
+/* The prepared answer appears after the visitor sees the ten-second wait. */
+.answer-preparing{margin:8px 0 16px;color:#f4f0e8;font-size:18px}
+.answer-seconds{margin:0;color:#f4f0e8}.answer-seconds strong{font-size:clamp(52px,7vw,76px);line-height:1}.answer-seconds span{display:block;margin-top:6px;font-size:14px}
+.question-answer-clock [hidden]{display:none!important}
