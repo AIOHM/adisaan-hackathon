@@ -29,13 +29,14 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::get('/answer/received', 'received')->name('adisaan.public.received');
     Route::post('/answer/received', 'storeReceived')->middleware('throttle:30,1')->name('adisaan.public.received.store');
     Route::get('/million', 'million')->name('adisaan.public.million');
-    Route::get('/about', 'about')->name('adisaan.public.about');
     Route::get('/privacy', 'privacy')->name('adisaan.public.privacy');
     Route::get('/api/journey/scoreboard', 'boardJson')->middleware('throttle:60,1')->name('adisaan.public.board');
     Route::post('/cookie-consent/log', 'cookieConsent')->middleware('throttle:30,1')->name('cookie-consent.log');
     Route::post('/api/ask-muse', 'askMuse')->withoutMiddleware([ValidateCsrfToken::class])->middleware('throttle:30,1')->name('adisaan.public.ask-muse');
     Route::post('/api/ask-muse/follow-up', 'askMuseFollowUp')->withoutMiddleware([ValidateCsrfToken::class])->name('adisaan.public.ask-muse.follow-up');
 });
+
+Route::get('/about', static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').'/', 302))->name('adisaan.public.about');
 
 foreach (['members' => '/members', 'members.profile' => '/members/profile', 'news' => '/news', 'journey' => '/journey', 'manifesto' => '/manifesto'] as $name => $path) {
     Route::get($path, static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').$path, 302))->name('adisaan.public.'.$name);

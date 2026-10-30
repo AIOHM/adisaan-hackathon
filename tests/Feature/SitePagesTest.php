@@ -39,18 +39,17 @@ final class SitePagesTest extends TestCase
             ->assertSee('A million answers.', false);
     }
 
-    public function test_about_page_introduces_the_project_with_avatar(): void
+    public function test_about_redirects_to_brand_home_and_menu_links_there(): void
     {
-        $this->get('/about')->assertOk()
-            ->assertSee('One question, a million answers.', false)
-            ->assertSee('/assets/adisaan/site/avatar-adisaan.jpg', false)
-            ->assertSee('>About</a>', false);
+        $url = rtrim(config('adisaan_public.brand_url'), '/').'/';
+        $this->get('/about')->assertRedirect($url);
+        $this->get('/')->assertOk()->assertSee('href="'.$url.'">About</a>', false);
     }
 
-    public function test_sitemap_lists_the_about_page(): void
+    public function test_sitemap_omits_the_redirected_about_page(): void
     {
         $this->get('/sitemap.xml')->assertOk()
-            ->assertSee(config('tbwim.url').'/about', false);
+            ->assertDontSee(config('tbwim.url').'/about', false);
     }
 
     public function test_answer_page_points_agents_at_this_apps_endpoint(): void
