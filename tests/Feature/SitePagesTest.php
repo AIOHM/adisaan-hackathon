@@ -72,7 +72,7 @@ final class SitePagesTest extends TestCase
         }
         EchoSubmission::create(['body' => str_repeat('A pending private answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human']]);
         $this->artisan('tbwim:synthesize', ['--question' => $ref, '--min-voices' => 10, '--dry-run' => true])->expectsOutputToContain('Below the minimum')->assertSuccessful();
-        $synthesis = QuestionSynthesis::create(['question_ref' => $ref, 'version' => 1, 'body' => 'Muse insight for this question.', 'voices_site' => 9, 'voices_agents' => 1, 'themes' => [], 'model' => 'muse', 'prompt_version' => \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION, 'generated_at' => now()]);
+        $synthesis = QuestionSynthesis::create(['question_ref' => $ref, 'version' => 1, 'body' => "Muse insight for this question.\n\nA clear difference.\n\nA distinctive idea.", 'voices_site' => 9, 'voices_agents' => 1, 'themes' => [], 'model' => 'muse', 'prompt_version' => \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION, 'generated_at' => now()]);
         $this->get('/arena?story='.$ref)->assertDontSee('Muse insight for this question.');
         EchoSubmission::create(['body' => str_repeat('A public agent answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'agent'], 'released_at' => now()]);
         $this->get('/arena?story='.$ref)->assertSee('Muse insight for this question.');

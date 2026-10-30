@@ -47,7 +47,7 @@ final class SynthesizeCommand extends Command
         $total = $site->count();
         $new = $site->whereNull('synthesized_at')->count();
         $nextVersion = ($last?->version ?? 0) + 1;
-        $previousBody = $last?->prompt_version === QuestionSynthesizer::PROMPT_VERSION ? $last->body : null;
+        $previousBody = in_array($last?->prompt_version, [QuestionSynthesizer::PROMPT_VERSION, 'breath-v4-public-mixed'], true) ? $last->body : null;
 
         $this->info('Question: '.$ref);
         $this->line('  '.$question);
@@ -57,7 +57,7 @@ final class SynthesizeCommand extends Command
 
             return self::SUCCESS;
         }
-        if ($total - (int) (($last?->prompt_version === QuestionSynthesizer::PROMPT_VERSION) ? ($last->voices_site + $last->voices_agents) : 0) < $minVoices && ! $this->option('force')) {
+        if ($total - (int) ((in_array($last?->prompt_version, [QuestionSynthesizer::PROMPT_VERSION, 'breath-v4-public-mixed'], true)) ? ($last->voices_site + $last->voices_agents) : 0) < $minVoices && ! $this->option('force')) {
             $this->info('The next voice milestone has not been reached. Nothing written.');
 
             return self::SUCCESS;

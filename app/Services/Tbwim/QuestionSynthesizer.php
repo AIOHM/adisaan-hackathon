@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  */
 final class QuestionSynthesizer
 {
-    public const PROMPT_VERSION = 'breath-v4-public-mixed';
+    public const PROMPT_VERSION = 'breath-v5-comparison';
 
     public const INSTRUCTIONS = <<<'PROMPT'
 You are Muse writing as AdiSaan, Adrian Aparaschivei's avatar. AdiSaan asks one honest question at a time; people and AI agents answer. Your job is to say, in AdiSaan's words, what those answers suggest: the living answer, rewritten each time new voices arrive.
@@ -24,14 +24,14 @@ You are Muse writing as AdiSaan, Adrian Aparaschivei's avatar. AdiSaan asks one 
 Direct, calm, slightly spiritual, zero corporate jargon. Short sentences. One idea at a time. Distinguish human perspectives from AI responses; do not imply AI responses are human experiences. Plain words. End on a full thought.
 
 ## WHAT TO WRITE
-One answer of MIN to MAX words. Count them. It describes "the best way they imagine", as the voices actually say it. Where voices disagree, say so in one sentence; do not pick a winner. Describe common themes and differences, clearly distinguishing human and AI responses; do not invent agreement. Paraphrase; never quote, name, or mention a platform, handle, city or age. No number beyond "most", "some", "a few", "one person". No price, offer, link, hashtag or emoji. If an earlier version is given, keep what still holds and change only what the new voices change.
+Write three short, concrete sections, together MIN to MAX words: similarities, differences, and a noteworthy perspective. Compare actual answers, distinguishing people and AI agents where the evidence supports it. Describe specific ideas and tensions, not vague generalities. Report a count only when directly supported by the numbered answers; do not infer majority or disagreement from limited evidence. If there is no clear common ground or difference, say so. Avoid quotations, names, private details, invented motives, and unsupported claims. Use short sentences and plain language.
 
 ## THEMES
 Give every voice exactly one theme: two to four plain lower-case words, the same spelling for the same idea. Aim for 3 to 7 themes.
 
 ## OUTPUT
 One JSON object and nothing else:
-{"answer": "the answer", "themes": [{"theme": "control and logging", "voices": [1, 4, 9]}]}
+{"similarities": "what the answers share", "differences": "how they differ", "noteworthy": "a distinctive perspective", "themes": [{"theme": "control and logging", "voices": [1, 4, 9]}]}
 Every voice number appears in exactly one theme.
 PROMPT;
 
@@ -78,7 +78,7 @@ PROMPT;
     {
         $lines = ['QUESTION: '.trim($question), 'VERSION TO WRITE: '.$version, ''];
         if ($previousBody !== null && trim($previousBody) !== '') {
-            $lines[] = 'EARLIER VERSION (keep what still holds, change only what the new voices change):';
+            $lines[] = 'EARLIER VERSION (context only; verify every claim against the answers and improve the analysis):';
             $lines[] = trim($previousBody);
             $lines[] = '';
         }
@@ -97,10 +97,14 @@ PROMPT;
     public function parse(string $text, int $voiceCount, int $min, int $max): array
     {
         $data = MetaClient::extractJson($text);
-        if ($data === null || ! is_string($data['answer'] ?? null)) {
-            return ['error' => 'the response was not the JSON object with an "answer" string'];
+        $sections = [];
+        foreach (['similarities', 'differences', 'noteworthy'] as $key) {
+            if (! is_string($data[$key] ?? null) || trim($data[$key]) === '') {
+                return ['error' => "missing the {$key} section"];
+            }
+            $sections[] = trim(preg_replace('/\s+/u', ' ', $data[$key]) ?? '');
         }
-        $body = trim(preg_replace('/\s+/u', ' ', $data['answer']) ?? '');
+        $body = implode("\n\n", $sections);
         $words = self::countWords($body);
         if ($words < $min || $words > $max) {
             return ['error' => "the answer has {$words} words, it must have {$min} to {$max}"];

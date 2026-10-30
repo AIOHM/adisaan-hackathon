@@ -30,3 +30,8 @@
 /* Bring the Arena title closer to the navigation. */
 .home-episode.arena-page{padding-top:clamp(28px,4vw,48px)}
 .home-episode.arena-page .qloop--breath{margin-top:0;padding-top:12px}
+
+.arena-insights__minimum{color:#c9d6c2;font-size:14px;line-height:1.5;margin:0 auto 30px}
+.arena-insights__finding{text-align:left;padding:20px 0;border-top:1px solid rgba(233,199,117,.34)}
+.arena-insights__finding h5{margin:0 0 8px;color:#e9c775;font-size:17px;line-height:1.3}
+.arena-insights .arena-insights__finding p{margin:0;max-width:none;color:#f4f0e8;font-size:clamp(16px,1.7vw,19px);line-height:1.65}

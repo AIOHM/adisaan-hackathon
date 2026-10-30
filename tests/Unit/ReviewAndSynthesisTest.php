@@ -61,8 +61,8 @@ final class ReviewAndSynthesisTest extends TestCase
     {
         $s = app(QuestionSynthesizer::class);
         $words = implode(' ', array_fill(0, 70, 'word'));
-        $ok = $s->parse('{"answer": "'.$words.'", "themes": [{"theme": "Control", "voices": [1, 2]}, {"theme": "rest", "voices": [3, 3, 9]}]}', 3, 60, 120);
-        $this->assertSame(70, $ok['words']);
+        $ok = $s->parse('{"similarities": "'.$words.'", "differences": "different", "noteworthy": "distinct", "themes": [{"theme": "Control", "voices": [1, 2]}, {"theme": "rest", "voices": [3, 3, 9]}]}', 3, 60, 120);
+        $this->assertSame(72, $ok['words']);
         $this->assertSame([1 => 'control', 2 => 'control', 3 => 'rest'], $ok['voice_themes']);
         $this->assertSame('error', array_key_first($s->parse('{"answer": "too short", "themes": []}', 3, 60, 120)));
         $this->assertStringContainsString('[2] (site)', $s->buildPrompt('Q?', [['circle' => 'site', 'text' => 'a'], ['circle' => 'site', 'text' => 'b']], null, 1));
