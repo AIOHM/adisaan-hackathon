@@ -29,7 +29,13 @@
 @endphp
 @if($breathAvailable || $hasDuel)
 <div class="qloop qloop--breath" id="breath" aria-labelledby="breath-heading">
-    <h3 id="breath-heading" class="qloop__title qloop__title--arena"><span>{{ $bw['title'] }}</span><span class="qloop__title-light" aria-hidden="true">{{ $bw['title'] }}</span></h3>
+    <h3 id="breath-heading" class="qloop__title qloop__title--arena">
+        @if(!empty($arenaPicker))
+            <span class="arena-brand"><img src="/assets/adisaan/site/wordmark.svg" alt="AdiSaan"><span>Arena</span></span>
+        @else
+            <span>{{ $bw['title'] }}</span><span class="qloop__title-light" aria-hidden="true">{{ $bw['title'] }}</span>
+        @endif
+    </h3>
     @if($breathAvailable && $latest)
     <p class="qloop__meta breath__version">{{ $bt('version', ['n' => $latest['version'], 'voices' => number_format((int) $latest['total']), 'date' => $latest['generated_at']]) }}</p>
     <p class="breath__body">{{ $latest['body'] }}</p>
@@ -103,6 +109,9 @@
                             @if($i < 3)<span class="duel__rank" aria-label="Rank {{ $i + 1 }}">{{ $i + 1 }}</span>@endif
                             <p class="duel__body">{{ \Illuminate\Support\Str::limit($row['body'], 190) }}</p>
                             <p class="duel__by">{{ $row['signature'] }}@if(($row['votes'] ?? 0) > 0) <span>· {{ number_format($row['votes']) }} {{ (int) $row['votes'] === 1 ? 'vote' : 'votes' }}</span>@endif</p>
+                            @if(!empty($arenaPicker) && !empty($row['id']))
+                                <a class="duel__more" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answer-{{ $row['id'] }}" aria-label="Read the full answer from {{ $row['signature'] }}">More ↗</a>
+                            @endif
                         </li>
                     @empty
                         <li class="duel__empty">{{ $column['empty'] }}</li>

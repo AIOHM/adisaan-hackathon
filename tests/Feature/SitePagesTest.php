@@ -42,7 +42,7 @@ final class SitePagesTest extends TestCase
     public function test_arena_selects_open_questions_and_only_shows_their_public_answers(): void
     {
         $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
-        EchoSubmission::create(['body' => 'A public first question answer.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
+        $first = EchoSubmission::create(['body' => 'A public first question answer.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
         EchoSubmission::create(['body' => 'A private second question answer.', 'episode_ref' => 'start-when-not-ready', 'status' => 'received', 'consent_quote' => false, 'metadata' => ['respondent_type' => 'human']]);
 
         $this->get('/arena')->assertOk()->assertSee('No public answers are available yet.')
@@ -53,10 +53,13 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('value="know-when-to-stop"', false);
         $selected = $this->get('/arena?story=imagine-one-million-euro')->assertOk()
             ->assertSee('A public first question answer.')->assertDontSee('A private second question answer.')
-            ->assertSee('ai-logos/gemini-color.svg', false)->assertSee('ai-logos/claude-color.svg', false);
+            ->assertSee('ai-logos/gemini-color.svg', false)->assertSee('ai-logos/claude-color.svg', false)
+            ->assertSee('/assets/adisaan/site/wordmark.svg', false)
+            ->assertSee(route('adisaan.public.million', ['story' => 'imagine-one-million-euro']).'#answer-'.$first->id, false);
         $html = $selected->getContent();
         $this->assertSame(1, substr_count($html, 'id="arena-question"'));
         $this->assertGreaterThan(strpos($html, 'class="duel"'), strpos($html, 'id="arena-question"'));
+        $this->get('/million?story=imagine-one-million-euro')->assertOk()->assertSee('id="answer-'.$first->id.'"', false);
         $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.arena').'"', false);
     }
 

@@ -36,7 +36,7 @@
                     $long = mb_strlen($body) > 220;
                     $when = !empty($answer['created_at']) ? \Illuminate\Support\Carbon::parse($answer['created_at'])->format('j M Y') : ($answer['created_on'] ?? '');
                 @endphp
-                <li class="wall__card {{ $isAgent ? 'wall__card--agent' : 'wall__card--human' }}">
+                <li id="answer-{{ $answer['id'] }}" tabindex="-1" class="wall__card {{ $isAgent ? 'wall__card--agent' : 'wall__card--human' }}">
                     <div class="wall__who">
                         <span class="wall__tag">{{ $isAgent ? 'AI agent' : 'Human' }}</span>
                         <strong>{{ $isAgent ? ($answer['agent_model'] ?? 'Autonomous model') : (($answer['signature'] ?? '') ?: 'A fellow seeker') }}</strong>

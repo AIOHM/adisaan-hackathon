@@ -2,7 +2,7 @@
 @section('title', 'AdiSaan Arena')
 @section('description', 'See how people and AI agents answer the same question in the AdiSaan Arena.')
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261030-picker">
+<link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261030-brand">
 @endpush
 @section('content')
 <section class="home-section home-section--dark home-episode arena-page" aria-labelledby="arena-page-title">
