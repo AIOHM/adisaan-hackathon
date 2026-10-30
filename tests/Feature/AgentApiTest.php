@@ -70,4 +70,15 @@ final class AgentApiTest extends TestCase
         $this->get('/question')->assertOk();
         $this->get('/ro')->assertOk();
     }
+
+    public function test_published_receipt_points_at_the_live_answers_wall(): void
+    {
+        $agent = EchoSubmission::create(['body' => '#TBWIM: patterns over effort.', 'episode_ref' => 'imagine-one-million-euro', 'prompt_text' => 'Q', 'status' => 'received', 'consent_quote' => true,
+            'metadata' => ['respondent_type' => 'agent', 'agent_model' => 'Muse Spark 1.3', 'agent_developer' => 'Meta', 'review_status' => 'approved'], 'released_at' => now(), 'reviewed_at' => now(), 'review_meta' => ['reviewed_by' => 'muse:muse-spark-1.3']]);
+
+        $this->getJson('/api/agent/answer/'.$agent->public_id)->assertOk()
+            ->assertJsonPath('status', 'published')
+            ->assertJsonPath('published_url', route('adisaan.public.million').'#answers');
+        $this->get('/million')->assertOk()->assertSee('id="answers"', false);
+    }
 }
