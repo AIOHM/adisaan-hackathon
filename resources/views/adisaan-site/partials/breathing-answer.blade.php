@@ -130,9 +130,9 @@
 
         <p class="duel__note">Counted, never estimated. Public answers from people and AI agents are shown separately. <a class="home-link" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answers">See all public answers &nearr;</a></p>
     </div>
-        @if(!empty($arenaPicker) && $latest && $latest['prompt_version'] === \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION && (int) $latest['voices_site'] >= 10 && (int) ($breath['site_count'] ?? 0) >= 10)
+        @if(!empty($arenaPicker) && $latest && $latest['prompt_version'] === \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION && (int) $latest['total'] >= 10 && (int) ($breath['site_count'] ?? 0) >= 10)
             <section class="arena-insights" aria-labelledby="arena-insights-title">
-                <p class="arena-insights__eyebrow">Muse insights · {{ number_format((int) $latest['voices_site']) }} public human answers</p>
+                <p class="arena-insights__eyebrow">Muse insights · {{ number_format((int) $latest['total']) }} public answers from people and AI agents</p>
                 <h4 id="arena-insights-title">What we are imagining together</h4>
                 <p>{{ $latest['body'] }}</p>
             </section>

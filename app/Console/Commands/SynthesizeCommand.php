@@ -40,8 +40,8 @@ final class SynthesizeCommand extends Command
         $question = (string) $story['question'];
         $minVoices = max(1, (int) ($this->option('min-voices') ?: config('tbwim.synthesis.min_voices', 10)));
 
-        $site = EchoSubmission::query()->publiclyVisible()->humans()->where('episode_ref', $ref)
-            ->orderBy('created_at')->orderBy('id')->get(['id', 'body', 'synthesized_at'])
+        $site = EchoSubmission::query()->publiclyVisible()->where('episode_ref', $ref)
+            ->orderBy('created_at')->orderBy('id')->get(['id', 'body', 'synthesized_at', 'metadata'])
             ->filter(fn (EchoSubmission $e) => trim((string) $e->body) !== '')->values();
         $last = QuestionSynthesis::query()->forQuestion($ref)->newestFirst()->first();
         $total = $site->count();
@@ -51,18 +51,18 @@ final class SynthesizeCommand extends Command
 
         $this->info('Question: '.$ref);
         $this->line('  '.$question);
-        $this->line(sprintf('  %d consented human voices, %d new since the last version%s', $total, $new, $last ? ', last version '.$last->version.' from '.$last->generated_at?->toDateTimeString() : ', no version yet'));
+        $this->line(sprintf('  %d public human and AI answers, %d new since the last version%s', $total, $new, $last ? ', last version '.$last->version.' from '.$last->generated_at?->toDateTimeString() : ', no version yet'));
         if ($total < $minVoices) {
             $this->info(sprintf('Below the minimum (%d of %d voices). Nothing written.', $total, $minVoices));
 
             return self::SUCCESS;
         }
-        if ($total - (int) (($last?->prompt_version === QuestionSynthesizer::PROMPT_VERSION) ? $last->voices_site : 0) < $minVoices && ! $this->option('force')) {
+        if ($total - (int) (($last?->prompt_version === QuestionSynthesizer::PROMPT_VERSION) ? ($last->voices_site + $last->voices_agents) : 0) < $minVoices && ! $this->option('force')) {
             $this->info('The next voice milestone has not been reached. Nothing written.');
 
             return self::SUCCESS;
         }
-        $voices = $site->map(fn (EchoSubmission $e) => ['circle' => 'site', 'text' => (string) $e->body])->all();
+        $voices = $site->map(fn (EchoSubmission $e) => ['circle' => $e->isAgent() ? 'agent' : 'human', 'text' => (string) $e->body])->all();
         if ($this->option('dry-run')) {
             $this->line($synthesizer->buildPrompt($question, $voices, $previousBody, $nextVersion));
 
@@ -83,7 +83,7 @@ final class SynthesizeCommand extends Command
         $generatedAt = now();
         DB::transaction(function () use ($ref, $nextVersion, $result, $site, $generatedAt): void {
             QuestionSynthesis::create([
-                'question_ref' => $ref, 'version' => $nextVersion, 'body' => $result['body'], 'voices_site' => $site->count(), 'voices_agents' => 0,
+                'question_ref' => $ref, 'version' => $nextVersion, 'body' => $result['body'], 'voices_site' => $site->filter(fn (EchoSubmission $e) => ! $e->isAgent())->count(), 'voices_agents' => $site->filter(fn (EchoSubmission $e) => $e->isAgent())->count(),
                 'themes' => $result['themes'], 'model' => $result['model'], 'prompt_version' => $result['prompt_version'],
                 'prompt_tokens' => $result['prompt_tokens'], 'completion_tokens' => $result['completion_tokens'], 'generated_at' => $generatedAt,
             ]);
