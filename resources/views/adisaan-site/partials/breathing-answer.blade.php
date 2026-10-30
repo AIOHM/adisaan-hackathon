@@ -36,7 +36,7 @@
             <span>{{ $bw['title'] }}</span><span class="qloop__title-light" aria-hidden="true">{{ $bw['title'] }}</span>
         @endif
     </h3>
-    @if($breathAvailable && $latest)
+    @if(empty($arenaPicker) && $breathAvailable && $latest)
     <p class="qloop__meta breath__version">{{ $bt('version', ['n' => $latest['version'], 'voices' => number_format((int) $latest['total']), 'date' => $latest['generated_at']]) }}</p>
     <p class="breath__body">{{ $latest['body'] }}</p>
     <ul class="breath__circles">
