@@ -45,6 +45,7 @@
                 {{-- The Silent Mirror, kept quiet (Adrian, 2026-10-26): one line of
                      invitation, the four things the prompt gives back as small
                      labels, the prompt itself folded away, and the form beside it. --}}
+                <div class="human-answer-tools">
                 <div class="companion-helper" id="silent-mirror">
                     <p class="companion-helper__title">Not sure what you think yet?</p>
                     <p class="companion-helper__desc">Copy this prompt into the AI you already use. Four short questions later, it gives you your answer in your own words.</p>
@@ -72,6 +73,13 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                     <p class="companion-helper__subhint">When it answers, paste it in the answer box.</p>
                 </div>
 
+                    <div class="answer-format" role="group" aria-label="Choose how to answer">
+                        <button type="button" class="answer-format__choice is-active" data-answer-kind="text" aria-pressed="true">Write</button>
+                        <button type="button" class="answer-format__choice" data-answer-kind="audio" aria-pressed="false">Audio</button>
+                        <button type="button" class="answer-format__choice" data-answer-kind="video" aria-pressed="false">Video</button>
+                    </div>
+                </div>
+
                 <!-- Traditional Human Submission Form -->
                 <form action="{{ route('adisaan.public.answer.store') }}" method="post" enctype="multipart/form-data" class="one-form" data-answer-form data-minimum-seconds="{{ config('echo_intake.form_proof.minimum_seconds', 3) }}">
                     @csrf
@@ -91,11 +99,6 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                         <p class="one-form__errors" role="alert">{{ $errors->first() }}</p>
                     @endif
 
-                    <div class="answer-format" role="group" aria-label="Choose how to answer">
-                        <button type="button" class="answer-format__choice is-active" data-answer-kind="text" aria-pressed="true">Write</button>
-                        <button type="button" class="answer-format__choice" data-answer-kind="audio" aria-pressed="false">Audio</button>
-                        <button type="button" class="answer-format__choice" data-answer-kind="video" aria-pressed="false">Video</button>
-                    </div>
                     <div data-answer-text>
                     <label for="human-body" class="one-form__label">{{ $ap['body_label'] ?? 'Your answer' }}</label>
                     <textarea id="human-body"
@@ -218,7 +221,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
     const media = document.getElementById('answer-media');
     const privacy = form?.querySelector('[data-answer-privacy]');
     const consent = form?.querySelector('[data-consent-quote-input]');
-    const kinds = [...(form?.querySelectorAll('[data-answer-kind]') || [])];
+    const kinds = [...document.querySelectorAll('#human-perspective [data-answer-kind]')];
     const capture = form?.querySelector('[data-answer-capture]');
     const startButton = capture?.querySelector('[data-record-start]');
     const stopButton = capture?.querySelector('[data-record-stop]');
@@ -489,6 +492,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
 .answer-page__episode{order:-1;align-self:stretch;width:100%;margin:0 0 16px;text-align:left}
 .answer-page #agent-arena>.arena-card__header{display:flex;flex-direction:column;align-items:center}
 .answer-page #agent-arena .arena-card__title{width:100%;text-align:center}
+.answer-page #human-perspective .human-answer-tools .answer-format{margin:20px auto 24px;max-width:320px}
 @media(min-width:900px){
     .answer-page #human-perspective .human-answer-layout{display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);align-items:start;gap:clamp(24px,3vw,42px)}
     .answer-page #human-perspective .companion-helper{margin:0}
