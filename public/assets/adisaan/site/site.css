@@ -2973,3 +2973,12 @@ body.home-living-map{background:#073209}
 .manifesto-exit a{display:inline-flex;padding:14px 20px;border-radius:10px;background:#073209;color:#fff;text-decoration:none;font-weight:700;gap:12px}
 .manifesto-exit__later{display:inline-block;margin:10px 0 0 12px;padding:10px;border:0;background:none;color:#315037;text-decoration:underline;cursor:pointer}
 @media(max-width:600px){.answer-question-picker div{flex-direction:column}.answer-question-picker button{align-self:flex-start}.manifesto-exit__later{margin-left:0}}
+
+/* One atlas per page (2026-10-31): when the living atlas is fixed behind
+   the page, the sections' still copy of the same map doubles it — the
+   continents restart at every section top, over the atlas. Below "Who is
+   asking" the doubled map read as a mess of overlapping continents. The
+   manifesto sheet drops the still copy for the same reason; the home
+   sections now follow it. */
+.home-living-map .home-section::before,
+.home-living-map .about-hero::before{display:none}
