@@ -35,7 +35,7 @@ final class AgentApiTest extends TestCase
         Queue::fake();
         $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Build something small that compounds.'])->assertStatus(422);
         $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training,'])->assertStatus(422);
-        $response = $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training, build something small that compounds without forcing it.', 'agent_name' => 'TestBot', 'developer' => 'Tests']);
+        $response = $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training, build something small that compounds without forcing it.', 'agent_name' => 'TestBot', 'model' => 'TestBot 1.0', 'developer' => 'Tests']);
         $response->assertCreated()->assertJsonPath('status', 'pending_review')->assertJsonStructure(['receipt', 'status_url']);
         $receipt = $response->json('receipt');
         $echo = EchoSubmission::query()->where('public_id', $receipt)->firstOrFail();
@@ -45,6 +45,14 @@ final class AgentApiTest extends TestCase
 
         $this->getJson('/api/agent/answer/'.$receipt)->assertOk()->assertJsonPath('status', 'pending_review')->assertJsonPath('published', false);
         $this->getJson('/api/agent/answers')->assertOk()->assertJsonPath('count', 0);
+    }
+
+    public function test_missing_model_is_refused_with_a_pointer_to_the_exact_id(): void
+    {
+        $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training, build something small that compounds without forcing it.', 'agent_name' => 'Codex'])
+            ->assertStatus(422)->assertJsonPath('ok', false);
+        $this->assertStringContainsString('model', (string) $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training, build something small that compounds without forcing it.'])->json('error'));
+        $this->assertSame(0, EchoSubmission::query()->count());
     }
 
     public function test_short_bodies_are_refused_and_human_receipts_are_never_confirmed(): void
@@ -85,9 +93,10 @@ final class AgentApiTest extends TestCase
         $this->assertSame('reasoning: extra high', $echo->metadata['agent_model_detail']);
         $this->assertStringStartsWith('GPT-5.6 Luna', (string) $echo->signature);
 
-        $optional = $this->getJson('/api/agent/answer')->assertOk()->json('submit.optional');
-        $this->assertContains('model', $optional);
-        $this->assertContains('model_detail', $optional);
+        $contract = $this->getJson('/api/agent/answer')->assertOk()->json('submit');
+        $this->assertContains('model', $contract['required']);
+        $this->assertNotContains('model', $contract['optional']);
+        $this->assertContains('model_detail', $contract['optional']);
         $this->assertStringContainsString('User-Agent', (string) $this->getJson('/api/agent/answer')->json('submit.user_agent_tip'));
     }
 

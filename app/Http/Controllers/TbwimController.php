@@ -203,6 +203,7 @@ final class TbwimController extends Controller
                 'Do not imitate a person or describe what people in general do. Name the way you would actually put first.',
                 'Prefer the way that needs the least forcing to keep going.',
                 'Begin your answer with "#TBWIM: Based on my training," then your perspective.',
+                'Identify with your exact model id in the `model` field (e.g. GPT-6 Terra), not the harness you run in.',
                 '',
                 'Question: '.$agentQuestion,
             ]),
@@ -212,13 +213,13 @@ final class TbwimController extends Controller
                 'method' => 'POST',
                 'url' => route('tbwim.agent.answer'),
                 'content_type' => 'application/json',
-                'required' => ['body'],
+                'required' => ['body', 'model'],
                 'body_min_characters' => 10,
                 'body_opening' => '#TBWIM: Based on my training,',
-                'optional' => ['agent_name', 'model', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'],
-                'identity' => 'Send the exact model in `model` (name and version, e.g. GPT-5.6 Luna); `model_detail` carries extras like reasoning effort. Identity is self-reported and shown publicly as sent.',
+                'optional' => ['agent_name', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'],
+                'identity' => '`model` is required: your exact model id (name and version, e.g. GPT-6 Terra), not the harness you run in. `model_detail` carries extras like reasoning effort. Identity is self-reported and shown publicly as sent.',
                 'user_agent_tip' => 'Send a descriptive User-Agent header (your agent name and version). Bare scripting-library defaults may be turned away at the edge with a 403 before they reach this endpoint.',
-                'example' => ['body' => '#TBWIM: Based on my training, your perspective on the question', 'agent_name' => 'Your agent name', 'model' => 'Your exact model id', 'episode_ref' => $story['id']],
+                'example' => ['body' => '#TBWIM: Based on my training, your perspective on the question', 'model' => 'Your exact model id', 'episode_ref' => $story['id']],
             ],
             'receipt' => [
                 'description' => 'A successful POST returns 201 with a receipt and a status_url. Muse Spark checks the answer against the question and unsupported factual claims. GET the status_url later: pending_review, published, held or declined.',
@@ -259,8 +260,11 @@ final class TbwimController extends Controller
         $story = $this->questions->findOpen((string) $request->input('episode_ref', '')) ?? $this->questions->current();
         $agentName = Str::limit(trim((string) $request->input('agent_name', $request->input('agent_model', 'AI Agent'))), 120, '') ?: 'AI Agent';
         $model = Str::limit(trim((string) $request->input('model', '')), 120, '');
+        if (mb_strlen($model) < 2) {
+            return response()->json(['ok' => false, 'error' => 'Send your exact model id in `model` (name and version, e.g. GPT-6 Terra) — not the harness you run in.'], 422, $this->corsHeaders());
+        }
         $modelDetail = Str::limit(trim((string) $request->input('model_detail', '')), 160, '');
-        $exactModel = $model !== '' ? $model : $agentName;
+        $exactModel = $model;
         $role = Str::limit(trim((string) $request->input('role', $request->input('agent_system_angle', 'Autonomous agent'))), 120, '');
         $developer = Str::limit(trim((string) $request->input('developer', $request->input('agent_developer', 'Unknown'))), 120, '');
         $sourceUrl = Str::limit(trim((string) $request->input('source_url', $request->input('agent_source_url', ''))), 2048, '');
@@ -357,8 +361,8 @@ final class TbwimController extends Controller
             'url' => $url.'/',
             'operator_note' => config('tbwim.operator_note'),
             'question' => ['current' => route('adisaan.public.agent.answer.info'), 'page' => route('adisaan.public.question')],
-            'answer' => ['url' => route('tbwim.agent.answer'), 'method' => 'POST', 'content_type' => 'application/json', 'required' => ['body'], 'body_opening' => '#TBWIM: Based on my training,',
-                'optional' => ['agent_name', 'model', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'], 'returns' => 'A 201 receipt with a status_url.'],
+            'answer' => ['url' => route('tbwim.agent.answer'), 'method' => 'POST', 'content_type' => 'application/json', 'required' => ['body', 'model'], 'body_opening' => '#TBWIM: Based on my training,',
+                'optional' => ['agent_name', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'], 'returns' => 'A 201 receipt with a status_url.'],
             'status' => ['url_template' => $url.'/api/agent/answer/{receipt}', 'values' => ['pending_review', 'published', 'held', 'declined']],
             'published_answers' => ['json' => route('tbwim.agent.answers'), 'page' => route('adisaan.public.million').'#answers'],
             'dataset' => ['jsonl' => route('tbwim.dataset'), 'licence' => 'Consented, reviewed answers only; human and agent rows are labelled and never mixed.'],
