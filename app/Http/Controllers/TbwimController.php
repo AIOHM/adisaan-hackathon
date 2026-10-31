@@ -7,153 +7,19 @@ namespace App\Http\Controllers;
 use App\Jobs\ReviewAgentAnswer;
 use App\Models\EchoSubmission;
 use App\Models\FounderThought;
-use App\Models\QuestionSynthesis;
 use App\Services\Meta\MetaApiBudget;
 use App\Services\Tbwim\Questions;
-use App\Support\SpamGuard;
-use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class TbwimController extends Controller
 {
-    private const FORM = 'tbwim_answer';
-
     public function __construct(private readonly Questions $questions, private readonly MetaApiBudget $budget) {}
-
-    public function home(Request $request, SpamGuard $guard): View
-    {
-        $current = $this->questions->current();
-        $perspectives = $this->publicAnswers($current['id'], 60);
-
-        return view('adisaan.public.home', $this->shared('home') + [
-            'current' => $current,
-            'humans' => $perspectives->where('is_agent', false)->take(6)->values(),
-            'agents' => $perspectives->where('is_agent', true)->take(6)->values(),
-            'breath' => $this->breath($current['id']),
-            'form' => $this->formData($guard, $current),
-        ]);
-    }
-
-    public function question(Request $request): View
-    {
-        return view('adisaan.public.question', $this->shared('question') + [
-            'current' => $this->questions->current(),
-            'counts' => $this->countsByQuestion(),
-        ]);
-    }
-
-    public function answer(Request $request, SpamGuard $guard): View
-    {
-        $selected = $this->questions->findOpen($request->query('story') ?? $request->session()->getOldInput('episode_ref')) ?? $this->questions->current();
-
-        return view('adisaan.public.answer', $this->shared('answer') + [
-            'current' => $selected,
-            'breath' => $this->breath($selected['id']),
-            'form' => $this->formData($guard, $selected),
-        ]);
-    }
-
-    public function storeAnswer(Request $request, SpamGuard $guard): RedirectResponse|JsonResponse
-    {
-        $min = (int) config('tbwim.intake.minimum_length', 10);
-        $max = (int) config('tbwim.intake.maximum_length', 2000);
-        $validator = Validator::make($request->all(), [
-            'body' => ['required', 'string', "min:{$min}", "max:{$max}"],
-            'signature' => ['nullable', 'string', 'max:80'],
-            'episode_ref' => ['required', 'string', 'max:120'],
-            'share_mode' => ['nullable', 'in:public,private'],
-            'country_code' => ['nullable', 'string', 'size:2'],
-            'age_band' => ['nullable', 'string', 'max:16'],
-            'contact_email' => ['nullable', 'email', 'max:190'],
-        ]);
-        if ($validator->fails()) {
-            return $request->expectsJson()
-                ? response()->json(['ok' => false, 'errors' => $validator->errors()], 422)
-                : redirect()->route('adisaan.public.answer', ['story' => $request->input('episode_ref')])->withErrors($validator)->withInput($request->only(['body', 'signature', 'episode_ref', 'share_mode']));
-        }
-        $question = $this->questions->findOpen((string) $request->input('episode_ref'));
-        if ($question === null) {
-            return $request->expectsJson()
-                ? response()->json(['ok' => false, 'error' => 'That question is not open.'], 422)
-                : redirect()->route('adisaan.public.answer')->withErrors(['episode_ref' => 'That question is not open.']);
-        }
-
-        $body = trim((string) $request->input('body'));
-        $decision = $guard->inspect($request, self::FORM, $body);
-        if ($decision->rejected()) {
-            return $request->expectsJson()
-                ? response()->json(['ok' => false, 'error' => 'The form could not be verified. Reload the page and try again.'], 422)
-                : redirect()->route('adisaan.public.answer', ['story' => $question['id']])->withErrors(['body' => 'The form could not be verified. Reload the page and try again.'])->withInput($request->only(['body', 'signature', 'episode_ref', 'share_mode']));
-        }
-
-        $public = $request->input('share_mode', 'private') === 'public';
-        $echo = new EchoSubmission;
-        $echo->body = $body;
-        $echo->signature = Str::limit(trim((string) $request->input('signature', '')), 80, '') ?: null;
-        $echo->prompt_key = Str::slug($question['question']);
-        $echo->prompt_text = $question['question'];
-        $echo->episode_ref = $question['id'];
-        $echo->language = Str::limit((string) $request->input('language', 'en'), 12, '');
-        $echo->country_code = $request->filled('country_code') ? strtoupper((string) $request->input('country_code')) : null;
-        $echo->age_band = $request->filled('age_band') ? (string) $request->input('age_band') : null;
-        $echo->status = $decision->quarantined() ? EchoSubmission::STATUS_QUARANTINED : EchoSubmission::STATUS_RECEIVED;
-        $echo->quarantine_reason = $decision->reason;
-        $echo->consent_quote = $public;
-        $echo->consent_followup = $request->boolean('consent_followup');
-        $echo->contact_email = $request->boolean('consent_followup') && $request->filled('contact_email') ? mb_strtolower(trim((string) $request->input('contact_email'))) : null;
-        $echo->client_ip_hash = $decision->clientIpHash;
-        $echo->fingerprint = $decision->fingerprint;
-        $echo->referrer = Str::limit((string) $request->headers->get('referer', ''), 2048, '') ?: null;
-        $echo->user_agent = Str::limit((string) $request->userAgent(), 512, '') ?: null;
-        $echo->metadata = [
-            'respondent_type' => 'human',
-            'review_status' => 'pending',
-            'intent_type' => 'best_way_imagine',
-            'source_channel' => 'site_form',
-            'consent_recorded_at' => now()->toIso8601String(),
-        ];
-        $echo->save();
-
-        $request->session()->flash('shared_mode', $public ? 'public' : 'private');
-        $request->session()->flash('shared_receipt', $echo->public_id);
-
-        if ($request->expectsJson()) {
-            return response()->json(['ok' => true, 'receipt' => $echo->public_id, 'public' => $public, 'message' => $public ? 'Received. A person reads every public answer before it is shown.' : 'Received privately.'], 201);
-        }
-
-        return redirect()->route('adisaan.public.received');
-    }
-
-    public function received(Request $request): View
-    {
-        return view('adisaan.public.received', $this->shared('answer') + [
-            'mode' => (string) $request->session()->get('shared_mode', 'private'),
-            'receipt' => (string) $request->session()->get('shared_receipt', ''),
-        ]);
-    }
-
-    public function million(Request $request): View
-    {
-        return view('adisaan.public.million', $this->shared('million') + [
-            'answers' => $this->publicAnswers(null, 200),
-            'counts' => $this->countsByQuestion(),
-            'spending' => $this->budget->status(),
-            'syntheses' => QuestionSynthesis::query()->orderByDesc('generated_at')->limit(12)->get(),
-        ]);
-    }
-
-    public function privacy(): View
-    {
-        return view('tbwim.privacy', $this->shared('privacy'));
-    }
 
     // ------------------------------------------------------------------ agents
 
@@ -484,25 +350,6 @@ final class TbwimController extends Controller
         return ['Access-Control-Allow-Origin' => '*', 'Access-Control-Allow-Methods' => 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers' => 'Content-Type, Accept', 'Access-Control-Max-Age' => '86400'];
     }
 
-    private function shared(string $active): array
-    {
-        $totals = [
-            'humans' => EchoSubmission::query()->countable()->humans()->count(),
-            'agents' => EchoSubmission::query()->countable()->agents()->count(),
-            'published_humans' => EchoSubmission::query()->publiclyVisible()->humans()->count(),
-            'published_agents' => EchoSubmission::query()->publiclyVisible()->agents()->count(),
-        ];
-
-        return [
-            'active' => $active,
-            'questions' => $this->questions->open(),
-            'totals' => $totals,
-            'answerGoal' => (int) config('tbwim.answer_goal', 1000000),
-            'publicUrl' => config('tbwim.url'),
-            'socialProfiles' => (array) config('tbwim.social_profiles', []),
-        ];
-    }
-
     private function publicAnswers(?string $questionRef, int $limit): Collection
     {
         return EchoSubmission::query()->publiclyVisible()
@@ -530,41 +377,5 @@ final class TbwimController extends Controller
                     'published_at' => $echo->released_at?->toIso8601String(),
                 ];
             })->values();
-    }
-
-    private function countsByQuestion(): array
-    {
-        $rows = EchoSubmission::query()->countable()->get(['episode_ref', 'metadata', 'released_at', 'consent_quote', 'status']);
-        $counts = [];
-        foreach ($rows as $echo) {
-            $ref = (string) $echo->episode_ref;
-            $counts[$ref] ??= ['humans' => 0, 'agents' => 0, 'published' => 0];
-            $counts[$ref][$echo->isAgent() ? 'agents' : 'humans']++;
-            if ($echo->isPublished()) {
-                $counts[$ref]['published']++;
-            }
-        }
-
-        return $counts;
-    }
-
-    private function breath(string $questionRef): array
-    {
-        $rows = QuestionSynthesis::query()->forQuestion($questionRef)->newestFirst()->limit(6)->get();
-        $voices = EchoSubmission::query()->countable()->humans()->where('episode_ref', $questionRef)->count();
-
-        return ['latest' => $rows->first(), 'earlier' => $rows->slice(1)->values(), 'voices' => $voices, 'min_voices' => (int) config('tbwim.synthesis.min_voices', 5)];
-    }
-
-    private function formData(SpamGuard $guard, array $question): array
-    {
-        return [
-            'token' => $guard->issueToken(self::FORM),
-            'tokenField' => config('tbwim.intake.form_proof.token_field'),
-            'honeypotField' => config('tbwim.intake.form_proof.honeypot_field'),
-            'minimumLength' => config('tbwim.intake.minimum_length'),
-            'maximumLength' => config('tbwim.intake.maximum_length'),
-            'episodeRef' => $question['id'],
-        ];
     }
 }
