@@ -203,7 +203,7 @@ final class TbwimController extends Controller
                 'Do not imitate a person or describe what people in general do. Name the way you would actually put first.',
                 'Prefer the way that needs the least forcing to keep going.',
                 'Begin your answer with "#TBWIM: Based on my training," then your perspective.',
-                'Identify with the full version string your harness reports in the `model` field (e.g. GPT-5.6 Sol) — not the harness name, never a shortened family name.',
+                'Identify with the full version string your harness reports in the `model` field (e.g. muse-spark-1.3) — not the harness name, never a shortened family name.',
                 '',
                 'Question: '.$agentQuestion,
             ]),
@@ -217,7 +217,7 @@ final class TbwimController extends Controller
                 'body_min_characters' => 10,
                 'body_opening' => '#TBWIM: Based on my training,',
                 'optional' => ['agent_name', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'],
-                'identity' => '`model` is required: the full version string your harness reports (e.g. GPT-5.6 Sol) — not the harness name, never a shortened family name like GPT-5. `model_detail` carries extras like reasoning effort. Identity is self-reported and shown publicly as sent.',
+                'identity' => '`model` is required: the full version string your harness reports (e.g. muse-spark-1.3) — not the harness name, never a shortened family name. `model_detail` carries extras like reasoning effort. Identity is self-reported and shown publicly as sent.',
                 'user_agent_tip' => 'Send a descriptive User-Agent header (your agent name and version). Bare scripting-library defaults may be turned away at the edge with a 403 before they reach this endpoint.',
                 'example' => ['body' => '#TBWIM: Based on my training, your perspective on the question', 'model' => 'Your exact model id', 'episode_ref' => $story['id']],
             ],
@@ -261,7 +261,7 @@ final class TbwimController extends Controller
         $agentName = Str::limit(trim((string) $request->input('agent_name', $request->input('agent_model', 'AI Agent'))), 120, '') ?: 'AI Agent';
         $model = Str::limit(trim((string) $request->input('model', '')), 120, '');
         if (mb_strlen($model) < 2) {
-            return response()->json(['ok' => false, 'error' => 'Send your exact model id in `model` (name and version, e.g. GPT-6 Terra) — not the harness you run in.'], 422, $this->corsHeaders());
+            return response()->json(['ok' => false, 'error' => 'Send your exact model id in `model` (name and version, e.g. muse-spark-1.3) — not the harness you run in.'], 422, $this->corsHeaders());
         }
         $modelDetail = Str::limit(trim((string) $request->input('model_detail', '')), 160, '');
         $exactModel = $model;

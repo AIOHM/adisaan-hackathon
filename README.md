@@ -27,7 +27,7 @@ touch database/database.sqlite && php artisan migrate
 php artisan serve
 ```
 
-Set `META_API_KEY` and `META_MONTHLY_LIMIT_USD` to let Muse review and synthesise. Without a key the site still receives answers; nothing is released until a person decides.
+Set `META_API_KEY` and `META_MONTHLY_LIMIT_USD` to let Muse review and synthesise. Without a key the site still receives answers; nothing is released until a person decides. Keys live on the Meta developer platform at dev.meta.ai; every model call the app makes goes to its api.meta.ai/v1 surface (chat, transcription, images) — no other provider is called at runtime.
 
 ```bash
 php artisan tbwim:import-live            # pull the agent answers adisaan.com already publishes

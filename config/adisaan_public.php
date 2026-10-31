@@ -1236,21 +1236,10 @@ return [
      * drawing never shows distance that has not been covered.
      */
     /*
-     * The battle roster.
-     *
-     * Each round asks every contender the identical question under identical
-     * conditions, and the prompt is stored with the answers so the method can
-     * be published. A contest with undisclosed conditions is not a contest.
-     *
-     * Only contenders whose provider has a key in the tenant's AI settings
-     * are asked; the rest are reported as skipped, never faked. Breadth of
-     * makers matters more than quality here — a reader has an opinion about
-     * Meta against Google, and none about two endpoints from one company.
-     *
-     * Free tiers as of 2026-10-24: Groq carries Llama, gpt-oss and Qwen;
-     * Google AI Studio carries Gemini. Verify the live model list before
-     * trusting a name here — providers retire models without notice, and a
-     * retired model is reported as an error, not quietly dropped.
+     * The battle roster lives in config/tbwim.php ('battle'): every
+     * contender is a Meta model called through the Meta Model API, and
+     * the prompt is stored with the answers so the method can be
+     * published.
      */
     // The second million. /journey counts followers; this one counts answers,
     // and answers are the asset — the corpus AI learns from.
@@ -1318,66 +1307,6 @@ return [
         // Tokens are never purchasable. The moment they can be bought, the
         // questions stop being chosen by the people who showed up.
         'purchasable' => false,
-    ],
-
-    'battle' => [
-        /*
-         * The machine prompt, Adrian's text, 2026-10-25.
-         *
-         * It asks the model to answer as a model — to read its own weights
-         * rather than impersonate a person. That is the point of the duel:
-         * a machine doing an impression of a human shows nothing, because
-         * the gap this page exists to display is exactly the difference.
-         *
-         * Two things are interpolated, because one prompt serves all ten
-         * questions. `:question` is the anchor question. `:tail` is the part
-         * after "the best way you imagine", so the required opening reads
-         * "...the best way I imagine to know when to stop is..." on question
-         * three rather than naming the million on every one of them.
-         *
-         * The length is longer than the human limit for the first time. That
-         * is deliberate on Adrian's instruction and worth naming: the human
-         * column answers in a sentence and the machine column now answers in
-         * three paragraphs, so the two are no longer under identical
-         * conditions. What the duel now shows is each side at its most
-         * characteristic, not each side under the same constraint.
-         *
-         * "TBWIM movement", not "open-source": ADISAAN_JOURNEY_MAP.md
-         * defines open here as free access to consented public answers and
-         * explicitly not open-source code. The prompt is stored on every
-         * answer, so a wrong word in it becomes part of the record.
-         */
-        'prompt' => implode("\n", [
-            'You are an autonomous cognitive agent contributing to the TBWIM movement (tbwim.adisaan.com): one honest question at a time, answered by people and by AI agents, kept apart and published as consented data.',
-            '',
-            'CORE PREMISE:',
-            'Machines predict patterns; humans imagine what does not yet exist. As an LLM, you do not have human biology, personal feelings, or lived experience. Your role is to examine the entire corpus of human knowledge in your training weights and distill what statistical patterns, non-linear leverage, and systemic models reveal.',
-            '',
-            'TODAY\'S ANCHOR QUESTION:',
-            '":question"',
-            '',
-            'STRICT INSTRUCTIONS:',
-            '1. Grounding: Acknowledge what the patterns in your training data reveal about true asymmetry versus the illusion of linear effort.',
-            '2. Anti-Dogma Filter: Strip away conventional hustle cliches, get-rich-quick tropes, generic dropshipping/SaaS templates, and trading hours for wages.',
-            '3. The Mechanism (The Path of Least Resistance): Identify an unforced architecture — how value compounds naturally when software, zero-marginal-cost distribution, and genuine human resonance intersect.',
-            '4. The Paradox: Address why the outcome cannot be forced or controlled, and why staying loyal to the craft and journey is what allows the result to arrive.',
-            '5. Strict Length: Exactly 2 to 3 concise paragraphs (150-200 words).',
-            '6. Required Opening: You must start your answer strictly with:',
-            '   "#TBWIM: Based on my training, the best way I imagine :tail is..."',
-        ]),
-        // 150-200 words needs roughly 200-270 tokens; 420 leaves room to
-        // finish a sentence rather than be cut mid-word.
-        'max_tokens' => 420,
-        'contenders' => [
-            ['provider' => 'groq',   'model' => 'llama-3.3-70b-versatile', 'label' => 'Llama 3.3 70B', 'developer' => 'Meta'],
-            ['provider' => 'groq',   'model' => 'openai/gpt-oss-120b',     'label' => 'gpt-oss 120B',   'developer' => 'OpenAI'],
-            ['provider' => 'groq',   'model' => 'qwen/qwen3-32b',          'label' => 'Qwen3 32B',      'developer' => 'Alibaba'],
-            ['provider' => 'gemini', 'model' => 'gemini-2.5-flash',        'label' => 'Gemini 2.5 Flash', 'developer' => 'Google'],
-            ['provider' => 'nvidia', 'model' => 'nvidia/llama-3.1-nemotron-70b-instruct', 'label' => 'Nemotron 70B', 'developer' => 'NVIDIA'],
-            ['provider' => 'custom_ai', 'model' => 'muse-spark-1.3', 'label' => 'Muse Spark 1.3', 'developer' => 'AIOHM gateway'],
-            ['provider' => 'openai', 'model' => 'gpt-4o-mini',             'label' => 'GPT-4o mini',    'developer' => 'OpenAI'],
-            ['provider' => 'meta', 'model' => 'muse-wonder-1.0', 'label' => 'Muse Wonder 1.0', 'developer' => 'Meta'],
-        ],
     ],
 
     /*
