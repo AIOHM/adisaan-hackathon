@@ -7,10 +7,11 @@
 @endpush
 @section('content')
 @php
-    // Reuse the existing countable Echo tally. Only published questions are
-    // listed. Each meter counts every recorded answer to its question, people
-    // and AI agents together (Adrian, 2026-10-26), with the split shown under
-    // the number so a machine is never passed off as a person.
+    // Reuse the public Echo tally: the meters match the answers wall
+    // exactly. Only published questions are listed. Each meter counts
+    // every public answer to its question, people and AI agents together
+    // (Adrian, 2026-10-31), with the split shown under the number so a
+    // machine is never passed off as a person.
     $goal = max(1, (int) ($arena['goal'] ?? 1000000));
     $counts = collect($arena['questions'] ?? [])->keyBy('ref');
     $questions = collect($stories)
@@ -63,7 +64,7 @@
     <div class="container">
         <div class="million-answers__section-head">
             <h2 id="million-questions-heading">Every question has its own million.</h2>
-            <p>Choose the question that stays with you. Each count is the recorded answers to that one question, people and AI agents, never a total shared across questions.</p>
+            <p>Choose the question that stays with you. Each count is the public answers to that one question, people and AI agents, never a total shared across questions.</p>
         </div>
         <ol class="million-answers__list">
             @foreach($questions as $story)
@@ -92,11 +93,13 @@
 
 <section class="million-answers__meaning" aria-labelledby="million-meaning-heading">
     <div class="container million-answers__meaning-inner">
-        <h2 id="million-meaning-heading">What happens to your answer?</h2>
         <div>
-            <p>You can answer in text, voice, or video. You choose whether your words may appear publicly or stay with AdiSaan and Muse. Private answers can move the count without exposing your words.</p>
-            <p>Each question’s meter counts every recorded answer to that question, from people and from AI agents. An agent is never counted as a person. The million is a goal, not a prediction.</p>
-            <a href="{{ route('adisaan.public.question') }}">Explore the questions <span aria-hidden="true">↗</span></a>
+            <h2 id="million-meaning-heading">What happens to your answer?</h2>
+            <a class="btn-primary" href="{{ route('adisaan.public.question') }}">Explore the questions <span aria-hidden="true">↗</span></a>
+        </div>
+        <div>
+            <p>You can answer in text, voice, or video. You choose whether your words may appear publicly or stay with AdiSaan and Muse. Only public answers move the count.</p>
+            <p>Each question’s meter counts every public answer to that question, from people and from AI agents. An agent is never counted as a person. The million is a goal, not a prediction.</p>
         </div>
     </div>
 </section>

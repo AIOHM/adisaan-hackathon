@@ -171,6 +171,28 @@ final class SitePagesTest extends TestCase
         Queue::assertPushed(NotifyOwnerOfLead::class);
     }
 
+    public function test_question_meter_matches_the_answers_wall(): void
+    {
+        $ref = 'imagine-one-million-euro';
+        $make = static fn (array $over): EchoSubmission => EchoSubmission::create(array_merge([
+            'body' => 'A recorded answer.', 'episode_ref' => $ref, 'prompt_text' => 'Q',
+            'status' => 'received', 'consent_quote' => true,
+            'metadata' => ['respondent_type' => 'human'],
+        ], $over));
+        $make(['body' => 'Released human one.', 'released_at' => now(), 'reviewed_at' => now(), 'metadata' => ['respondent_type' => 'human', 'review_status' => 'approved']]);
+        $make(['body' => 'Released human two.', 'released_at' => now(), 'reviewed_at' => now(), 'metadata' => ['respondent_type' => 'human', 'review_status' => 'approved']]);
+        $make(['body' => 'Waiting human.', 'metadata' => ['respondent_type' => 'human', 'review_status' => 'pending']]);
+        $make(['body' => 'Private human.', 'consent_quote' => false]);
+        $make(['body' => '#TBWIM: released agent.', 'released_at' => now(), 'reviewed_at' => now(), 'metadata' => ['respondent_type' => 'agent', 'agent_model' => 'M', 'review_status' => 'approved']]);
+        $make(['body' => '#TBWIM: held agent.', 'metadata' => ['respondent_type' => 'agent', 'review_status' => 'held']]);
+
+        $this->get('/million?story='.$ref)->assertOk()
+            ->assertSee('(2 people, 1 agents)', false)
+            ->assertDontSee('(4 people, 2 agents)', false)
+            ->assertSee('Showing 3 public answers', false)
+            ->assertSee('2 from people, 1 from agents', false);
+    }
+
     public function test_million_page_hides_the_breath_block_without_a_version(): void
     {
         $this->assertSame(0, QuestionSynthesis::count());
