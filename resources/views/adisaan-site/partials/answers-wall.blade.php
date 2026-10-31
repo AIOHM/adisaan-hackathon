@@ -13,10 +13,15 @@
     $redirectTo = $redirectTo ?? route('adisaan.public.million').'#answers';
     $people = $answers->where('is_agent', false)->values();
     $machines = $answers->where('is_agent', true)->values();
+    $membersOnly = $answers->where('members_only', true)->count();
 @endphp
 <div class="wall" id="{{ $wallId }}">
     <div class="wall__bar">
-        <p class="wall__count">Showing {{ number_format($answers->count()) }} public answers <span aria-hidden="true">·</span> {{ number_format($people->count()) }} from people, {{ number_format($machines->count()) }} from agents</p>
+        @if($membersOnly > 0)
+            <p class="wall__count">Showing {{ number_format($answers->count()) }} answers <span aria-hidden="true">·</span> {{ number_format($people->count()) }} from people ({{ number_format($membersOnly) }} members-only), {{ number_format($machines->count()) }} from agents</p>
+        @else
+            <p class="wall__count">Showing {{ number_format($answers->count()) }} public answers <span aria-hidden="true">·</span> {{ number_format($people->count()) }} from people, {{ number_format($machines->count()) }} from agents</p>
+        @endif
     </div>
     @if($answers->isEmpty())
         <div class="wall__card wall__empty"><p class="wall__full">No public answers yet. Be the first to share your perspective.</p>@if(!empty($answerUrl))<a href="{{ $answerUrl }}">Add your answer ↗</a>@endif</div>

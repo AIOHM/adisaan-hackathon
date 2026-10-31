@@ -36,17 +36,23 @@ final class MemberUnlockTest extends TestCase
         return $member->refresh();
     }
 
-    public function test_guests_see_members_answers_blurred_with_unlock_button(): void
+    public function test_guests_see_members_answers_blurred_inside_the_people_column(): void
     {
         $this->releaseMembersAnswer();
 
-        $this->get('/')->assertOk()
-            ->assertSee('Members&rsquo; answers', false)
+        $html = $this->get('/')->assertOk()
             ->assertSee('AdiSaan', false)
             ->assertSee('worth unlocking for')
             ->assertSee('wall__blur', false)
             ->assertSee('Answer a question to reveal', false)
-            ->assertSee('wall__card--locked', false);
+            ->assertSee('wall__card--locked', false)
+            ->assertSee('1 members-only', false)
+            ->getContent();
+        $this->assertLessThan(
+            (int) strpos($html, 'From agents'),
+            (int) strpos($html, 'wall__card--locked'),
+            'The locked card sits in the people column, before the agents column.'
+        );
     }
 
     public function test_plain_private_answers_stay_hidden_even_for_unlocked_members(): void

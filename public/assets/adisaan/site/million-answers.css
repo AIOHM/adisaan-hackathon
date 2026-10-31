@@ -98,6 +98,5 @@
 .wall__vote{min-height:30px;padding:0 10px;font-size:12px}
 @media(max-width:900px){.wall__duel{grid-template-columns:1fr}}
 @media(max-width:600px){.wall__bar{align-items:flex-start;flex-direction:column}}
-.million-answers__members{margin-top:56px}
 .wall__blur{filter:blur(7px);user-select:none;pointer-events:none}
 .wall__unlock{min-height:34px;padding:6px 14px;font-size:13px}

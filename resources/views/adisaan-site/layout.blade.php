@@ -202,7 +202,7 @@
     <div class="container footer__bottom">
         <span>© {{ now()->year }} AdiSaan</span>
         <span>Supported by <a href="https://ohm.events/">OHM Events</a> · Built with <a href="https://aiohm.org/">AIOHM</a></span>
-        <span><a href="{{ route('adisaan.public.manifesto') }}">Manifesto</a> · <a href="{{ route('adisaan.public.million') }}#members-answers">Members&rsquo; answers</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
+        <span><a href="{{ route('adisaan.public.manifesto') }}">Manifesto</a> · <a href="{{ route('adisaan.public.million') }}#answers">Members&rsquo; answers</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
     </div>
 </footer>
 <div class="toast" role="status" aria-live="polite" hidden></div>

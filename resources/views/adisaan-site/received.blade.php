@@ -37,7 +37,7 @@
             <p class="received-story__eyebrow">{{ ($hasSubmission ?? false) ? 'Your voice joined the conversation' : 'The conversation is open' }}</p>
             <h1 id="received-heading" @if(session('just_answered')) data-analytics-event="answer_submitted" data-analytics-mode="{{ $mode }}" data-analytics-episode="{{ session('shared_question', '') }}" @endif>{{ ($hasSubmission ?? false) ? ($ap['received_title'] ?? 'Thank you.') : 'Your voice belongs here.' }}</h1>
             @if(session('just_unlocked'))
-                <p class="received-unlock" role="status">Now you have access to members&rsquo; answers. <a href="{{ route('adisaan.public.million') }}#members-answers">Read them <span aria-hidden="true">↗</span></a></p>
+                <p class="received-unlock" role="status">Now you have access to members&rsquo; answers. <a href="{{ route('adisaan.public.million') }}#answers">Read them <span aria-hidden="true">↗</span></a></p>
             @endif
             @unless($hasSubmission ?? false)
                 <p class="home-lead">Answer a question to join the conversation. Your receipt and tokens will appear here.</p>
@@ -116,7 +116,7 @@
                         @if(session()->has('claim_saved'))
                             <p class="received-wallet__ok" role="status">Claimed. {{ (int) session('claim_saved') > 0 ? '+'.(int) session('claim_saved').' tokens, and ' : '' }}your answers are yours now.</p>
                         @endif
-                        <a class="home-link" href="{{ route('adisaan.public.million') }}#members-answers">Read the members&rsquo; answers <span aria-hidden="true">&nearr;</span></a>
+                        <a class="home-link" href="{{ route('adisaan.public.million') }}#answers">Read the members&rsquo; answers <span aria-hidden="true">&nearr;</span></a>
                     @elseif($hasSubmission ?? false)
                         <p class="received-wallet__line">Claim this anonymous answer with your first name and email. You receive {{ $gratitude['claim_reward'] }} more tokens; confirmed tokens become usable.</p>
                         <form class="received-claim" method="post" action="{{ route('adisaan.public.received') }}">
