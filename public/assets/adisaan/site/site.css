@@ -972,7 +972,7 @@
 .brand-header__slim-meta small{margin-top:3px;font-size:12px;font-weight:400;letter-spacing:0;color:#c1cbb8}
 /* The menu shares the logo's row, aligned right (Adrian, 2026-10-26); under 900px it drops to a centred second row. */
 @media(max-width:900px){.public-header--compact .brand-header__slim-row{grid-template-columns:1fr;gap:10px 16px}.public-header--compact .tabs{grid-column:1/-1;grid-row:2}.public-header--compact .tabs__inner{justify-content:center;padding-bottom:6px}}
-@media(max-width:700px){.brand-header__slim-meta{display:block;font-size:clamp(10px,2.6vw,13px);letter-spacing:0;line-height:1.25}.brand-header__slim-meta small{font-size:clamp(10px,2.4vw,12px)}.public-header--compact .brand-header__wordmark{width:min(37vw,170px)}.public-header--compact .tabs__inner{flex-wrap:wrap;justify-content:center;padding:3px 0 8px;overflow:visible}/* Phones (2026-10-26): the menu wraps onto two rows instead of scrolling sideways. The scrolling strip clipped the open 'The million' and 'Members Area' menus and hid the last pills off-screen; wrapped, every pill and both menus are on screen, the same UI as desktop. Each menu opens toward the side of the row its pill is on so it stays inside the viewport. */.public-header--compact .tabs__million .tabs__members-menu{left:auto;right:0}.public-header--compact .tabs__members:not(.tabs__million) .tabs__members-menu{left:0;right:auto}.tabs__members-menu{max-width:calc(100vw - 40px)}}
+@media(max-width:700px){.brand-header__slim-meta{display:block;font-size:clamp(10px,2.6vw,13px);letter-spacing:0;line-height:1.25}.brand-header__slim-meta small{font-size:clamp(10px,2.4vw,12px)}.public-header--compact .brand-header__wordmark{width:min(37vw,170px)}.public-header--compact .tabs__inner{flex-wrap:wrap;justify-content:center;padding:3px 0 8px;overflow:visible}/* Phones: the menu wraps onto two rows instead of scrolling sideways, so every pill and the Members menu stay on screen. */.public-header--compact .tabs__members .tabs__members-menu{left:0;right:auto}.tabs__members-menu{max-width:calc(100vw - 40px)}}
 .arena-echo-empty{padding:18px;border:1px dashed #b5c1ad;border-radius:14px;background:#f4f0e8;color:#3e4f3f}
 .arena-echo-empty p{margin:0 0 10px;font-size:14px;line-height:1.6}
 .arena-echo-empty p:last-child{margin-bottom:0}
@@ -2125,7 +2125,7 @@ body.home-living-map{background:#073209}
    two rows tall. They are one tab with a menu now, reusing .tabs__members.
    Its menu hangs from the right because it is the last tab; this one sits
    mid-row, so it hangs from its own left edge instead. */
-.tabs__million .tabs__members-menu{right:auto;left:0;min-width:200px}
+.tabs__members .tabs__members-menu{right:auto;left:0;min-width:200px}
 
 .question-page-v2__intro .home-episode__tag{margin:0 auto 10px}
 

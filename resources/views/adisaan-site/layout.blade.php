@@ -1,7 +1,7 @@
 @php
-    // Phase 1 (2026-10-19): only the homepage renders the hero; every other page
-    // gets the compact header (wordmark + the menu row).
-    $compactHeader = ($active ?? '') !== 'construction';
+    // Every page renders the compact header (wordmark + the menu row); the
+    // hero homepage was removed with /construction and /ro (2026-10-31).
+    $compactHeader = true;
     $followersTotal = isset($board['total_followers']) && $board['total_followers'] !== null ? number_format((int) $board['total_followers']) : null;
     $countedOn = !empty($board['last_synced_at']) ? \Illuminate\Support\Carbon::parse($board['last_synced_at'])->format($home['date_format'] ?? 'j M Y') : null;
     $countWords = ($home['count_words'] ?? null) ?: ['none' => 'No measured count yet', 'follow' => 'follow so far', 'counted' => 'counted'];
@@ -45,11 +45,6 @@
     <meta name="description" content="@yield('description', 'A morning question. An evening perspective. Join AdiSaan on a real journey toward one million follows.')">
     <meta name="theme-color" content="#073209">
     <link rel="canonical" href="{{ $publicUrl }}{{ $canonicalPath }}">
-    @if(($active ?? '') === 'construction')
-    <link rel="alternate" hreflang="en" href="{{ $publicUrl }}/">
-    <link rel="alternate" hreflang="ro" href="{{ $publicUrl }}/ro">
-    <link rel="alternate" hreflang="x-default" href="{{ $publicUrl }}/">
-    @endif
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('title', 'AdiSaan — Your online partner')">
     <meta property="og:description" content="A real story. A question for your imagination. A journey we shape together.">
@@ -188,19 +183,7 @@
         <a href="{{ route('adisaan.public.question') }}" @if($active === 'question') aria-current="page" @endif>Question</a>
         <a href="{{ route('adisaan.public.answer') }}" @if($active === 'answer') aria-current="page" @endif>Answer</a>
         <a href="{{ route('adisaan.public.arena') }}" @if($active === 'arena') aria-current="page" @endif>Arena</a>
-        {{-- The two million pages as one tab with a menu under it, the same
-             shape as Members below. Reuses that component's classes
-             rather than styling a second dropdown: one pattern, one set of
-             rules, and a tab that behaves the way the other one already
-             taught people it would. --}}
-        <details class="tabs__members tabs__million">
-            <summary @if(in_array($active, ['million', 'journey', 'about'], true)) aria-current="page" @endif>The million</summary>
-            <div class="tabs__members-menu">
-                <a href="{{ route('adisaan.public.million') }}" @if($active === 'million') aria-current="page" @endif>The million</a>
-                <a href="{{ route('adisaan.public.journey') }}" @if($active === 'journey') aria-current="page" @endif>The journey</a>
-                <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
-            </div>
-        </details>
+        <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
         <details class="tabs__members">
             <summary @if(in_array($active, ['members', 'news'], true)) aria-current="page" @endif>{{ !empty($memberUnlocked) ? 'Members Sanctuary' : 'Members' }}</summary>
             <div class="tabs__members-menu">

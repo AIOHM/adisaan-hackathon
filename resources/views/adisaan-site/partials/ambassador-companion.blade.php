@@ -26,16 +26,15 @@
          of the three ask cards. A greeting is right the first time someone
          arrives and wrong on top of the thing they came to read.
 
-         Keyed on the canonical path rather than $active, because the home
-         page's shared() key is still the legacy 'construction' and keying a
-         greeting off that would be a trap for whoever renames it.
+         Keyed on the canonical path rather than $active, so a greeting
+         follows the page even when the shared key changes.
 
          Hidden in the markup rather than by script, so on the pages that
          start closed it is never visible for the moment before JavaScript
          runs. Everything that deliberately raises it — the sanctuary gate
          guide, the end of a story video, closing the chat — sets
          hidden = false itself and is unaffected. --}}
-    @php $companionGreets = in_array($canonicalPath ?? '', ['/', '/ro'], true); @endphp
+    @php $companionGreets = ($canonicalPath ?? '') === '/'; @endphp
     <div class="adisaan-thought" data-avatar-thought @unless($companionGreets) hidden @endunless>
         <button type="button" data-hide-thought aria-label="Hide AdiSaan’s thoughts">×</button>
         <span data-thought-context>Let’s talk</span>

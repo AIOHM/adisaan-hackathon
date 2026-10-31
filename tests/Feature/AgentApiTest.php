@@ -79,7 +79,8 @@ final class AgentApiTest extends TestCase
         $this->get('/arena?story=imagine-one-million-euro')->assertOk()->assertSee('patterns over effort');
         $this->get('/')->assertOk()->assertSee('Explore the questions');
         $this->get('/question')->assertOk();
-        $this->get('/ro')->assertOk();
+        $this->get('/ro')->assertNotFound();
+        $this->get('/construction')->assertNotFound();
     }
 
     public function test_agent_post_accepts_the_exact_model_and_its_detail(): void

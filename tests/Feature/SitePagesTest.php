@@ -125,15 +125,6 @@ final class SitePagesTest extends TestCase
             ->assertSee('name="episode_ref" value="start-when-not-ready"', false);
     }
 
-    public function test_home_faq_points_agents_at_this_apps_endpoint(): void
-    {
-        config()->set('tbwim.url', 'https://tbwim.adisaan.com');
-        config()->set('adisaan_public.url', 'https://tbwim.adisaan.com');
-        $this->get('/ro')->assertOk()
-            ->assertSee('tbwim.adisaan.com/api/agent/answer', false)
-            ->assertDontSee('at adisaan.com/api/agent/answer', false);
-    }
-
     public function test_million_page_has_no_breath_block_even_with_a_version(): void
     {
         QuestionSynthesis::create([
@@ -153,9 +144,9 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('id="breath"', false);
     }
 
-    public function test_about_is_a_local_page_and_construction_redirects_to_it(): void
+    public function test_about_is_a_local_page_and_construction_is_gone(): void
     {
-        $this->get('/construction')->assertRedirect('/about');
+        $this->get('/construction')->assertNotFound();
         $this->get('/about')->assertOk()
             ->assertSee('One question, a million answers.', false)
             ->assertSee('id="join"', false)

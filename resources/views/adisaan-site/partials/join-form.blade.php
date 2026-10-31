@@ -1,6 +1,5 @@
-{{-- The "one email when a new episode is out" form. Shared by /about and
-     /ro, so the two copies cannot drift apart. Words come from
-     config('adisaan_public.home.join'); posts to POST / (lead). --}}
+{{-- The "one email when a new episode is out" form on /about. Words come
+     from config('adisaan_public.home.join'); posts to POST / (lead). --}}
 @php($join = $home['join'] ?? [])
 <section class="home-section home-section--light home-join" id="join" aria-labelledby="join-heading">
     <div class="container home-join__grid reveal">
