@@ -29,6 +29,7 @@ final class NotifyPendingCommand extends Command
         $answers = EchoSubmission::query()->humans()
             ->where('status', EchoSubmission::STATUS_RECEIVED)
             ->whereNull('metadata->owner_notified_at')
+            ->whereNull('metadata->decided_by')
             ->where('created_at', '<', $cutoff)
             ->orderBy('created_at')->limit($limit)->get();
         foreach ($answers as $echo) {

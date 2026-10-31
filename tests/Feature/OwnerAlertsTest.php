@@ -152,4 +152,20 @@ final class OwnerAlertsTest extends TestCase
         $this->assertNotNull($missed->fresh()->metadata['owner_notified_at']);
         $this->assertArrayNotHasKey('owner_notified_at', (array) $junk->fresh()->metadata);
     }
+
+    public function test_decided_rows_are_never_pinged(): void
+    {
+        $this->ownerConfig();
+        Http::fake();
+        $echo = $this->humanAnswer(['metadata' => ['respondent_type' => 'human', 'review_status' => 'approved', 'decided_by' => 'human']]);
+        (new NotifyOwnerOfAnswer($echo->public_id))->handle(app(OwnerAlerts::class));
+        Http::assertNothingSent();
+
+        Carbon::setTestNow(now()->subMinutes(20));
+        $old = $this->humanAnswer(['body' => 'Decided long ago, never announced.', 'metadata' => ['respondent_type' => 'human', 'review_status' => 'approved', 'decided_by' => 'human']]);
+        Carbon::setTestNow();
+        $this->artisan('tbwim:notify-pending')->assertSuccessful();
+        Http::assertNothingSent();
+        $this->assertArrayNotHasKey('owner_notified_at', (array) $old->fresh()->metadata);
+    }
 }

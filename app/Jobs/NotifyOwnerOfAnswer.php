@@ -24,7 +24,9 @@ final class NotifyOwnerOfAnswer implements ShouldQueue
     public function handle(OwnerAlerts $alerts): void
     {
         $echo = EchoSubmission::query()->where('public_id', $this->receipt)->first();
-        if (! $echo || $echo->isAgent() || ($echo->metadata['owner_notified_at'] ?? null) !== null) {
+        if (! $echo || $echo->isAgent()
+            || ($echo->metadata['owner_notified_at'] ?? null) !== null
+            || ($echo->metadata['decided_by'] ?? null) !== null) {
             return;
         }
         if (! $alerts->notifyAnswer($echo)) {
