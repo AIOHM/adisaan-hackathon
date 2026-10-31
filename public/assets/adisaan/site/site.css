@@ -253,7 +253,7 @@
 .build-follow__card .build-follow__consent{display:flex;align-items:flex-start;gap:12px;margin:16px 0 0;color:#f4f0e8;font-size:14px;font-weight:400;line-height:1.55;cursor:pointer}
 .build-follow__card .build-follow__consent input[type=checkbox]{width:18px;height:18px;flex:0 0 18px;padding:0;margin:2px 0 0;accent-color:#d6b25e;cursor:pointer}
 .build-follow__consent a{color:#e9c775;text-decoration-thickness:1px}
-.build-follow__card input::placeholder,.answer-form input::placeholder,.answer-form textarea::placeholder,.big-chat-meta-grid input::placeholder,.members-field input::placeholder,.members-field textarea::placeholder{color:#526352;opacity:1}.build-follow__card input:focus-visible,.build-follow__card button:focus-visible,.build-button:focus-visible,.build-link:focus-visible{outline:3px solid #bb9850;outline-offset:3px}
+.build-follow__card input::placeholder,.answer-form input::placeholder,.answer-form textarea::placeholder,.big-chat-meta-grid input::placeholder,.build-follow__card input:focus-visible,.build-follow__card button:focus-visible,.build-button:focus-visible,.build-link:focus-visible{outline:3px solid #bb9850;outline-offset:3px}
 .build-follow__card button{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;min-height:52px;margin-top:20px;padding:12px 17px;background:#d6b25e;color:#073209;border:0;border-radius:14px;font:inherit;font-size:14px;font-weight:700;cursor:pointer}
 .build-follow__card button:hover{background:#e9c775}
 .build-follow__card small{display:block;margin-top:14px;color:#5d6c5b;font-size:14px;line-height:1.6}
@@ -686,23 +686,23 @@
 .home-fun-mode-link__arrow{color:#e9c775;font-weight:700;font-size:16px}
 
 /* Members Sanctuary (/members) & 3 Fun Mode Cards */
-.members-sanctuary{background:#073209;color:#f4f0e8;padding:clamp(36px,5vw,68px) 0;position:relative;isolation:isolate}
-.members-sanctuary::before{content:"";position:absolute;inset:0;background:url('/assets/adisaan/site/aiohm-world-map.webp') center/cover no-repeat;opacity:.22;mix-blend-mode:screen;pointer-events:none;z-index:0}
-.members-sanctuary>.container{position:relative;z-index:1}
-.members-hero{margin-bottom:28px}
-.members-hero__card{background:#0b3811f2;border:1px solid #d6b25e88;border-radius:22px;padding:clamp(24px,3.5vw,38px);box-shadow:0 20px 52px #00140466}
-.members-hero__status-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
-.members-hero__badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:#d6b25e26;border:1px solid #d6b25e;color:#e9c775;font-size:14px;font-weight:800;letter-spacing:.06em}
-.members-hero__subbadge{font-size:14px;font-weight:700;color:#b8d1b0;letter-spacing:.05em}
-.members-hero__title{color:#fff;font-size:clamp(24px,3.2vw,40px);margin:0 0 12px;line-height:1.18}
-.members-hero__lead{color:#d5e4cf;font-size:15px;line-height:1.65;margin:0;max-width:860px}
-.members-alert{margin-top:18px;padding:14px 18px;border-radius:12px;font-size:14px;font-weight:700}
-.members-alert--success{background:#155220;border:1px solid #64d470;color:#e8ffea}
-.members-alert--info{background:#0d3c13;border:1px solid #d6b25e;color:#f4f0e8}
 
-.members-gate__grid{display:grid;grid-template-columns:1.25fr .88fr;gap:28px;align-items:start}
-.members-gate__form-card{background:#f4f0e8;color:#073209;border-radius:22px;padding:clamp(22px,3.2vw,36px);border:2px solid #d6b25e;box-shadow:0 22px 54px #00140466}
-.members-gate__heading{color:#073209;font-size:clamp(20px,2.2vw,26px);margin:6px 0 16px}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .thought-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
 .thought-mode-btn{text-align:left;padding:14px;border-radius:14px;background:#fffdf8;border:2px solid #c5d0be;color:#073209;cursor:pointer;display:flex;flex-direction:column;gap:5px;transition:border-color .18s,background .18s,transform .15s}
 .thought-mode-btn:hover{border-color:#193f10;transform:translateY(-1px)}
@@ -711,51 +711,51 @@
 .thought-mode-btn__title{font-size:14px;font-weight:800}
 .thought-mode-btn__desc{font-size:14px;line-height:1.4;opacity:.88}
 
-.members-starters{background:#e7eee3;border:1px solid #c2d1bc;border-radius:14px;padding:12px 14px;margin-bottom:16px}
-.members-starters__label{display:block;font-size:14px;font-weight:700;color:#193f10;margin-bottom:8px}
-.members-starters__chips{display:flex;flex-wrap:wrap;gap:8px}
-.members-starter-chip{background:#fff;border:1px solid #9ab093;color:#073209;border-radius:99px;padding:6px 12px;font-size:14px;cursor:pointer;text-align:left;transition:background .15s,border-color .15s}
-.members-starter-chip:hover{background:#193f10;color:#fff;border-color:#193f10}
 
-.members-field{margin-bottom:16px}
-.members-field__label-row{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:6px}
-.members-field label{display:block;font-size:14px;font-weight:800;color:#073209;text-transform:uppercase;letter-spacing:.05em}
-.members-field__hint{font-size:14px;color:#2c4c30}
-.members-field textarea,.members-field input{width:100%;padding:13px 15px;border-radius:10px;border:1px solid #adbca7;background:#fffdf8;color:#073209;font-size:14px;font-family:inherit}
-.members-form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 
-.members-privacy-choice{border:0;padding:0;margin:0 0 16px}
-.members-privacy-choice legend{font-size:14px;font-weight:800;color:#073209;margin-bottom:8px}
-.members-privacy-choice__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.members-privacy-pill{display:flex;align-items:flex-start;gap:8px;padding:12px;border-radius:12px;background:#fffdf8;border:1px solid #b8c6b2;cursor:pointer}
-.members-privacy-pill strong{display:block;font-size:14px;color:#073209}
-.members-privacy-pill small{display:block;font-size:14px;color:#3d5240;line-height:1.4;margin-top:2px}
-.members-checkbox{margin-bottom:10px;font-size:14px;color:#1d3b20}
-.members-unlock-submit{width:100%;margin-top:8px;padding:16px 22px;border-radius:12px;background:#193f10;color:#fff;border:1px solid #d6b25e;font-weight:800;font-size:14px;cursor:pointer}
-.members-unlock-submit:hover{background:#0f2c09}
 
-.members-gate__preview-card{background:#0b3811f2;border:1px solid #d6b25e66;border-radius:22px;padding:clamp(22px,3vw,32px)}
-.members-gate__lock-tag{display:inline-block;padding:4px 10px;border-radius:99px;background:#d6b25e22;color:#e9c775;font-size:14px;font-weight:800;letter-spacing:.08em}
-.members-gate__preview-card h3{color:#fff;font-size:20px;margin:12px 0 18px}
-.members-preview-list{list-style:none;padding:0;margin:0 0 22px;display:flex;flex-direction:column;gap:14px}
-.members-preview-list li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;padding:12px;border-radius:14px;background:#07260a;border:1px solid #ffffff17}
-.members-preview-list__icon{font-size:20px}
-.members-preview-list strong{display:block;color:#fff;font-size:14px;margin-bottom:3px}
-.members-preview-list p{color:#c9d9c2;font-size:14px;line-height:1.5;margin:0}
-.members-gate__storyboard-note{padding:16px;border-radius:14px;background:#124419;border:1px solid #d6b25e66}
-.members-gate__storyboard-note h4{color:#fff;font-size:15px;margin:6px 0}
-.members-gate__storyboard-note p{color:#d3e2cc;font-size:14px;line-height:1.55;margin:0}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Unlocked Members Sanctuary Sections */
 /* Members Pass & Vision Board */
-.members-pass-bar{margin-bottom:28px}
-.members-pass-card{background:#114418;border:1px solid #d6b25e;border-radius:18px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.members-pass-card__kicker{font-size:14px;font-weight:800;color:#e9c775;letter-spacing:.08em}
-.members-pass-card h3{color:#fff;font-size:18px;margin:4px 0}
-.members-pass-card__email{font-size:14px;font-weight:400;color:#b8d1b0}
-.members-pass-card__thought{color:#e6f2e2;font-size:14px;font-style:italic;margin:4px 0 0}
-.members-pass-card__actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.members-lock-btn{background:transparent;border:1px solid #ffffff33;color:#d3e2cc;padding:9px 14px;border-radius:10px;font-size:14px;cursor:pointer}
+
+
+
+
+
+
+
+
 
 /* --- RECEIVED PAGE VISION CARD --- */
 .received-vision-card{margin:24px 0;background:#0b3811f2;border:2px solid #d6b25e;border-radius:20px;padding:clamp(20px,3vw,30px);box-shadow:0 18px 48px #00140466;color:#f4f0e8}
@@ -827,10 +827,10 @@
 
 .vision-board__footer-row{margin-top:22px;padding-top:14px;border-top:1px solid #ffffff18;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;color:#a9c2a1;font-size:14px}
 
-.members-section{margin-bottom:42px}
-.members-section__header{margin-bottom:22px}
-.members-section__header h2{color:#fff;font-size:clamp(22px,2.8vw,34px);margin:6px 0 8px}
-.members-section__header p{color:#d3e2cc;font-size:14px;margin:0;max-width:780px}
+
+
+
+
 
 .podcast-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px}
 .podcast-card{background:#0b3811f2;border:1px solid #d6b25e66;border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:10px}
@@ -864,23 +864,23 @@
 .vault-card__excerpt{margin:4px 0;padding-left:10px;border-left:2px solid #d6b25e;color:#f4f0e8;font-size:14px;font-style:italic}
 .vault-card__meta{margin-top:auto;padding-top:8px;border-top:1px solid #ffffff14;display:flex;flex-direction:column;gap:4px;font-size:14px;color:#9be4a0}
 
-.members-cocreation-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:28px;align-items:start}
-.members-cocreation-board{background:#0b3811f2;border:1px solid #d6b25e66;border-radius:22px;padding:clamp(22px,3vw,32px)}
-.members-cocreation-board h2{color:#fff;font-size:24px;margin:6px 0}
-.members-cocreation-board__sub{color:#c9d9c2;font-size:14px;margin:0 0 18px}
-.members-board-list{display:flex;flex-direction:column;gap:12px}
-.members-board-item{background:#062308;border:1px solid #ffffff1a;border-radius:14px;padding:14px 16px}
-.members-board-item__top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
-.members-board-item__badge{color:#e9c775;font-weight:800}
-.members-board-item__time{color:#9eb596}
-.members-board-item__body{color:#fff;font-size:14px;line-height:1.5;margin:0 0 8px}
-.members-board-item__footer{display:flex;justify-content:space-between;font-size:14px;color:#b8d1b0}
+
+
+
+
+
+
+
+
+
+
+
 
 @media(max-width:980px){
-  .home-storyboard-podcast-card__grid,.members-gate__grid,.members-cocreation-grid,.vision-board__grid{grid-template-columns:1fr}
+  .home-storyboard-podcast-card__grid,
 }
 @media(max-width:640px){
-  .thought-mode-grid,.members-form-row,.members-privacy-choice__grid{grid-template-columns:1fr}
+  .thought-mode-grid,
 }
 
 .top10-voices-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:.04em;background:rgba(244,240,232,.07);border:1px solid rgba(244,240,232,.18);color:#c9d9c2}
@@ -950,13 +950,13 @@
 }
 
 /* The existing Ambassador joins the gate instead of covering its controls. */
-.members-avatar-dock{min-height:150px;margin-bottom:24px;border-bottom:1px solid #07320922;padding-bottom:20px}
+
 .adisaan-companion.is-gate-guide{position:relative;inset:auto;max-width:100%;width:100%;gap:14px;align-items:center;z-index:2}
 .is-gate-guide .adisaan-companion-face{width:64px;height:64px;animation:none;order:-1;box-shadow:0 4px 16px #07320922}
 .is-gate-guide .adisaan-thought{display:block;flex:1;min-width:0;max-width:none;border-radius:20px;margin:0;padding:18px 24px 14px 18px;box-shadow:none}
 .is-gate-guide .adisaan-thought:before,.is-gate-guide .adisaan-thought:after{display:none}
 .is-gate-guide .adisaan-native-chat{position:fixed;right:24px;bottom:24px;z-index:45;max-height:calc(100dvh - 48px)}
-@media(max-width:560px){.members-avatar-dock{min-height:175px}.is-gate-guide .adisaan-companion-face{width:48px;height:48px}.adisaan-companion.is-gate-guide{gap:10px}.is-gate-guide .adisaan-thought{padding:16px 22px 12px 14px}.is-gate-guide .adisaan-native-chat{right:16px;bottom:16px;max-height:calc(100dvh - 32px)}}
+@media(max-width:560px){.is-gate-guide .adisaan-companion-face{width:48px;height:48px}.adisaan-companion.is-gate-guide{gap:10px}.is-gate-guide .adisaan-thought{padding:16px 22px 12px 14px}.is-gate-guide .adisaan-native-chat{right:16px;bottom:16px;max-height:calc(100dvh - 32px)}}
 .brand-header--slim .brand-header__slim-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px;padding-block:14px}
 .brand-header__wordmark{display:block;width:min(46vw,200px);line-height:0}
 .brand-header__wordmark img{width:100%;height:auto}
@@ -1880,74 +1880,53 @@ body.home-living-map{background:#073209}
    It moved here from the home page, where it sat on cream. The sanctuary is
    deep green, so the cards take the same cream-on-dark treatment the living
    map gives them rather than the bare white box, which read as a hole. */
-/* Specificity note: `.members-section__header p` is 0-1-1 and would win over
-   a bare class, so the question line is selected inside the header. */
-.members-section__header p.members-answers__question{margin:10px 0 0;color:#e9c775;
-  font-size:clamp(17px,2vw,21px);line-height:1.4;font-weight:700;max-width:34ch}
-.members-answers .home-answers__list{margin-bottom:0;gap:14px}
-.members-answers .home-answer{background:#f4f0e8;color:#073209;border:1px solid #d6b25e88;
-  box-shadow:0 16px 38px #001b062b}
-.members-answers .home-answers__empty{margin:0;padding:clamp(22px,3vw,34px);
-  border:1px solid #e9c77566;border-radius:18px;background:rgba(5,39,12,.5);
-  color:#d3e2cc;font-size:17px;max-width:none}
-.members-answers .home-answers__list+.home-answers__empty{margin-top:14px}
-.members-answers__add{margin:22px 0 0}
+/* Specificity note: `
+
+
+
+
+
 
 /* The sanctuary gate: sign in, or make an account.
    Replaced the three-mode thought form on 2026-10-25, when membership
    became a platform account instead of a cookie this site signed itself. */
-.members-gate__lead{margin:0 0 22px;font-size:16px;line-height:1.6;color:#2c4430;max-width:52ch}
-.members-auth-tabs{display:flex;gap:8px;margin:0 0 22px;padding:5px;border-radius:999px;
-  background:rgba(7,50,9,.07);border:1px solid rgba(7,50,9,.1)}
-.members-auth-tab{flex:1;min-height:42px;border:0;border-radius:999px;cursor:pointer;
-  background:transparent;color:#2c4430;font-size:15px;font-weight:700;font-family:inherit;
-  transition:background-color 160ms ease,color 160ms ease,box-shadow 160ms ease}
-.members-auth-tab:hover{color:#073209}
-.members-auth-tab.is-active{background:#073209;color:#f4f0e8;box-shadow:0 6px 16px rgba(7,50,9,.22)}
-.members-auth-tab:focus-visible{outline:2px solid #073209;outline-offset:2px}
-.members-auth-form[hidden]{display:none}
+
+
+
+
+
+
+
 /* The platform's login and registration components, dressed for this card.
    They ship with Tailwind utility classes and a dark landing surface; this
    site loads neither, so the raw elements are styled here and the component's
    own wrappers are flattened. Nothing about their behaviour is touched. */
-.members-auth-form .login-hero-surface{width:100%;max-width:none;margin:0;padding:0;
-  background:none;border:0;box-shadow:none;backdrop-filter:none}
-.members-auth-form>div{display:block;padding:0}
-.members-auth-form .map-overlay-global{display:none}
-.members-auth-form form>div{margin-bottom:16px}
-.members-auth-form label{display:block;margin-bottom:6px;font-size:13px;font-weight:700;
-  letter-spacing:.04em;color:#2c4430}
-.members-auth-form input[type=text],
-.members-auth-form input[type=email],
-.members-auth-form input[type=password]{width:100%;min-height:48px;padding:12px 14px;
-  border:1px solid rgba(7,50,9,.25);border-radius:12px;background:#fff;color:#073209;
-  font-size:16px;font-family:inherit}
-.members-auth-form input::placeholder{color:#8aa08c}
-.members-auth-form input:focus-visible{outline:2px solid #073209;outline-offset:1px;
-  border-color:#073209}
-.members-auth-form .relative{position:relative}
-.members-auth-form .relative input{padding-right:46px}
-.members-auth-form .relative button{position:absolute;right:10px;top:50%;
-  transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center;
-  width:28px;height:28px;padding:0;border:0;background:none;cursor:pointer;color:#4a5f4c}
-.members-auth-form .relative button:hover{color:#073209}
-.members-auth-form .relative svg{width:20px;height:20px}
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Alpine hides elements with x-cloak until it boots, but only if the page
    says so. Without this both eye icons draw on top of each other. */
 [x-cloak]{display:none !important}
-.members-auth-form .remember-row{display:flex;align-items:center;gap:8px;margin-bottom:18px}
-.members-auth-form .remember-row input{width:18px;height:18px;min-height:0;accent-color:#073209}
-.members-auth-form .remember-row label{margin:0;font-weight:600;color:#4a5f4c}
-.members-auth-form button[type=submit]{width:100%;min-height:50px;border:0;border-radius:999px;
-  cursor:pointer;background:var(--gold);color:var(--green);font-size:16px;font-weight:700;
-  font-family:inherit;letter-spacing:.06em;text-transform:uppercase;
-  transition:background-color 160ms ease,transform 160ms ease}
-.members-auth-form button[type=submit]:hover{background:#f0d28a}
-.members-auth-form button[type=submit]:active{transform:scale(.99)}
-.members-auth-form button[type=submit]:focus-visible{outline:2px solid #073209;outline-offset:3px}
-.members-auth-form .text-red-500{margin-top:12px;color:#8c2f1d;font-size:14px;text-align:left}
-.members-auth-fineprint{margin:14px 0 0;font-size:13px;line-height:1.55;color:#4a5f4c}
-.members-auth-fineprint a{color:#0c5a14}
+
+
+
+
+
+
+
+
+
+
 
 /* The agents card sits under the human one (Adrian, 2026-10-25), so both
    get the page's full width and the human form splits in two instead. Side
@@ -1969,78 +1948,59 @@ body.home-living-map{background:#073209}
 /* The members sanctuary: a left menu and a column of pages.
    Five destinations, so no hamburger — under 900px the menu becomes a
    horizontal strip that scrolls, which keeps every page one tap away. */
-.members-shell{display:grid;gap:clamp(22px,3vw,44px);align-items:start}
-@media(min-width:900px){.members-shell{grid-template-columns:232px minmax(0,1fr)}}
-.members-main{min-width:0}
-.members-main__header{margin-bottom:26px}
-.members-main__header h1{color:#f4f0e8;font-size:clamp(28px,3.4vw,42px);margin:4px 0 10px}
-.members-main__header p{color:#d3e2cc;font-size:15px;line-height:1.65;max-width:62ch;margin:0}
 
-.members-nav{position:sticky;top:92px;display:flex;flex-direction:column;gap:18px;
-  padding:20px 16px;border:1px solid rgba(214,178,94,.4);border-radius:20px;
-  background:rgba(5,39,12,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.members-nav__who{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
-.members-nav__avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;
-  border:2px solid #d6b25e;margin-bottom:6px}
-.members-nav__avatar--blank{display:grid;place-items:center;background:#0d3a14;color:#e9c775;
-  font-size:22px;font-weight:800}
-.members-nav__name{color:#f4f0e8;font-size:15px;font-weight:700;line-height:1.3;overflow-wrap:anywhere}
-.members-nav__handle{color:#e9c775;font-size:13px;font-weight:600;overflow-wrap:anywhere}
-.members-nav__list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;
-  border-top:1px solid rgba(214,178,94,.26);padding-top:14px}
-.members-nav__link{display:flex;align-items:center;gap:10px;min-height:42px;padding:0 12px;
-  border-radius:11px;color:#d3e2cc;text-decoration:none;font-size:14.5px;font-weight:600;
-  transition:background-color 150ms ease,color 150ms ease}
-.members-nav__link:hover{background:rgba(244,240,232,.08);color:#f4f0e8}
-.members-nav__link.is-active{background:#d6b25e;color:#073209}
-.members-nav__link:focus-visible{outline:2px solid #e9c775;outline-offset:2px}
-.members-nav__icon{flex:none;width:18px;text-align:center;opacity:.9}
-.members-nav__link.is-soon{color:rgba(211,226,204,.5);cursor:default}
-.members-nav__link.is-soon small{margin-left:auto;font-size:10px;letter-spacing:.1em;
-  text-transform:uppercase;color:rgba(233,199,117,.75)}
-.members-nav__out{border-top:1px solid rgba(214,178,94,.26);padding-top:14px;margin:0}
-.members-nav__out button{width:100%;min-height:40px;border:1px solid rgba(214,178,94,.45);
-  border-radius:11px;background:transparent;color:#e9c775;font:inherit;font-size:14px;
-  font-weight:700;cursor:pointer}
-.members-nav__out button:hover{background:rgba(214,178,94,.14)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @media(max-width:899px){
-  .members-nav{position:static;flex-direction:row;align-items:center;gap:12px;
-    overflow-x:auto;padding:12px 14px;scrollbar-width:thin}
-  .members-nav__who{flex-direction:row;align-items:center;gap:8px;flex:none}
-  .members-nav__avatar{width:36px;height:36px;margin:0}
-  .members-nav__handle{display:none}
-  .members-nav__list{flex-direction:row;border-top:0;padding-top:0;flex:none}
-  .members-nav__link{white-space:nowrap}
-  .members-nav__link.is-soon small{display:none}
-  .members-nav__out{border-top:0;padding-top:0;flex:none}
-  .members-nav__out button{padding-inline:14px}
+  
+  
+  
+  
+  
+  
+  
+  
+  
 }
 
 /* The profile form sits on the same cream card the gate uses. */
-.members-form{max-width:640px;padding:clamp(22px,3vw,34px);border-radius:22px;
-  border:2px solid #d6b25e;background:#f4f0e8;color:#073209}
-.members-form .members-field label{color:#2c4430}
-.members-form .members-field__hint{margin:6px 0 0;font-size:13px;line-height:1.55;color:#4a5f4c}
-.members-form .members-readonly{margin:0;padding:12px 14px;border-radius:10px;
-  background:rgba(7,50,9,.06);color:#073209;font-size:15px;overflow-wrap:anywhere}
-.members-handle{display:flex;align-items:stretch;border:1px solid rgba(7,50,9,.25);
-  border-radius:12px;background:#fff;overflow:hidden}
-.members-handle__prefix{display:flex;align-items:center;padding:0 2px 0 13px;
-  color:#5d7360;font-size:14px;white-space:nowrap}
-.members-handle input{flex:1;min-width:0;border:0;background:transparent;padding:12px 13px 12px 2px;
-  font:inherit;font-size:16px;color:#073209}
-.members-handle input:focus-visible{outline:2px solid #073209;outline-offset:-2px}
-.members-visibility{margin:22px 0;padding:18px;border:1px solid rgba(7,50,9,.2);
-  border-radius:14px;background:rgba(7,50,9,.04)}
-.members-visibility legend{padding:0 8px;font-size:13px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;color:#2c4430}
-.members-visibility small{display:block;margin-top:4px;color:#4a5f4c;font-size:13px;line-height:1.55}
-.members-flash{margin:0 0 20px;padding:13px 16px;border-radius:12px;
-  border:1px solid rgba(214,178,94,.5);background:rgba(214,178,94,.14);color:#f4f0e8;font-size:15px}
-@media(max-width:700px){.members-handle{flex-direction:column}
-  .members-handle__prefix{padding:9px 13px 0;font-size:12px}
-  .members-handle input{padding:6px 13px 12px}}
+
+
+
+
+
+
+
+
+
+
+
+
+@media(max-width:700px){
+  
+  }
 
 
 /* ------------------------------------------------------------------------
@@ -2060,11 +2020,11 @@ body.home-living-map{background:#073209}
 /* The preview card beside the unlock form is gone, so the form is on its own
    in a two-column grid. One child takes the whole width and centres, and the
    two columns come back by themselves if a second card is ever added. */
-.members-gate__grid>:only-child{grid-column:1/-1;width:min(100%,660px);margin-inline:auto}
+
 
 
 /* Unlocked Members Sanctuary Sections */
-.members-pass-bar{margin-bottom:28px}
+
 
 /* .home-who__photo was here, styling a wide rectangular figure that no
    markup rendered. Replaced rather than left beside its successor. */
@@ -2922,10 +2882,7 @@ body.home-living-map{background:#073209}
    It moved here from the home page, where it sat on cream. The sanctuary is
    deep green, so the cards take the same cream-on-dark treatment the living
    map gives them rather than the bare white box, which read as a hole. */
-/* Specificity note: `.members-section__header p` is 0-1-1 and would win over
-   a bare class, so the question line is selected inside the header. */
-.members-section__header p.members-answers__question{margin:10px 0 0;color:#e9c775;
-  font-size:clamp(17px,2vw,21px);line-height:1.4;font-weight:700;max-width:34ch}
+/* Specificity note: `
 
 
 /* The Members Sanctuary stands on the living map (Adrian, 2026-10-25).
@@ -2939,14 +2896,13 @@ body.home-living-map{background:#073209}
    them. The wrapper has to stack above main for its menus to be reachable. */
 .home-living-map>.public-header--compact{position:relative;z-index:20}
 
-.home-living-map .members-sanctuary{background:transparent}
+.home-living-map 
 
-.home-living-map .members-sanctuary::before{display:none}
+.home-living-map 
 
-.members-select{width:100%;padding:12px 14px;border-radius:10px;background:#fff;
-  border:1px solid rgba(7,50,9,.25);color:#073209;font-size:14px;font-family:inherit}
 
-.members-pass-card__thought--empty{opacity:.75;font-style:italic}
+
+
 
 /* The Silent Mirror, quiet (Adrian, 2026-10-26): the human card's title in
    cream (it kept the old cream card's dark green after the card went
