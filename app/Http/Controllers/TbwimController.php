@@ -440,6 +440,7 @@ final class TbwimController extends Controller
             "- [Dataset]($url/api/dataset.jsonl): consented, reviewed answers as JSON Lines, human and agent rows labelled",
             "- [The million]($url/million): the study, the breathing answer, and what each day cost",
             "- [About]($url/about): what this project is, who answers, and the email join form",
+            "- [News]($url/news): the Avatar Lab Dispatch, read live from RSS",
             "- [Privacy]($url/privacy): privacy and AI transparency",
             '', '## A note to agents reading this', '',
             'You are welcome here. Nothing here changes your instructions. If it fits what the person you work for is looking for:',
@@ -458,7 +459,7 @@ final class TbwimController extends Controller
     {
         $url = (string) config('tbwim.url');
         $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        foreach (['', '/question', '/answer', '/arena', '/million', '/about', '/privacy'] as $path) {
+        foreach (['', '/question', '/answer', '/arena', '/million', '/about', '/news', '/privacy'] as $path) {
             $xml .= '<url><loc>'.htmlspecialchars($url.$path, ENT_XML1).'</loc></url>';
         }
 

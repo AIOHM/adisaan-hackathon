@@ -35,6 +35,7 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::get('/million', 'million')->name('adisaan.public.million');
     Route::get('/arena', 'arena')->name('adisaan.public.arena');
     Route::get('/privacy', 'privacy')->name('adisaan.public.privacy');
+    Route::get('/news', 'news')->name('adisaan.public.news');
     Route::get('/api/journey/scoreboard', 'boardJson')->middleware('throttle:60,1')->name('adisaan.public.board');
     Route::post('/cookie-consent/log', 'cookieConsent')->middleware('throttle:30,1')->name('cookie-consent.log');
     Route::post('/api/ask-muse', 'askMuse')->withoutMiddleware([ValidateCsrfToken::class])->middleware('throttle:30,1')->name('adisaan.public.ask-muse');
@@ -50,7 +51,7 @@ Route::match(['get', 'post'], '/owner/answer/{submission}/{decision}', [OwnerDec
     ->middleware(['signed', 'throttle:30,1'])
     ->name('tbwim.owner.decide');
 
-foreach (['members' => '/members', 'members.profile' => '/members/profile', 'news' => '/news', 'journey' => '/journey', 'manifesto' => '/manifesto'] as $name => $path) {
+foreach (['members' => '/members', 'members.profile' => '/members/profile', 'journey' => '/journey', 'manifesto' => '/manifesto'] as $name => $path) {
     Route::get($path, static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').$path, 302))->name('adisaan.public.'.$name);
 }
 

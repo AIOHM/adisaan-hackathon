@@ -12,6 +12,7 @@ use App\Models\QuestionSynthesis;
 use App\Services\AdiSaan\GratitudeLedger;
 use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\AdiSaan\VisitorIdentity;
+use App\Services\Tbwim\NewsReader;
 use App\Services\Tbwim\Questions;
 use App\Support\SpamGuard;
 use Illuminate\Http\JsonResponse;
@@ -458,6 +459,47 @@ final class AdiSaanSiteController extends Controller
     public function privacy(Request $request): View
     {
         return view('adisaan-site.privacy', $this->shared(''));
+    }
+
+    /** The Avatar Lab Dispatch: the movement's news desk, read from RSS. */
+    public function news(Request $request, NewsReader $reader): View
+    {
+        $categories = (array) config('tbwim_news.categories', []);
+        $category = (string) $request->query('category', '');
+        if ($category !== '' && ! isset($categories[$category])) {
+            abort(404);
+        }
+        $query = trim((string) $request->query('q', ''));
+        $page = max(1, (int) $request->query('page', 1));
+        $perPage = max(1, (int) config('tbwim_news.per_page', 12));
+
+        $filtered = $reader->signals($category !== '' ? $category : null, $query !== '' ? $query : null);
+        $lead = ($page === 1 && $query === '' && $filtered !== []) ? array_shift($filtered) : null;
+        $totalPages = max(1, (int) ceil(count($filtered) / $perPage));
+        $page = min($page, $totalPages);
+        $grid = array_slice($filtered, ($page - 1) * $perPage, $perPage);
+        $counts = $reader->counts();
+
+        $pageUrl = static function (int $target) use ($request): string {
+            return $request->fullUrlWithQuery(['page' => $target]);
+        };
+
+        return view('adisaan-site.news', $this->shared('news') + [
+            'categories' => $categories,
+            'activeCategory' => $category,
+            'searchQuery' => $query,
+            'counts' => $counts,
+            'lead' => $lead,
+            'videos' => ($page === 1 && ($category === '' || $category === 'adisaan-video-journey')) ? $reader->videos(4) : [],
+            'grid' => $grid,
+            'fastSignals' => array_slice($reader->signals($category !== '' ? $category : null, $query !== '' ? $query : null), 0, 5),
+            'streams' => $reader->streams(),
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalItems' => count($filtered) + ($lead !== null ? 1 : 0),
+            'prevUrl' => $page > 1 ? $pageUrl($page - 1) : null,
+            'nextUrl' => $page < $totalPages ? $pageUrl($page + 1) : null,
+        ]);
     }
 
     /** The follower board the header script polls: the brand site's measured count, read-only. */
