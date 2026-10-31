@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Jobs\NotifyOwnerOfLead;
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
 use App\Services\Tbwim\QuestionSynthesizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 final class SitePagesTest extends TestCase
@@ -84,17 +86,15 @@ final class SitePagesTest extends TestCase
         $this->get('/arena?story='.$ref)->assertDontSee('Muse insight for this question.');
     }
 
-    public function test_about_redirects_to_brand_home_and_menu_links_there(): void
+    public function test_menu_links_about_to_the_local_page(): void
     {
-        $url = rtrim(config('adisaan_public.brand_url'), '/').'/';
-        $this->get('/about')->assertRedirect($url);
-        $this->get('/')->assertOk()->assertSee('href="'.$url.'">About</a>', false);
+        $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.about').'"', false)->assertSee('>About</a>', false);
     }
 
-    public function test_sitemap_omits_the_redirected_about_page(): void
+    public function test_sitemap_lists_the_local_about_page(): void
     {
         $this->get('/sitemap.xml')->assertOk()
-            ->assertDontSee(config('tbwim.url').'/about', false);
+            ->assertSee(config('tbwim.url').'/about', false);
     }
 
     public function test_answer_page_points_agents_at_this_apps_endpoint(): void
@@ -129,7 +129,7 @@ final class SitePagesTest extends TestCase
     {
         config()->set('tbwim.url', 'https://tbwim.adisaan.com');
         config()->set('adisaan_public.url', 'https://tbwim.adisaan.com');
-        $this->get('/construction')->assertOk()
+        $this->get('/ro')->assertOk()
             ->assertSee('tbwim.adisaan.com/api/agent/answer', false)
             ->assertDontSee('at adisaan.com/api/agent/answer', false);
     }
@@ -153,11 +153,22 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('id="breath"', false);
     }
 
-    public function test_construction_points_to_the_arena_instead_of_the_breath(): void
+    public function test_about_is_a_local_page_and_construction_redirects_to_it(): void
     {
-        $this->get('/construction')->assertOk()
-            ->assertDontSee('id="breath"', false)
-            ->assertSee('/arena', false);
+        $this->get('/construction')->assertRedirect('/about');
+        $this->get('/about')->assertOk()
+            ->assertSee('One question, a million answers.', false)
+            ->assertSee('id="join"', false)
+            ->assertSee('name="email"', false);
+    }
+
+    public function test_join_form_lands_back_on_the_about_page(): void
+    {
+        Queue::fake();
+        $this->post('/', ['email' => 'ana@example.com', 'consent_updates' => '1'])
+            ->assertRedirect(route('adisaan.public.about').'#join');
+        $this->assertDatabaseHas('join_leads', ['email' => 'ana@example.com']);
+        Queue::assertPushed(NotifyOwnerOfLead::class);
     }
 
     public function test_million_page_hides_the_breath_block_without_a_version(): void

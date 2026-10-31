@@ -578,7 +578,7 @@ final class AdiSaanSiteController extends Controller
             NotifyOwnerOfLead::dispatch($email);
         }
 
-        return redirect()->to(route('adisaan.public.construction').'#join')->with('lead_success', 'You’re in. I’ll write when the next episode is out.');
+        return redirect()->to(route('adisaan.public.about').'#join')->with('lead_success', 'You’re in. I’ll write when the next episode is out.');
     }
 
     /** The analytics choice, logged as the privacy page says. */

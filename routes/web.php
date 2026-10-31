@@ -19,7 +19,10 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     // The root serves the million page (the hackathon entry point); the
     // question experience lives on at /question.
     Route::get('/', 'million')->name('adisaan.public.home');
-    Route::get('/construction', 'home')->name('adisaan.public.construction');
+    // 2026-10-31: /construction was renamed to /about; the old URL stays as a
+    // permanent redirect so bookmarks and the demo script keep working.
+    Route::redirect('/construction', '/about', 301)->name('adisaan.public.construction');
+    Route::get('/about', 'about')->name('adisaan.public.about');
     Route::get('/ro', 'homeRo')->name('adisaan.public.home_ro');
     Route::post('/', 'lead')->middleware('throttle:30,1')->name('adisaan.public.construction.lead');
     Route::get('/question', 'question')->name('adisaan.public.question');
@@ -37,8 +40,6 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::post('/api/ask-muse', 'askMuse')->withoutMiddleware([ValidateCsrfToken::class])->middleware('throttle:30,1')->name('adisaan.public.ask-muse');
     Route::post('/api/ask-muse/follow-up', 'askMuseFollowUp')->withoutMiddleware([ValidateCsrfToken::class])->name('adisaan.public.ask-muse.follow-up');
 });
-
-Route::get('/about', static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').'/', 302))->name('adisaan.public.about');
 
 // The owner's decision behind a signed Telegram link. GET only shows what
 // the tap would do (safe for link previews); POST decides. The signature

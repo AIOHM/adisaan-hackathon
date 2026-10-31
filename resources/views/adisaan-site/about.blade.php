@@ -27,4 +27,5 @@
         <p class="fine-print">{{ number_format((int) $board['total_followers']) }} followers measured so far.</p>
     @endif
 </article>
+@include('adisaan-site.partials.join-form')
 @endsection

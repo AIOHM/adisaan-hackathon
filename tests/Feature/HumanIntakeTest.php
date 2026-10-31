@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\EchoSubmission;
+use App\Services\Tbwim\ReviewService;
 use App\Support\FormProofInspector;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -35,7 +36,7 @@ final class HumanIntakeTest extends TestCase
         $this->assertSame('human', $echo->metadata['respondent_type']);
         $this->assertNotNull($echo->client_ip_hash);
         $this->assertStringNotContainsString('127.0.0.1', json_encode($echo->toArray()));
-        $this->get('/construction')->assertOk()->assertDontSee('keep it running quietly');
+        $this->get('/about')->assertOk()->assertDontSee('keep it running quietly');
     }
 
     public function test_missing_proof_and_honeypot_are_refused_and_links_are_quarantined(): void
@@ -61,6 +62,7 @@ final class HumanIntakeTest extends TestCase
         $this->assertSame('AdiSaan', EchoSubmission::query()->firstOrFail()->signature);
         $this->assertSame($match[1], EchoSubmission::query()->firstOrFail()->prompt_key);
     }
+
     public function test_member_answers_require_explicit_consent_human_approval_and_bridge_authentication(): void
     {
         config()->set('tbwim.member_bridge_secret', str_repeat('a', 48));
@@ -70,11 +72,10 @@ final class HumanIntakeTest extends TestCase
         $this->assertSame('sender_selected_members_only', $member->metadata['member_sharing']['basis']);
         $this->getJson('/api/internal/member-answers?question=imagine-one-million-euro')->assertNotFound();
         $this->withToken(str_repeat('a', 48))->getJson('/api/internal/member-answers?question=imagine-one-million-euro')->assertJsonCount(0, 'answers');
-        app(\App\Services\Tbwim\ReviewService::class)->decide($member, true);
+        app(ReviewService::class)->decide($member, true);
         EchoSubmission::create(['body' => 'An old private answer must remain private.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => false, 'released_at' => now(), 'reviewed_at' => now(), 'metadata' => ['review_status' => 'approved', 'decided_by' => 'human']]);
         $this->withToken(str_repeat('a', 48))->getJson('/api/internal/member-answers?question=imagine-one-million-euro')->assertJsonCount(1, 'answers')->assertJsonPath('answers.0.body', 'An answer intended only for signed in members.');
         $this->get('/arena?story=imagine-one-million-euro')->assertDontSee('An answer intended only for signed in members.');
         $this->get('/api/dataset.jsonl')->assertDontSee('An answer intended only for signed in members.');
     }
-
 }

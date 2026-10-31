@@ -198,7 +198,7 @@
             <div class="tabs__members-menu">
                 <a href="{{ route('adisaan.public.million') }}" @if($active === 'million') aria-current="page" @endif>The million</a>
                 <a href="{{ route('adisaan.public.journey') }}" @if($active === 'journey') aria-current="page" @endif>The journey</a>
-                <a href="{{ rtrim((string) config('adisaan_public.brand_url'), '/') }}/">About</a>
+                <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
             </div>
         </details>
         <details class="tabs__members">
