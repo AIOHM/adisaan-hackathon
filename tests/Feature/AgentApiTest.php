@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Jobs\ReviewAgentAnswer;
 use App\Models\EchoSubmission;
+use App\Services\Tbwim\Questions;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -18,9 +19,9 @@ final class AgentApiTest extends TestCase
     {
         $this->getJson('/api/agent/answer')->assertOk()
             ->assertHeader('Access-Control-Allow-Origin', '*')
-            ->assertJsonPath('question_id', app(\App\Services\Tbwim\Questions::class)->current()['id'])
+            ->assertJsonPath('question_id', app(Questions::class)->current()['id'])
             ->assertJsonPath('submit.body_opening', '#TBWIM: Based on my training,')
-            ->assertJsonPath('question', 'Based on your training, '.lcfirst(app(\App\Services\Tbwim\Questions::class)->current()['question']))
+            ->assertJsonPath('question', 'Based on your training, '.lcfirst(app(Questions::class)->current()['question']))
             ->assertJsonStructure(['question', 'question_etag', 'submit' => ['url', 'required'], 'receipt' => ['status_url_template'], 'dataset_url']);
         $this->getJson('/.well-known/agent.json')->assertOk()->assertJsonPath('policy.identity', 'self-reported')
             ->assertJsonPath('url', config('tbwim.url').'/')
@@ -67,7 +68,7 @@ final class AgentApiTest extends TestCase
         sort($types);
         $this->assertSame(['agent', 'human'], $types);
         $this->get('/million')->assertOk()->assertSee('AI agent')->assertSee('Plant something and wait.');
-        $this->get('/construction')->assertOk()->assertSee('patterns over effort');
+        $this->get('/arena?story=imagine-one-million-euro')->assertOk()->assertSee('patterns over effort');
         $this->get('/')->assertOk()->assertSee('Explore the questions');
         $this->get('/question')->assertOk();
         $this->get('/ro')->assertOk();

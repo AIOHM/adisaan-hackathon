@@ -93,7 +93,12 @@
             </div>
         </div>
         @include('adisaan-site.partials.question-loop', ['loop' => $loop ?? null])
-        @include('adisaan-site.partials.breathing-answer', ['breath' => $breath ?? null])
+        {{-- 2026-10-31: the duel and the living synthesis live in the arena now. --}}
+        <div class="qloop" aria-labelledby="arena-pointer-heading">
+            <h3 id="arena-pointer-heading" class="qloop__title">The arena holds the synthesis</h3>
+            <p class="qloop__meta">The duel and what every voice adds up to, version by version.</p>
+            <p><a class="home-link" href="{{ route('adisaan.public.arena') }}">Enter the arena</a></p>
+        </div>
     </div>
 </section>
 

@@ -107,12 +107,7 @@ final class AdiSaanSiteController extends Controller
             'home' => $home,
             'homeEpisode' => $episode,
             'loop' => $this->loopState($episode, $shared['board'], $home['date_format'] ?? 'j M Y'),
-            'breath' => $this->breathState($episode['id'] ?? null, $home['date_format'] ?? 'j M Y'),
             'homeAnswers' => $perspectives->take(5)->values(),
-            'battleHuman' => $perspectives->where('is_agent', false)->take(5)->values(),
-            'battleMachines' => $perspectives->where('is_agent', true)->take(5)->values(),
-            'rejectedAgents' => $this->loadRejectedAgentAnswers($episode['id'] ?? null, 5),
-            'perspectiveSplit' => $questionCounts->get($episode['id'] ?? '', ['people' => 0, 'machines' => 0]),
             'lifeAreas' => (array) config('adisaan_public.life_areas', []),
             'questionCounts' => $questionCounts->all(),
             'answersTotal' => (int) ($arena['total'] ?? 0),
@@ -161,7 +156,6 @@ final class AdiSaanSiteController extends Controller
             'livingMap' => $this->loadLivingMap(),
             'selectedStory' => $selectedStory,
             'question' => $selectedStory['question'] ?? config('adisaan_public.story.question'),
-            'breath' => $this->breathState($selectedStory['id'] ?? null, (string) config('adisaan_public.home.date_format', 'j M Y')),
             'form' => $this->formData($guard, $selectedStory),
         ]);
     }
@@ -443,13 +437,9 @@ final class AdiSaanSiteController extends Controller
             }
         }
 
-        $home = config('adisaan_public.home', []);
-
         return view('adisaan-site.million', $shared + [
             'livingMap' => $this->loadLivingMap(),
-            'home' => $home,
             'homeEpisode' => $episode,
-            'breath' => $this->breathState($episode['id'] ?? null, $home['date_format'] ?? 'j M Y'),
             'arena' => $this->loadArena($shared['stories']),
             'publicAnswers' => $this->loadPublicPerspectives($episode['id'] ?? null, true),
             'rejectedAgents' => $this->loadRejectedAgentAnswers($episode['id'] ?? null, 24),
