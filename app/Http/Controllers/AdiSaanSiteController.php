@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Jobs\NotifyOwnerOfLead;
 use App\Jobs\ReviewHumanAnswer;
 use App\Jobs\TranscribeVoiceAnswer;
+use App\Models\AnswerVote;
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
 use App\Services\AdiSaan\GratitudeLedger;
@@ -14,6 +15,7 @@ use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\AdiSaan\VisitorIdentity;
 use App\Services\Tbwim\NewsReader;
 use App\Services\Tbwim\Questions;
+use App\Support\ClientIpResolver;
 use App\Support\IntakeDecision;
 use App\Support\SpamGuard;
 use Illuminate\Http\JsonResponse;
@@ -155,17 +157,12 @@ final class AdiSaanSiteController extends Controller
         ]);
     }
 
-    public function storeAnswer(Request $request, SpamGuard $guard): RedirectResponse|JsonResponse
+    public function storeAnswer(Request $request, SpamGuard $guard, ClientIpResolver $ips): RedirectResponse|JsonResponse
     {
-        // Resonance votes are a members-only act, and the members area lives
-        // on the brand site. Same answer the platform gives a non-member.
+        // Resonance votes are open to anonymous visitors: one per answer
+        // per fingerprint, counted locally, no accounts anywhere.
         if ($request->filled('vote_echo_id')) {
-            $unlock = $this->brandUrl('/members');
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json(['ok' => false, 'reason' => 'members_only', 'message' => 'Resonance is for members. Unlock the sanctuary to vote.', 'unlock_url' => $unlock], 403);
-            }
-
-            return redirect()->away($unlock.'#unlock-gate');
+            return $this->storeVote($request, $ips);
         }
 
         if ($request->input('respondent_type') === 'agent') {
@@ -297,6 +294,55 @@ final class AdiSaanSiteController extends Controller
         }
 
         return $this->receiptRedirect($request, $isPublic, $episodeRef, (string) $echo->id, $echo->public_id);
+    }
+
+    private function storeVote(Request $request, ClientIpResolver $ips): RedirectResponse|JsonResponse
+    {
+        $echo = EchoSubmission::query()->whereKey((int) $request->input('vote_echo_id'))->first();
+        $isAgent = $echo && (($echo->metadata['respondent_type'] ?? '') === 'agent');
+        $visible = $echo && ($isAgent
+            ? self::agentPublished($echo)
+            : ($echo->consent_quote && in_array($echo->status, [EchoSubmission::STATUS_RECEIVED, EchoSubmission::STATUS_SYNTHESIZED], true) && $echo->released_at !== null));
+        if (! $visible) {
+            abort(404);
+        }
+        $ip = $ips->resolve($request);
+        $fingerprint = hash('sha256', ($ip ?? 'unknown').'|'.substr((string) $request->userAgent(), 0, 200).'|resonance');
+        AnswerVote::query()->firstOrCreate(
+            ['echo_submission_id' => $echo->id, 'fingerprint' => $fingerprint],
+            ['client_ip_hash' => $ip ? hash('sha256', $ip) : null, 'created_at' => now()]
+        );
+        $voted = array_unique(array_merge((array) $request->session()->get('adisaan_voted_echoes', []), [$echo->id]));
+        $request->session()->put('adisaan_voted_echoes', $voted);
+        $votes = (int) ($echo->metadata['votes'] ?? 0) + AnswerVote::query()->where('echo_submission_id', $echo->id)->count();
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['ok' => true, 'votes' => $votes]);
+        }
+
+        return redirect()->to($this->localRedirectTarget($request, $echo).'#answer-'.$echo->id);
+    }
+
+    /** The vote form's return address, but only when it stays on this host. */
+    private function localRedirectTarget(Request $request, EchoSubmission $echo): string
+    {
+        $fallback = route('adisaan.public.million', ['story' => $echo->episode_ref]);
+        $to = explode('#', (string) $request->input('redirect_to', ''))[0];
+        if ($to === '') {
+            return $fallback;
+        }
+        $parts = parse_url($to);
+        if (! is_array($parts)) {
+            return $fallback;
+        }
+        if (isset($parts['host']) && $parts['host'] !== $request->getHost()) {
+            return $fallback;
+        }
+        $path = (string) ($parts['path'] ?? '');
+        if (! str_starts_with($path, '/')) {
+            return $fallback;
+        }
+
+        return $path.(isset($parts['query']) ? '?'.$parts['query'] : '');
     }
 
     /** The same words from the same sender within the hour: a burst, not an answer. */
@@ -846,7 +892,7 @@ final class AdiSaanSiteController extends Controller
     {
         $votedIds = array_map('intval', (array) request()->session()->get('adisaan_voted_echoes', []));
 
-        return EchoSubmission::query()
+        $rows = EchoSubmission::query()
             ->when($questionRef !== null, static fn ($query) => $query->where('episode_ref', $questionRef))
             ->where(static function ($query): void {
                 $query->publiclyVisible()
@@ -886,6 +932,16 @@ final class AdiSaanSiteController extends Controller
                     'agent_system_angle' => $meta['agent_system_angle'] ?? null,
                     'agent_source_url' => $meta['agent_source_url'] ?? null,
                 ];
+            })
+            ->values();
+        $counts = AnswerVote::query()->whereIn('echo_submission_id', $rows->pluck('id')->all())
+            ->selectRaw('echo_submission_id, count(*) as c')->groupBy('echo_submission_id')->pluck('c', 'echo_submission_id');
+
+        return $rows
+            ->map(static function (array $row) use ($counts): array {
+                $row['votes'] = $row['votes'] + (int) ($counts[$row['id']] ?? 0);
+
+                return $row;
             })
             ->sortByDesc('votes')
             ->values()

@@ -24,15 +24,11 @@
     @endif
     <div class="wall__meta">
         <span>{{ $when }}</span>
-        @if(!empty($memberUnlocked))
-            <form action="{{ route('adisaan.public.answer.store') }}" method="post" class="home-answer__vote" data-vote-form>
-                @csrf
-                <input type="hidden" name="vote_echo_id" value="{{ $answer['id'] }}">
-                <input type="hidden" name="redirect_to" value="{{ $redirectTo }}">
-                <button type="submit" class="home-answer__vote-btn wall__vote{{ !empty($answer['voted']) ? ' is-voted' : '' }}" aria-label="Resonates, {{ $answer['votes'] }} so far">Resonates <span data-vote-count>{{ $answer['votes'] }}</span></button>
-            </form>
-        @else
-            <a class="home-answer__vote-btn home-answer__vote-btn--locked wall__vote" href="{{ route('adisaan.public.members') }}#unlock-gate" aria-label="{{ $answer['votes'] }} resonances. Members can vote — sign in to the sanctuary."><span aria-hidden="true">🔒</span> Resonates <span data-vote-count>{{ $answer['votes'] }}</span></a>
-        @endif
+        <form action="{{ route('adisaan.public.answer.store') }}" method="post" class="home-answer__vote" data-vote-form>
+            @csrf
+            <input type="hidden" name="vote_echo_id" value="{{ $answer['id'] }}">
+            <input type="hidden" name="redirect_to" value="{{ $redirectTo }}">
+            <button type="submit" class="home-answer__vote-btn wall__vote{{ !empty($answer['voted']) ? ' is-voted' : '' }}" aria-label="This resonates with me, {{ $answer['votes'] }} so far">Resonates <span data-vote-count>{{ $answer['votes'] }}</span></button>
+        </form>
     </div>
 </li>
