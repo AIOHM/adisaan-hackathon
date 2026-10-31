@@ -20,16 +20,20 @@ final class ReviewService
     public function review(EchoSubmission $submission, bool $dryRun = false): array
     {
         $text = trim((string) $submission->body);
+        if (is_array($submission->metadata['media'] ?? null) && trim((string) $submission->transcript) !== '') {
+            // A recording's placeholder body says nothing; judge the words.
+            $text = trim((string) $submission->transcript);
+        }
         $question = $this->questionFor($submission);
         $ruled = $this->ruleCheck($text);
         if ($ruled !== null) {
             return $this->record($submission, ['release' => false, 'reason' => $ruled['reason'], 'note' => $ruled['note'], 'corrected' => '',
-                'confidence' => 100, 'on_topic' => 0, 'genuine' => 0, 'error' => null, 'reviewed_by' => 'rules'], $dryRun);
+                'confidence' => 100, 'on_topic' => 0, 'genuine' => 0, 'error' => null, 'reviewed_by' => 'rules'], $dryRun, $text);
         }
         $verdict = $this->reviewer->review($question, $text, $submission->isAgent());
         $verdict['reviewed_by'] = $verdict['error'] === null ? 'muse:'.($verdict['model'] ?? config('tbwim.review.model')) : 'unavailable';
 
-        return $this->record($submission, $verdict, $dryRun);
+        return $this->record($submission, $verdict, $dryRun, $text);
     }
 
     public function questionFor(EchoSubmission $submission): string
@@ -62,7 +66,7 @@ final class ReviewService
         return null;
     }
 
-    private function record(EchoSubmission $submission, array $verdict, bool $dryRun): array
+    private function record(EchoSubmission $submission, array $verdict, bool $dryRun, string $text): array
     {
         $release = (bool) ($verdict['release'] ?? false);
         // A person's answer is never released by a machine; the reviewer's
@@ -84,10 +88,10 @@ final class ReviewService
                     'on_topic' => (int) ($verdict['on_topic'] ?? 0), 'genuine' => (int) ($verdict['genuine'] ?? 0),
                     'note' => (string) ($verdict['note'] ?? ''), 'reviewed_by' => (string) ($verdict['reviewed_by'] ?? ''),
                     'model' => $verdict['model'] ?? null, 'prompt_tokens' => $verdict['prompt_tokens'] ?? null, 'completion_tokens' => $verdict['completion_tokens'] ?? null,
-                    'corrected' => $release ? (string) ($verdict['corrected'] ?: $submission->body) : null,
+                    'corrected' => $release ? (string) ($verdict['corrected'] ?: $text) : null,
                 ],
                 'metadata' => $meta,
-                'display_body' => $autoRelease ? ($verdict['corrected'] ?: $submission->body) : ($humanDecided ? $submission->display_body : null),
+                'display_body' => $autoRelease ? ($verdict['corrected'] ?: $text) : ($humanDecided ? $submission->display_body : null),
                 'released_at' => $autoRelease ? now() : ($submission->isAgent() ? null : $submission->released_at),
             ])->save();
         }

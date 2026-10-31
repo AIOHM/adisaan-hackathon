@@ -25,11 +25,21 @@ final class NotifyPendingCommand extends Command
         }
         $limit = max(1, (int) $this->option('limit'));
         $cutoff = now()->subMinutes(10);
+        $reviewGrace = now()->subMinutes(30);
         $sent = 0;
         $answers = EchoSubmission::query()->humans()
             ->where('status', EchoSubmission::STATUS_RECEIVED)
             ->whereNull('metadata->owner_notified_at')
             ->whereNull('metadata->decided_by')
+            // Held by the doorkeeper stays silent. Unreviewed rows get a
+            // grace period for the review job; past it the owner hears
+            // anyway, because silence about a stuck queue is worse.
+            ->where(function ($query): void {
+                $query->where('metadata->review_status', '!=', 'held')->orWhereNull('metadata->review_status');
+            })
+            ->where(function ($query) use ($reviewGrace): void {
+                $query->whereNotNull('reviewed_at')->orWhere('created_at', '<', $reviewGrace);
+            })
             ->where('created_at', '<', $cutoff)
             ->orderBy('created_at')->limit($limit)->get();
         foreach ($answers as $echo) {

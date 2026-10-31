@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Jobs\NotifyOwnerOfAnswer;
 use App\Jobs\NotifyOwnerOfLead;
+use App\Jobs\ReviewHumanAnswer;
 use App\Models\EchoSubmission;
 use App\Services\Tbwim\OwnerAlerts;
 use App\Support\FormProofInspector;
@@ -47,12 +48,13 @@ final class OwnerAlertsTest extends TestCase
         ], $over));
     }
 
-    public function test_human_intake_queues_an_owner_notification(): void
+    public function test_human_intake_queues_review_instead_of_notifying(): void
     {
         $this->ownerConfig();
         Queue::fake();
         $this->postJson('/answer', ['body' => 'Build one thing people need and keep it running quietly.', 'episode_ref' => 'imagine-one-million-euro', 'share_mode' => 'public', 'signature' => 'Ana', '_answer_form_token' => $this->proof()])->assertCreated();
-        Queue::assertPushed(NotifyOwnerOfAnswer::class);
+        Queue::assertPushed(ReviewHumanAnswer::class);
+        Queue::assertNotPushed(NotifyOwnerOfAnswer::class);
     }
 
     public function test_quarantined_answers_do_not_notify(): void
@@ -62,6 +64,7 @@ final class OwnerAlertsTest extends TestCase
         $this->postJson('/answer', ['body' => 'see https://a.example and https://b.example now', 'episode_ref' => 'imagine-one-million-euro', 'share_mode' => 'public', '_answer_form_token' => $this->proof()])->assertCreated();
         $this->assertSame('quarantined', EchoSubmission::query()->firstOrFail()->status);
         Queue::assertNotPushed(NotifyOwnerOfAnswer::class);
+        Queue::assertNotPushed(ReviewHumanAnswer::class);
     }
 
     public function test_answer_notification_names_the_question_and_links_both_decisions(): void
@@ -143,14 +146,18 @@ final class OwnerAlertsTest extends TestCase
     {
         $this->ownerConfig();
         Http::fake();
-        Carbon::setTestNow(now()->subMinutes(20));
+        $now = now();
+        Carbon::setTestNow($now->copy()->subMinutes(40));
         $missed = $this->humanAnswer(['body' => 'An answer the queue never announced.']);
         $junk = $this->humanAnswer(['body' => 'see https://a.example and https://b.example now', 'status' => 'quarantined']);
+        Carbon::setTestNow($now->copy()->subMinutes(20));
+        $young = $this->humanAnswer(['body' => 'Still inside the review grace period.']);
         Carbon::setTestNow();
         $this->artisan('tbwim:notify-pending')->assertSuccessful();
         Http::assertSentCount(1);
         $this->assertNotNull($missed->fresh()->metadata['owner_notified_at']);
         $this->assertArrayNotHasKey('owner_notified_at', (array) $junk->fresh()->metadata);
+        $this->assertArrayNotHasKey('owner_notified_at', (array) $young->fresh()->metadata);
     }
 
     public function test_decided_rows_are_never_pinged(): void

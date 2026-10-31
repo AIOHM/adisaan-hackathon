@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Jobs\NotifyOwnerOfAnswer;
 use App\Jobs\NotifyOwnerOfLead;
+use App\Jobs\ReviewHumanAnswer;
 use App\Jobs\TranscribeVoiceAnswer;
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
@@ -14,6 +14,7 @@ use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\AdiSaan\VisitorIdentity;
 use App\Services\Tbwim\NewsReader;
 use App\Services\Tbwim\Questions;
+use App\Support\IntakeDecision;
 use App\Support\SpamGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -228,6 +229,11 @@ final class AdiSaanSiteController extends Controller
 
             return $this->receiptRedirect($request, $isPublic, $episodeRef, '');
         }
+        if ($media === null && $this->recentDuplicate($decision->fingerprint, $decision->clientIpHash, $body)) {
+            // The same sender posting the same words twice: a stuck retry or
+            // a burst. Stored for the record, never announced.
+            $decision = new IntakeDecision(IntakeDecision::QUARANTINED, 'duplicate_burst', $decision->fingerprint, $decision->clientIpHash);
+        }
         $intentType = in_array((string) ($validated['intent_type'] ?? ''), ['make_a_wish', 'lets_try_this', 'best_way_imagine'], true)
             ? (string) $validated['intent_type'] : 'best_way_imagine';
         $sourceChannel = $this->resolveSourceChannel($request);
@@ -288,7 +294,9 @@ final class AdiSaanSiteController extends Controller
             TranscribeVoiceAnswer::dispatch($echo->public_id);
         }
         if ($echo->status !== EchoSubmission::STATUS_QUARANTINED) {
-            NotifyOwnerOfAnswer::dispatch($echo->public_id);
+            // The doorkeeper reads it first; the owner hears only what
+            // passes, or what the doorkeeper could not read at all.
+            ReviewHumanAnswer::dispatch($echo->public_id);
         }
 
         if ($request->expectsJson()) {
@@ -296,6 +304,26 @@ final class AdiSaanSiteController extends Controller
         }
 
         return $this->receiptRedirect($request, $isPublic, $episodeRef, (string) $echo->id, $echo->public_id);
+    }
+
+    /** The same words from the same sender within the hour: a burst, not an answer. */
+    private function recentDuplicate(string $fingerprint, ?string $clientIpHash, string $body): bool
+    {
+        if (trim($body) === '') {
+            return false;
+        }
+        $window = now()->subMinutes(max(1, (int) config('tbwim.intake.duplicate_minutes', 60)));
+
+        return EchoSubmission::query()
+            ->where('body', $body)
+            ->where('created_at', '>', $window)
+            ->where(function ($query) use ($fingerprint, $clientIpHash): void {
+                $query->where('fingerprint', $fingerprint);
+                if ($clientIpHash !== null) {
+                    $query->orWhere('client_ip_hash', $clientIpHash);
+                }
+            })
+            ->exists();
     }
 
     public function received(Request $request): View
