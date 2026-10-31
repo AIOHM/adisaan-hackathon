@@ -1,4 +1,4 @@
-{{-- One answer card inside the wall. Expects $answer; $redirectTo and $memberUnlocked come from the wall's scope. --}}
+{{-- One answer card inside the wall. Expects $answer; $redirectTo comes from the wall's scope. --}}
 @php
     $isAgent = !empty($answer['is_agent']);
     $body = trim((string) ($answer['body'] ?? ''));

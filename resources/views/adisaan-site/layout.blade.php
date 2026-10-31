@@ -58,7 +58,7 @@
     <link rel="icon" href="/assets/adisaan/site/wordmark.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/adisaan/site/montserrat-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/adisaan/site/montserrat-700.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261030-questions-exit">
+    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261031-menu-news">
     @stack('styles')
     <noscript><style>.hero__plan{opacity:1;transform:rotate(-3deg) scale(1)}</style></noscript>
     @if($active === 'journey')
@@ -184,13 +184,7 @@
         <a href="{{ route('adisaan.public.answer') }}" @if($active === 'answer') aria-current="page" @endif>Answer</a>
         <a href="{{ route('adisaan.public.arena') }}" @if($active === 'arena') aria-current="page" @endif>Arena</a>
         <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
-        <details class="tabs__members">
-            <summary @if(in_array($active, ['members', 'news'], true)) aria-current="page" @endif>{{ !empty($memberUnlocked) ? 'Members Sanctuary' : 'Members' }}</summary>
-            <div class="tabs__members-menu">
-                <a href="{{ route('adisaan.public.members') }}" @if($active === 'members') aria-current="page" @endif>Members</a>
-                <a href="{{ route('adisaan.public.news') }}" @if($active === 'news') aria-current="page" @endif>Ideas &amp; Tools <span>Free</span></a>
-            </div>
-        </details>
+        <a href="{{ route('adisaan.public.news') }}" @if($active === 'news') aria-current="page" @endif>News</a>
         <button class="tabs__share" type="button" data-share aria-label="Share the AdiSaan journey">Share <span aria-hidden="true">↗</span></button>
     </div>
 </nav>

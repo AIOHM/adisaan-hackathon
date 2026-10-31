@@ -121,7 +121,8 @@ final class NewsPageTest extends TestCase
 
     public function test_menu_links_news_locally_and_sitemap_lists_it(): void
     {
-        $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.news').'"', false);
+        $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.news').'"', false)
+            ->assertSee('>News</a>', false)->assertDontSee('Ideas &amp; Tools', false)->assertDontSee('tabs__members', false);
         $this->get('/sitemap.xml')->assertOk()->assertSee(config('tbwim.url').'/news', false);
     }
 
