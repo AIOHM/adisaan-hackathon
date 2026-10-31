@@ -14,11 +14,11 @@
         <strong>{{ ($answer['signature'] ?? '') ?: 'A fellow seeker' }}</strong>
         @if(!empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
     </div>
-    <div class="wall__lockmask" aria-hidden="true"><span></span><span></span><span></span></div>
-    <p class="wall__locknote">Answer a question to reveal members' answers.</p>
-    <a class="btn-primary wall__unlock" href="{{ $answerUrl ?? route('adisaan.public.answer') }}">Answer a question <span aria-hidden="true">↗</span></a>
+    <p class="wall__excerpt wall__blur" aria-hidden="true">{{ $body }}</p>
+    <p class="visually-hidden">Members-only answer. Answer a question to reveal it.</p>
     <div class="wall__meta">
         <span>{{ $when }}</span>
+        <a class="btn-primary wall__unlock" href="{{ $answerUrl ?? route('adisaan.public.answer') }}">Answer a question to reveal <span aria-hidden="true">↗</span></a>
     </div>
 </li>
 @else

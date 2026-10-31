@@ -36,16 +36,17 @@ final class MemberUnlockTest extends TestCase
         return $member->refresh();
     }
 
-    public function test_guests_see_members_answers_locked_with_no_body_bytes(): void
+    public function test_guests_see_members_answers_blurred_with_unlock_button(): void
     {
-        $member = $this->releaseMembersAnswer();
+        $this->releaseMembersAnswer();
 
         $this->get('/')->assertOk()
             ->assertSee('Members&rsquo; answers', false)
             ->assertSee('AdiSaan', false)
+            ->assertSee('worth unlocking for')
+            ->assertSee('wall__blur', false)
             ->assertSee('Answer a question to reveal', false)
-            ->assertDontSee('worth unlocking for')
-            ->assertDontSee((string) $member->public_id);
+            ->assertSee('wall__card--locked', false);
     }
 
     public function test_plain_private_answers_stay_hidden_even_for_unlocked_members(): void
@@ -59,6 +60,7 @@ final class MemberUnlockTest extends TestCase
 
         $this->withCookie('tbwim_member', (string) $raw)->get('/')
             ->assertSee('worth unlocking for')
+            ->assertDontSee('wall__blur', false)
             ->assertDontSee('strictly private line');
     }
 
@@ -82,7 +84,7 @@ final class MemberUnlockTest extends TestCase
         $this->releaseMembersAnswer();
 
         $this->withCookie('tbwim_member', 'forged.receipt.signature')->get('/')
-            ->assertDontSee('worth unlocking for')
+            ->assertSee('wall__blur', false)
             ->assertSee('Answer a question to reveal', false);
     }
 
