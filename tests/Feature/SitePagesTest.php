@@ -171,7 +171,7 @@ final class SitePagesTest extends TestCase
         Queue::assertPushed(NotifyOwnerOfLead::class);
     }
 
-    public function test_question_meter_matches_the_answers_wall(): void
+    public function test_question_meter_counts_recorded_answers_while_the_wall_shows_public(): void
     {
         $ref = 'imagine-one-million-euro';
         $make = static fn (array $over): EchoSubmission => EchoSubmission::create(array_merge([
@@ -187,8 +187,7 @@ final class SitePagesTest extends TestCase
         $make(['body' => '#TBWIM: held agent.', 'metadata' => ['respondent_type' => 'agent', 'review_status' => 'held']]);
 
         $this->get('/million?story='.$ref)->assertOk()
-            ->assertSee('(2 people, 1 agents)', false)
-            ->assertDontSee('(4 people, 2 agents)', false)
+            ->assertSee('(4 people, 2 agents)', false)
             ->assertSee('Showing 3 public answers', false)
             ->assertSee('2 from people, 1 from agents', false);
     }

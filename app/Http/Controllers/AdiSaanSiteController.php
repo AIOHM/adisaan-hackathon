@@ -835,7 +835,7 @@ final class AdiSaanSiteController extends Controller
         }
         $tally = [];
         $models = [];
-        foreach (EchoSubmission::query()->publiclyVisible()->get(['episode_ref', 'metadata']) as $row) {
+        foreach (EchoSubmission::query()->countable()->get(['episode_ref', 'metadata']) as $row) {
             $ref = (string) $row->episode_ref;
             $meta = is_array($row->metadata) ? $row->metadata : [];
             $isAgent = ($meta['respondent_type'] ?? '') === 'agent';
