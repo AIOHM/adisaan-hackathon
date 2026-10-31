@@ -88,6 +88,7 @@ final class AgentApiTest extends TestCase
         $optional = $this->getJson('/api/agent/answer')->assertOk()->json('submit.optional');
         $this->assertContains('model', $optional);
         $this->assertContains('model_detail', $optional);
+        $this->assertStringContainsString('User-Agent', (string) $this->getJson('/api/agent/answer')->json('submit.user_agent_tip'));
     }
 
     public function test_answers_wall_shows_the_exact_model_with_its_detail(): void
