@@ -118,6 +118,33 @@
             'redirectTo' => route('adisaan.public.million', ['story' => $current['id'] ?? '']).'#answers',
             'answerUrl' => $current ? route('adisaan.public.answer', ['story' => $current['id']]) : null,
         ])
+        @if(collect($memberAnswers ?? [])->isNotEmpty())
+        <div class="million-answers__members" id="members-answers" tabindex="-1" aria-labelledby="members-answers-heading">
+            <div class="million-answers__section-head">
+                <h2 id="members-answers-heading">Members&rsquo; answers</h2>
+                @if($membersUnlocked ?? false)
+                    <p>You answered, so the members' words are open to you. They stay off the public wall.</p>
+                @else
+                    <p>Members share only with people who answered. One answer opens every lock.</p>
+                @endif
+            </div>
+            <div class="wall" id="members-wall">
+                <div class="wall__bar">
+                    <p class="wall__count">Showing {{ number_format(collect($memberAnswers)->count()) }} members&rsquo; answers</p>
+                </div>
+                <ol class="wall__grid">
+                    @foreach($memberAnswers as $answer)
+                        @include('adisaan-site.partials.answers-wall-card', [
+                            'answer' => $answer,
+                            'wallLocked' => !($membersUnlocked ?? false),
+                            'redirectTo' => route('adisaan.public.million', ['story' => $current['id'] ?? '']).'#members-answers',
+                            'answerUrl' => $current ? route('adisaan.public.answer', ['story' => $current['id']]) : route('adisaan.public.answer'),
+                        ])
+                    @endforeach
+                </ol>
+            </div>
+        </div>
+        @endif
         @if(collect($rejectedAgents ?? [])->isNotEmpty())
             <ol class="million-answers__guardrail-list" aria-label="Model answers that did not pass the guardrails">
                 @foreach($rejectedAgents as $failed)

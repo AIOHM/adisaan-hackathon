@@ -78,6 +78,15 @@ class EchoSubmission extends Model
             ->whereNotNull('released_at');
     }
 
+    /** Members-only: sender chose members, a person released it. Strictly private rows never qualify. */
+    public function scopeMembersVisible(Builder $query): Builder
+    {
+        return $query->where('consent_quote', false)
+            ->whereIn('status', [self::STATUS_RECEIVED, self::STATUS_SYNTHESIZED])
+            ->whereNotNull('released_at')
+            ->where('metadata->member_sharing->status', 'approved');
+    }
+
     public function scopeAwaitingReview(Builder $query): Builder
     {
         return $query->where('status', '!=', self::STATUS_QUARANTINED)->whereNull('reviewed_at');

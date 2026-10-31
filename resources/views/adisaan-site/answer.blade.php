@@ -152,7 +152,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                         @if(strlen((string) config('tbwim.member_bridge_secret', '')) >= 32)
                         <label class="one-form__option{{ $initialMode === 'members' ? ' is-selected' : '' }}" data-share-mode-card="members">
                             <input type="radio" name="share_mode" value="members" @checked($initialMode === 'members')>
-                            <span><strong>AdiSaan members</strong><small>Signed-in members can read it after human review.</small></span>
+                            <span><strong>AdiSaan members</strong><small>People who answered can read it after human review.</small></span>
                         </label>
                         @else
                         <label class="one-form__option{{ $initialMode === 'private' ? ' is-selected' : '' }}" data-share-mode-card="private">

@@ -55,3 +55,5 @@
 @media(max-width:900px){.received-layout{grid-template-columns:1fr;gap:44px}.received-story{padding-top:0}.received-side{max-width:720px}.received-after{margin-top:54px}}
 @media(max-width:600px){.received-page{padding:40px 0 70px}.received-page .received-story h1{font-size:clamp(46px,12vw,66px)}.received-page .received-wallet{padding:24px 20px;border-radius:22px}.received-page .received-claim__row{grid-template-columns:1fr}.received-machines{grid-template-columns:1fr}.received-actions .btn-primary{width:100%}.received-wallet__split{gap:12px}}
 @media(prefers-reduced-motion:reduce){.received-celebration{display:none}}
+.received-unlock{margin:18px 0 0;padding:14px 18px;border:1px dashed rgba(233,199,117,.8);border-radius:14px;font-size:16px}
+.received-unlock a{color:#e9c775;font-weight:700;text-underline-offset:3px}

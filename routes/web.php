@@ -23,7 +23,6 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::post('/', 'lead')->middleware('throttle:30,1')->name('adisaan.public.construction.lead');
     Route::get('/question', 'question')->name('adisaan.public.question');
     Route::redirect('/questions', '/question', 301);
-    Route::redirect('/episodes', '/question', 301)->name('adisaan.public.episodes');
     Route::get('/answer', 'answer')->name('adisaan.public.answer');
     Route::post('/answer', 'storeAnswer')->middleware('throttle:20,1')->name('adisaan.public.answer.store');
     Route::get('/answer/received', 'received')->name('adisaan.public.received');
@@ -32,6 +31,7 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::get('/arena', 'arena')->name('adisaan.public.arena');
     Route::get('/privacy', 'privacy')->name('adisaan.public.privacy');
     Route::get('/news', 'news')->name('adisaan.public.news');
+    Route::get('/manifesto', 'manifesto')->name('adisaan.public.manifesto');
     Route::get('/api/journey/scoreboard', 'boardJson')->middleware('throttle:60,1')->name('adisaan.public.board');
     Route::post('/cookie-consent/log', 'cookieConsent')->middleware('throttle:30,1')->name('cookie-consent.log');
     Route::post('/api/ask-muse', 'askMuse')->withoutMiddleware([ValidateCsrfToken::class])->middleware('throttle:30,1')->name('adisaan.public.ask-muse');
@@ -47,9 +47,7 @@ Route::match(['get', 'post'], '/owner/answer/{submission}/{decision}', [OwnerDec
     ->middleware(['signed', 'throttle:30,1'])
     ->name('tbwim.owner.decide');
 
-foreach (['members' => '/members', 'members.profile' => '/members/profile', 'journey' => '/journey', 'manifesto' => '/manifesto'] as $name => $path) {
-    Route::get($path, static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').$path, 302))->name('adisaan.public.'.$name);
-}
+
 
 /*
  * The movement's machine side: the agent contract, the dataset, the

@@ -97,6 +97,24 @@ final class SitePagesTest extends TestCase
             ->assertSee(config('tbwim.url').'/about', false);
     }
 
+    public function test_manifesto_is_a_local_page_in_the_menu(): void
+    {
+        $this->get('/manifesto')->assertOk()
+            ->assertSee('Never take teachings', false)
+            ->assertSee('>Manifesto</a>', false);
+        $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.manifesto').'"', false);
+        $this->get('/sitemap.xml')->assertOk()->assertSee(config('tbwim.url').'/manifesto', false);
+        $this->get('/llms.txt')->assertOk()->assertSee('/manifesto', false);
+    }
+
+    public function test_removed_brand_redirects_are_gone(): void
+    {
+        $this->get('/members')->assertNotFound();
+        $this->get('/members/profile')->assertNotFound();
+        $this->get('/journey')->assertNotFound();
+        $this->get('/episodes')->assertNotFound();
+    }
+
     public function test_answer_page_points_agents_at_this_apps_endpoint(): void
     {
         config()->set('tbwim.url', 'https://tbwim.adisaan.com');

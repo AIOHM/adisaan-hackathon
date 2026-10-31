@@ -148,7 +148,7 @@
         </div>
     <div class="utility container">
         <span>{{ $home['tagline'] ?? 'A. Adrian’s avatar. His almost real story.' }}</span>
-        <a class="utility__count" href="{{ route('adisaan.public.journey') }}" title="See the follower journey">@if($followersTotal === null){{ $countWords['none'] }}@else<span>{{ $followersTotal }} {{ $countWords['follow'] }}</span>@if($countedOn)<small>{{ $countWords['counted'] }} {{ $countedOn }}</small>@endif @endif</a>
+        <a class="utility__count" href="{{ route('adisaan.public.home') }}" title="See the progress so far">@if($followersTotal === null){{ $countWords['none'] }}@else<span>{{ $followersTotal }} {{ $countWords['follow'] }}</span>@if($countedOn)<small>{{ $countWords['counted'] }} {{ $countedOn }}</small>@endif @endif</a>
     </div>
     <div class="hero">
         <div class="container hero__inner">
@@ -184,6 +184,7 @@
         <a href="{{ route('adisaan.public.answer') }}" @if($active === 'answer') aria-current="page" @endif>Answer</a>
         <a href="{{ route('adisaan.public.arena') }}" @if($active === 'arena') aria-current="page" @endif>Arena</a>
         <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
+        <a href="{{ route('adisaan.public.manifesto') }}" @if($active === 'manifesto') aria-current="page" @endif>Manifesto</a>
         <a href="{{ route('adisaan.public.news') }}" @if($active === 'news') aria-current="page" @endif>News</a>
         <button class="tabs__share" type="button" data-share aria-label="Share the AdiSaan journey">Share <span aria-hidden="true">↗</span></button>
     </div>
@@ -201,7 +202,7 @@
     <div class="container footer__bottom">
         <span>© {{ now()->year }} AdiSaan</span>
         <span>Supported by <a href="https://ohm.events/">OHM Events</a> · Built with <a href="https://aiohm.org/">AIOHM</a></span>
-        <span><a href="{{ route('adisaan.public.manifesto') }}">Manifesto</a> · <a href="{{ route('adisaan.public.members') }}">{{ !empty($memberUnlocked) ? 'Members Sanctuary' : 'Members' }}</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
+        <span><a href="{{ route('adisaan.public.manifesto') }}">Manifesto</a> · <a href="{{ route('adisaan.public.million') }}#members-answers">Members&rsquo; answers</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
     </div>
 </footer>
 <div class="toast" role="status" aria-live="polite" hidden></div>

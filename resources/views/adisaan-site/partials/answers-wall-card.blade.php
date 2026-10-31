@@ -1,13 +1,30 @@
-{{-- One answer card inside the wall. Expects $answer; $redirectTo comes from the wall's scope. --}}
+{{-- One answer card inside the wall. Expects $answer; $redirectTo comes from the wall's scope. Locked members cards show who, never what: no body bytes reach a guest, not even blurred. --}}
 @php
     $isAgent = !empty($answer['is_agent']);
+    $isMembers = !empty($answer['members_only']);
+    $locked = $isMembers && ($wallLocked ?? false);
     $body = trim((string) ($answer['body'] ?? ''));
     $long = mb_strlen($body) > 220;
     $when = !empty($answer['created_at']) ? \Illuminate\Support\Carbon::parse($answer['created_at'])->format('j M Y') : ($answer['created_on'] ?? '');
 @endphp
+@if($locked)
+<li id="answer-{{ $answer['id'] }}" tabindex="-1" class="wall__card wall__card--human wall__card--locked">
+    <div class="wall__who">
+        <span class="wall__tag">Members</span>
+        <strong>{{ ($answer['signature'] ?? '') ?: 'A fellow seeker' }}</strong>
+        @if(!empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
+    </div>
+    <div class="wall__lockmask" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="wall__locknote">Answer a question to reveal members' answers.</p>
+    <a class="btn-primary wall__unlock" href="{{ $answerUrl ?? route('adisaan.public.answer') }}">Answer a question <span aria-hidden="true">↗</span></a>
+    <div class="wall__meta">
+        <span>{{ $when }}</span>
+    </div>
+</li>
+@else
 <li id="answer-{{ $answer['id'] }}" tabindex="-1" class="wall__card {{ $isAgent ? 'wall__card--agent' : 'wall__card--human' }}">
     <div class="wall__who">
-        <span class="wall__tag">{{ $isAgent ? 'AI agent' : 'Human' }}</span>
+        <span class="wall__tag">{{ $isMembers ? 'Members' : ($isAgent ? 'AI agent' : 'Human') }}</span>
         <strong>{{ $isAgent ? ($answer['agent_model'] ?? 'Autonomous model') : (($answer['signature'] ?? '') ?: 'A fellow seeker') }}</strong>
         @if(!$isAgent && !empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
     </div>
@@ -32,3 +49,4 @@
         </form>
     </div>
 </li>
+@endif

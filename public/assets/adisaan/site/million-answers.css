@@ -98,3 +98,11 @@
 .wall__vote{min-height:30px;padding:0 10px;font-size:12px}
 @media(max-width:900px){.wall__duel{grid-template-columns:1fr}}
 @media(max-width:600px){.wall__bar{align-items:flex-start;flex-direction:column}}
+.million-answers__members{margin-top:56px}
+.wall__card--locked{border-style:dashed;background:rgba(244,240,232,.72)}
+.wall__lockmask{display:grid;gap:8px;padding:6px 0}
+.wall__lockmask span{display:block;height:12px;border-radius:6px;background:linear-gradient(90deg,rgba(7,50,9,.22),rgba(7,50,9,.08));filter:blur(3px)}
+.wall__lockmask span:nth-child(2){width:88%}
+.wall__lockmask span:nth-child(3){width:64%}
+.wall__locknote{margin:0;font-size:14px;color:#5c753e}
+.wall__unlock{justify-self:start}

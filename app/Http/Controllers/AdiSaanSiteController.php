@@ -13,6 +13,7 @@ use App\Models\QuestionSynthesis;
 use App\Services\AdiSaan\GratitudeLedger;
 use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\AdiSaan\VisitorIdentity;
+use App\Services\Tbwim\MemberUnlock;
 use App\Services\Tbwim\NewsReader;
 use App\Services\Tbwim\Questions;
 use App\Support\ClientIpResolver;
@@ -86,6 +87,7 @@ final class AdiSaanSiteController extends Controller
         private readonly GratitudeLedger $ledger,
         private readonly VisitorIdentity $visitors,
         private readonly Questions $questions,
+        private readonly MemberUnlock $unlock,
     ) {}
 
     // ------------------------------------------------------------------ pages
@@ -279,6 +281,13 @@ final class AdiSaanSiteController extends Controller
             throw $e;
         }
 
+        // Answering unlocks the members wall: first accepted answer mints
+        // the cookie, and the receipt celebrates exactly that moment.
+        if ($echo->status !== EchoSubmission::STATUS_QUARANTINED && ! $this->unlock->unlocked($request)) {
+            $this->unlock->grant($echo->public_id);
+            $request->session()->flash('just_unlocked', true);
+        }
+
         $this->awardForAnswer($request, $episodeRef, $echo, $media !== null);
         if ($mediaPath !== null) {
             TranscribeVoiceAnswer::dispatch($echo->public_id);
@@ -300,9 +309,10 @@ final class AdiSaanSiteController extends Controller
     {
         $echo = EchoSubmission::query()->whereKey((int) $request->input('vote_echo_id'))->first();
         $isAgent = $echo && (($echo->metadata['respondent_type'] ?? '') === 'agent');
-        $visible = $echo && ($isAgent
-            ? self::agentPublished($echo)
-            : ($echo->consent_quote && in_array($echo->status, [EchoSubmission::STATUS_RECEIVED, EchoSubmission::STATUS_SYNTHESIZED], true) && $echo->released_at !== null));
+        $humanPublic = $echo && $echo->consent_quote && in_array($echo->status, [EchoSubmission::STATUS_RECEIVED, EchoSubmission::STATUS_SYNTHESIZED], true) && $echo->released_at !== null;
+        $humanMembers = $echo && ! $echo->consent_quote && in_array($echo->status, [EchoSubmission::STATUS_RECEIVED, EchoSubmission::STATUS_SYNTHESIZED], true) && $echo->released_at !== null
+            && data_get($echo->metadata, 'member_sharing.status') === 'approved' && $this->unlock->unlocked($request);
+        $visible = $echo && ($isAgent ? self::agentPublished($echo) : ($humanPublic || $humanMembers));
         if (! $visible) {
             abort(404);
         }
@@ -510,6 +520,8 @@ final class AdiSaanSiteController extends Controller
             'homeEpisode' => $episode,
             'arena' => $this->loadArena($shared['stories']),
             'publicAnswers' => $this->loadPublicPerspectives($episode['id'] ?? null, true),
+            'memberAnswers' => $this->loadMemberPerspectives($episode['id'] ?? null),
+            'membersUnlocked' => $this->unlock->unlocked($request),
             'rejectedAgents' => $this->loadRejectedAgentAnswers($episode['id'] ?? null, 24),
         ]);
     }
@@ -517,6 +529,16 @@ final class AdiSaanSiteController extends Controller
     public function privacy(Request $request): View
     {
         return view('adisaan-site.privacy', $this->shared(''));
+    }
+
+    /** The working manifesto: why this observatory exists, and the rules it follows. */
+    public function manifesto(Request $request): View
+    {
+        $shared = $this->shared('manifesto');
+
+        return view('adisaan-site.manifesto', $shared + [
+            'current' => $this->currentEpisode($shared['stories'], config('adisaan_public.home.episode_ref')),
+        ]);
     }
 
     /** The Avatar Lab Dispatch: the movement's news desk, read from RSS. */
@@ -623,7 +645,6 @@ final class AdiSaanSiteController extends Controller
                 'profile_key' => $profileKey,
                 'profile_url' => self::SOCIAL_PROFILES[$profileKey] ?? null,
                 'sanctuary_voices' => $sanctuaryVoices,
-                'unlock_via_channel_url' => route('adisaan.public.members', ['mode' => 'make_a_wish', 'utm_source' => $profileKey]),
                 'virality_score' => $viralityScore,
                 'virality_badge' => $viralityBadge,
             ];
@@ -747,8 +768,6 @@ final class AdiSaanSiteController extends Controller
         return [
             'active' => $active,
             'board' => $board,
-            'memberUnlocked' => false,
-            'memberPass' => null,
             'detectedChannel' => $this->resolveSourceChannel($req),
             'barometruChannels' => self::BAROMETRU_CHANNELS,
             'channelVoiceCounts' => $channelVoiceCounts,
@@ -946,6 +965,48 @@ final class AdiSaanSiteController extends Controller
             ->sortByDesc('votes')
             ->values()
             ->when(! $all, static fn (Collection $answers) => $answers->take(8));
+    }
+
+    /** Members-only rows for the wall: same card shape, flagged for the lock. */
+    private function loadMemberPerspectives(?string $questionRef = null): Collection
+    {
+        $votedIds = array_map('intval', (array) request()->session()->get('adisaan_voted_echoes', []));
+
+        $rows = EchoSubmission::query()
+            ->when($questionRef !== null, static fn ($query) => $query->where('episode_ref', $questionRef))
+            ->membersVisible()
+            ->whereNotNull('created_at')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function (EchoSubmission $echo) use ($votedIds): array {
+                return [
+                    'id' => $echo->id,
+                    'body' => $echo->displayBody(),
+                    'signature' => $echo->signature ?: 'A fellow seeker',
+                    'place' => $this->formatPlace($echo->city, $echo->country_code),
+                    'episode_ref' => $echo->episode_ref ?: 'who-are-you',
+                    'theme' => $echo->theme ?: 'Living Mirror',
+                    'votes' => max(0, (int) (($echo->metadata['votes'] ?? 0))),
+                    'voted' => in_array((int) $echo->id, $votedIds, true),
+                    'created_human' => $echo->created_at ? $echo->created_at->diffForHumans() : 'recently',
+                    'created_on' => $echo->created_at?->format('j M Y'),
+                    'created_at' => $echo->created_at?->toIso8601String(),
+                    'is_agent' => false,
+                    'members_only' => true,
+                ];
+            })
+            ->values();
+        $counts = AnswerVote::query()->whereIn('echo_submission_id', $rows->pluck('id')->all())
+            ->selectRaw('echo_submission_id, count(*) as c')->groupBy('echo_submission_id')->pluck('c', 'echo_submission_id');
+
+        return $rows
+            ->map(static function (array $row) use ($counts): array {
+                $row['votes'] = $row['votes'] + (int) ($counts[$row['id']] ?? 0);
+
+                return $row;
+            })
+            ->sortByDesc('votes')
+            ->values();
     }
 
     private static function agentPublished(EchoSubmission $echo): bool
