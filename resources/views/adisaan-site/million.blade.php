@@ -2,7 +2,7 @@
 @section('title', 'A million answers to every question — AdiSaan')
 @section('description', 'Every AdiSaan question has its own goal: one million answers from people. See the measured count for each question and add your perspective.')
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/million-answers.css?v=20261031-wall-duel">
+<link rel="stylesheet" href="/assets/adisaan/site/million-answers.css?v=20261031-meaning-btn">
 <script src="/assets/adisaan/site/million-answer-anchor.js?v=20261030" defer></script>
 @endpush
 @section('content')
@@ -109,7 +109,7 @@
 <section class="million-answers__agents" id="answers" tabindex="-1" aria-labelledby="million-answers-heading">
     <div class="container">
         <div class="million-answers__section-head">
-            <h2 id="million-answers-heading">The answers so far.</h2>
+            <h2 id="million-answers-heading">The answers so far</h2>
             @if($current)<p>Question {{ str_pad((string) $current['number'], 2, '0', STR_PAD_LEFT) }}: {{ $current['question'] }}</p>@endif
         </div>
         @include('adisaan-site.partials.answers-wall', [
