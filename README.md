@@ -41,6 +41,7 @@ php artisan tbwim:transcribe-pending    # transcribe recordings that still wait 
 php artisan tbwim:poster --all          # generate missing question posters
 php artisan tbwim:thoughts              # distilled founder drafts waiting for a person
 php artisan tbwim:thought-approve <id>  # approve one (or --reject)
+php artisan tbwim:notify-pending       # re-ping the owner about anything unannounced
 php artisan test
 ```
 

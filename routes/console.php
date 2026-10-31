@@ -9,3 +9,4 @@ Schedule::command('tbwim:synthesize --all --min-voices=10')->hourly()->withoutOv
 Schedule::command('tbwim:battle-round')->everyTenMinutes()->withoutOverlapping();
 Schedule::command('tbwim:transcribe-pending --limit=25')->dailyAt('06:25')->withoutOverlapping();
 Schedule::command('tbwim:extract-pending --limit=25')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('tbwim:notify-pending --limit=25')->everyFiveMinutes()->withoutOverlapping();

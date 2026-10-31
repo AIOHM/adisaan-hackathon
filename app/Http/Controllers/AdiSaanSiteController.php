@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyOwnerOfAnswer;
+use App\Jobs\NotifyOwnerOfLead;
 use App\Jobs\TranscribeVoiceAnswer;
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
@@ -290,6 +292,9 @@ final class AdiSaanSiteController extends Controller
         if ($mediaPath !== null) {
             TranscribeVoiceAnswer::dispatch($echo->public_id);
         }
+        if ($echo->status !== EchoSubmission::STATUS_QUARANTINED) {
+            NotifyOwnerOfAnswer::dispatch($echo->public_id);
+        }
 
         if ($request->expectsJson()) {
             return response()->json(['ok' => true, 'receipt' => $echo->public_id, 'public' => $isPublic, 'message' => $isPublic ? 'Received. A person reads every public answer before it is shown.' : 'Received privately.'], 201);
@@ -569,6 +574,7 @@ final class AdiSaanSiteController extends Controller
             'consent_updates' => ['accepted'],
         ]);
         $email = mb_strtolower(trim((string) $validated['email']));
+        $isNew = ! DB::table('join_leads')->where('email', $email)->exists();
         DB::table('join_leads')->updateOrInsert(['email' => $email], [
             'consent_updates' => true,
             'source_channel' => $this->resolveSourceChannel($request),
@@ -578,6 +584,9 @@ final class AdiSaanSiteController extends Controller
             'updated_at' => now(),
             'created_at' => now(),
         ]);
+        if ($isNew) {
+            NotifyOwnerOfLead::dispatch($email);
+        }
 
         return redirect()->to(route('adisaan.public.construction').'#join')->with('lead_success', 'You’re in. I’ll write when the next episode is out.');
     }

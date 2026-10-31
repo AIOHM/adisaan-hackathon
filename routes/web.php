@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\AdiSaanSiteController;
 use App\Http\Controllers\CaptureController;
+use App\Http\Controllers\OwnerDecisionController;
 use App\Http\Controllers\TbwimController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,15 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
 });
 
 Route::get('/about', static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').'/', 302))->name('adisaan.public.about');
+
+// The owner's decision behind a signed Telegram link. GET only shows what
+// the tap would do (safe for link previews); POST decides. The signature
+// is the authentication, so CSRF is off here by design.
+Route::match(['get', 'post'], '/owner/answer/{submission}/{decision}', [OwnerDecisionController::class, 'show'])
+    ->where('decision', 'approve|reject')
+    ->withoutMiddleware([ValidateCsrfToken::class])
+    ->middleware(['signed', 'throttle:30,1'])
+    ->name('tbwim.owner.decide');
 
 foreach (['members' => '/members', 'members.profile' => '/members/profile', 'news' => '/news', 'journey' => '/journey', 'manifesto' => '/manifesto'] as $name => $path) {
     Route::get($path, static fn () => redirect()->away(rtrim((string) config('adisaan_public.brand_url'), '/').$path, 302))->name('adisaan.public.'.$name);

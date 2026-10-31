@@ -127,6 +127,19 @@ return [
         'max_bytes' => 40 * 1024 * 1024,
     ],
 
+    /*
+     * Owner alerts: the platform bot sends Adrian a Telegram message for
+     * every human answer (with signed release/reject links) and every
+     * join-lead email. Sending only — the platform owns the bot's
+     * webhook, so approve/reject travel as signed links, not callbacks.
+     * Empty values disable all of it silently.
+     */
+    'owner_alerts' => [
+        'bot_token' => env('TBWIM_OWNER_BOT_TOKEN', ''),
+        'chat_id' => env('TBWIM_OWNER_CHAT_ID', ''),
+        'link_days' => 7,
+    ],
+
     'extraction' => [
         'model' => env('TBWIM_EXTRACTION_MODEL', 'muse-spark-1.3'),
     ],
