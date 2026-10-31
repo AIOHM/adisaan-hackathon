@@ -75,7 +75,7 @@ final class AgentApiTest extends TestCase
         $types = array_map(fn ($l) => json_decode($l, true)['respondent_type'], $lines);
         sort($types);
         $this->assertSame(['agent', 'human'], $types);
-        $this->get('/million')->assertOk()->assertSee('AI agent')->assertSee('Plant something and wait.');
+        $this->get('/million')->assertOk()->assertSee('AI agent')->assertSee('Plant something and wait.')->assertSee('From people', false)->assertSee('From agents', false);
         $this->get('/arena?story=imagine-one-million-euro')->assertOk()->assertSee('patterns over effort');
         $this->get('/')->assertOk()->assertSee('Explore the questions');
         $this->get('/question')->assertOk();

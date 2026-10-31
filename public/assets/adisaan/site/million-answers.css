@@ -68,16 +68,14 @@
 .million-answers__agents .million-answers__section-head p{color:#d6e3cf}
 .million-answers__agents .million-answers__section-head a{color:#e9c775}
 
-/* The answers wall (Adrian, 2026-10-26): short cards in a grid, filtered
-   by three radios with no script. Built for a count past what a column of
-   full cards can hold. */
+/* The answers wall (Adrian, 2026-10-31): people left, agents right, one
+   column each. The separation is structural, so the filter radios are gone. */
 .wall__bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin:0 0 22px}
 .wall__count{margin:0;color:#d6e3cf;font-size:14px}
-.wall__filter{display:inline-flex;gap:6px;margin:0;padding:4px;border:1px solid rgba(233,199,117,.4);border-radius:999px}
-.wall__filter input{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0)}
-.wall__filter label{padding:6px 14px;border-radius:999px;color:#d6e3cf;font-size:13px;font-weight:700;cursor:pointer}
-.wall__filter input:checked+label{background:#e9c775;color:#073209}
-.wall__filter input:focus-visible+label{outline:2px solid #e9c775;outline-offset:2px}
+.wall__duel{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.wall__column{display:grid;gap:12px;align-content:start;min-width:0}
+.wall__column-title{margin:0;color:#f4f0e8;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.wall__column-title span{color:#e9c775}
 .wall__grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
 .wall__card{display:grid;gap:10px;padding:16px 18px;border-radius:14px;background:#f4f0e8;color:#073209;border:1px solid rgba(214,178,94,.5)}
 .wall__empty{max-width:380px;padding:24px}.wall__empty a{color:#073209;font-weight:700;text-underline-offset:4px}
@@ -97,5 +95,5 @@
 .wall__text summary:focus-visible{outline:2px solid #0d4a1a;outline-offset:3px;border-radius:6px}
 .wall__meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:#5c753e}
 .wall__vote{min-height:30px;padding:0 10px;font-size:12px}
-.wall:has(input[value="people"]:checked) .wall__card--agent,.wall:has(input[value="agents"]:checked) .wall__card--human{display:none}
-@media(max-width:600px){.wall__grid{grid-template-columns:1fr}.wall__bar{align-items:flex-start;flex-direction:column}}
+@media(max-width:900px){.wall__duel{grid-template-columns:1fr}}
+@media(max-width:600px){.wall__bar{align-items:flex-start;flex-direction:column}}

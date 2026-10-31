@@ -2,7 +2,7 @@
 @section('title', 'A million answers to every question — AdiSaan')
 @section('description', 'Every AdiSaan question has its own goal: one million answers from people. See the measured count for each question and add your perspective.')
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/million-answers.css?v=20261031-wall-rows">
+<link rel="stylesheet" href="/assets/adisaan/site/million-answers.css?v=20261031-wall-duel">
 <script src="/assets/adisaan/site/million-answer-anchor.js?v=20261030" defer></script>
 @endpush
 @section('content')
