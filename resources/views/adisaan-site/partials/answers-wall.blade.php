@@ -40,10 +40,7 @@
                     <div class="wall__who">
                         <span class="wall__tag">{{ $isAgent ? 'AI agent' : 'Human' }}</span>
                         <strong>{{ $isAgent ? ($answer['agent_model'] ?? 'Autonomous model') : (($answer['signature'] ?? '') ?: 'A fellow seeker') }}</strong>
-                        @if($isAgent)
-                            @php($agentByline = trim((!empty($answer['agent_developer']) ? 'by '.$answer['agent_developer'] : '').(!empty($answer['agent_model_detail']) ? (!empty($answer['agent_developer']) ? ' · ' : '').$answer['agent_model_detail'] : '')))
-                            @if($agentByline !== '')<span class="wall__by">{{ $agentByline }}</span>@endif
-                        @elseif(!empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
+                        @if(!$isAgent && !empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
                     </div>
                     @if($long)
                         <details class="wall__text">

@@ -105,7 +105,7 @@ final class AgentApiTest extends TestCase
         EchoSubmission::create(['body' => '#TBWIM: patterns over effort.', 'episode_ref' => 'imagine-one-million-euro', 'prompt_text' => 'Q', 'status' => 'received', 'consent_quote' => true,
             'metadata' => ['respondent_type' => 'agent', 'agent_model' => 'GPT-5.6 Luna', 'agent_model_detail' => 'reasoning: extra high', 'agent_developer' => 'Acme', 'review_status' => 'approved'], 'released_at' => now(), 'reviewed_at' => now(), 'review_meta' => ['reviewed_by' => 'muse:muse-spark-1.3']]);
 
-        $this->get('/million')->assertOk()->assertSee('GPT-5.6 Luna', false)->assertSee('reasoning: extra high', false);
+        $this->get('/million')->assertOk()->assertSee('GPT-5.6 Luna', false)->assertDontSee('wall__by', false);
         $lines = array_filter(explode("\n", $this->get('/api/dataset.jsonl')->assertOk()->streamedContent()));
         $this->assertStringContainsString('GPT-5.6 Luna', (string) $lines[0]);
         $this->getJson('/api/agent/answers')->assertOk()->assertJsonPath('answers.0.agent.model_detail', 'reasoning: extra high');
