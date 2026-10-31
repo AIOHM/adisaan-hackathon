@@ -59,6 +59,18 @@
     @endif
 </section>
 
+{{-- The breathing answer (2026-10-30, restored 2026-10-31): the featured
+     question's synthesis, once a version exists. The duel stays on
+     /construction — this page already shows the answers wall and the
+     guardrail cards below. --}}
+@if(($breath['latest'] ?? null))
+<section class="million-answers__breath" aria-label="What the voices add up to">
+    <div class="container">
+        @include('adisaan-site.partials.breathing-answer', ['breath' => $breath, 'rejectedAgents' => []])
+    </div>
+</section>
+@endif
+
 <section class="million-answers__questions" id="questions" aria-labelledby="million-questions-heading">
     <div class="container">
         <div class="million-answers__section-head">

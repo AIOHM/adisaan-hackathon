@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Models\QuestionSynthesis;
 use App\Models\EchoSubmission;
+use App\Models\QuestionSynthesis;
+use App\Services\Tbwim\QuestionSynthesizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class SitePagesTest extends TestCase
@@ -21,7 +23,7 @@ final class SitePagesTest extends TestCase
 
     public function test_selecting_a_question_shows_only_its_public_answers(): void
     {
-        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         EchoSubmission::create(['body' => 'First question answer.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
         EchoSubmission::create(['body' => 'Private second answer.', 'episode_ref' => 'start-when-not-ready', 'status' => 'received', 'consent_quote' => false, 'metadata' => ['respondent_type' => 'human']]);
 
@@ -41,7 +43,7 @@ final class SitePagesTest extends TestCase
 
     public function test_arena_selects_open_questions_and_only_shows_their_public_answers(): void
     {
-        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $first = EchoSubmission::create(['body' => 'A public first question answer.', 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
         EchoSubmission::create(['body' => 'A private second question answer.', 'episode_ref' => 'start-when-not-ready', 'status' => 'received', 'consent_quote' => false, 'metadata' => ['respondent_type' => 'human']]);
 
@@ -65,14 +67,14 @@ final class SitePagesTest extends TestCase
 
     public function test_arena_insights_require_ten_public_answers_and_a_public_synthesis(): void
     {
-        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $ref = 'imagine-one-million-euro';
         for ($i = 0; $i < 9; $i++) {
             EchoSubmission::create(['body' => str_repeat('A public human answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human'], 'released_at' => now()]);
         }
         EchoSubmission::create(['body' => str_repeat('A pending private answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human']]);
         $this->artisan('tbwim:synthesize', ['--question' => $ref, '--min-voices' => 10, '--dry-run' => true])->expectsOutputToContain('Below the minimum')->assertSuccessful();
-        $synthesis = QuestionSynthesis::create(['question_ref' => $ref, 'version' => 1, 'body' => "Muse insight for this question.\n\nA clear difference.\n\nA distinctive idea.", 'voices_site' => 9, 'voices_agents' => 1, 'themes' => [], 'model' => 'muse', 'prompt_version' => \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION, 'generated_at' => now()]);
+        $synthesis = QuestionSynthesis::create(['question_ref' => $ref, 'version' => 1, 'body' => "Muse insight for this question.\n\nA clear difference.\n\nA distinctive idea.", 'voices_site' => 9, 'voices_agents' => 1, 'themes' => [], 'model' => 'muse', 'prompt_version' => QuestionSynthesizer::PROMPT_VERSION, 'generated_at' => now()]);
         $this->get('/arena?story='.$ref)->assertDontSee('Muse insight for this question.');
         EchoSubmission::create(['body' => str_repeat('A public agent answer. ', 3), 'episode_ref' => $ref, 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'agent'], 'released_at' => now()]);
         $this->get('/arena?story='.$ref)->assertSee('Muse insight for this question.');
@@ -106,7 +108,7 @@ final class SitePagesTest extends TestCase
 
     public function test_answer_page_selects_latest_open_question_and_allows_choosing_an_earlier_one(): void
     {
-        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $this->get('/answer')->assertOk()
             ->assertSee('What is the best way you imagine to start something', false)
             ->assertSee('value="start-when-not-ready" selected', false)
@@ -132,7 +134,7 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('at adisaan.com/api/agent/answer', false);
     }
 
-    public function test_million_page_hides_the_breathing_answer_when_a_version_exists(): void
+    public function test_million_page_shows_the_breathing_answer_when_a_version_exists(): void
     {
         QuestionSynthesis::create([
             'question_ref' => (string) config('adisaan_public.home.episode_ref'),
@@ -147,8 +149,8 @@ final class SitePagesTest extends TestCase
         ]);
 
         $this->get('/')->assertOk()
-            ->assertDontSee('TEST-SYNTHESIS-BODY', false)
-            ->assertDontSee('id="breath"', false);
+            ->assertSee('TEST-SYNTHESIS-BODY', false)
+            ->assertSee('Version 3', false);
     }
 
     public function test_million_page_hides_the_breath_block_without_a_version(): void
