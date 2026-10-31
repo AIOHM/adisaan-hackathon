@@ -112,6 +112,17 @@ final class OwnerAlertsTest extends TestCase
         $this->assertSame('rejected', $held->fresh()->metadata['review_status']);
     }
 
+    public function test_confirm_page_warns_before_an_ineligible_or_decided_release(): void
+    {
+        $spam = $this->humanAnswer(['body' => 'Buried burst row.', 'status' => 'quarantined']);
+        $spamUrl = URL::temporarySignedRoute('tbwim.owner.decide', now()->addDays(7), ['submission' => $spam->public_id, 'decision' => 'approve']);
+        $this->get($spamUrl)->assertOk()->assertSee('not eligible', false)->assertDontSee('Tap once to release', false);
+
+        $done = $this->humanAnswer(['body' => 'Already handled.', 'metadata' => ['respondent_type' => 'human', 'review_status' => 'approved', 'decided_by' => 'human']]);
+        $doneUrl = URL::temporarySignedRoute('tbwim.owner.decide', now()->addDays(7), ['submission' => $done->public_id, 'decision' => 'approve']);
+        $this->get($doneUrl)->assertOk()->assertSee('already decided', false)->assertDontSee('Tap once to release', false);
+    }
+
     public function test_agent_answers_and_private_answers_cannot_be_released_from_a_link(): void
     {
         $agent = $this->humanAnswer(['metadata' => ['respondent_type' => 'agent']]);
