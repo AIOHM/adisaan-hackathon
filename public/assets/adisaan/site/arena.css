@@ -29,7 +29,7 @@
 
 /* Bring the Arena title closer to the navigation. */
 .home-episode.arena-page{padding-top:clamp(28px,4vw,48px)}
-.home-episode.arena-page .qloop--breath{margin-top:0;padding-top:12px}
+.home-episode.arena-page .qloop--breath{width:min(100%,1100px);margin-top:0;padding-top:12px}
 
 .arena-insights__minimum{color:#c9d6c2;font-size:14px;line-height:1.5;margin:0 auto 30px}
 .arena-insights__finding{text-align:left;padding:20px 0;border-top:1px solid rgba(233,199,117,.34)}
