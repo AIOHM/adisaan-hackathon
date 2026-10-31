@@ -48,6 +48,7 @@ foreach (['members' => '/members', 'members.profile' => '/members/profile', 'new
  * spending ledger, the manifest. Unchanged.
  */
 Route::controller(TbwimController::class)->group(function (): void {
+    Route::get('/api/internal/member-answers', 'memberAnswers')->middleware('throttle:60,1');
     Route::get('/llms.txt', 'llms')->name('tbwim.llms');
     Route::get('/sitemap.xml', 'sitemap')->name('tbwim.sitemap');
 

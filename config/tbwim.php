@@ -18,6 +18,7 @@ return [
     'name' => env('TBWIM_NAME', 'AdiSaan'),
     'contact' => env('TBWIM_CONTACT', 'contact@adisaan.com'),
     'timezone' => env('TBWIM_TIMEZONE', 'Europe/Bucharest'),
+    'member_bridge_secret' => env('TBWIM_MEMBER_BRIDGE_SECRET', ''),
 
     // Media stays where it already lives. The open repository carries no
     // video; every asset path below is resolved against this base.

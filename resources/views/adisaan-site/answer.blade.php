@@ -149,10 +149,17 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                             <input type="radio" name="share_mode" value="public" @checked($initialMode === 'public')>
                             <span><strong>{{ $ap['public_label'] ?? 'Everyone can read this' }}</strong><small>{{ $ap['public_hint'] ?? 'It can appear on adisaan.com and be read in an episode.' }}</small></span>
                         </label>
+                        @if(strlen((string) config('tbwim.member_bridge_secret', '')) >= 32)
+                        <label class="one-form__option{{ $initialMode === 'members' ? ' is-selected' : '' }}" data-share-mode-card="members">
+                            <input type="radio" name="share_mode" value="members" @checked($initialMode === 'members')>
+                            <span><strong>AdiSaan members</strong><small>Signed-in members can read it after human review.</small></span>
+                        </label>
+                        @else
                         <label class="one-form__option{{ $initialMode === 'private' ? ' is-selected' : '' }}" data-share-mode-card="private">
                             <input type="radio" name="share_mode" value="private" @checked($initialMode === 'private')>
-                            <span><strong>{{ $ap['private_label'] ?? 'Only AdiSaan and Muse read this' }}</strong><small>{{ $ap['private_hint'] ?? 'Not shown publicly.' }}</small></span>
+                            <span><strong>Only AdiSaan and Muse read this</strong><small>Not shown publicly.</small></span>
                         </label>
+                        @endif
                     </fieldset>
 
                     <button type="submit" class="btn-primary one-form__send" style="margin-top: 16px;">

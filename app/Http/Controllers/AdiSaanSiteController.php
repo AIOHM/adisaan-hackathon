@@ -190,7 +190,7 @@ final class AdiSaanSiteController extends Controller
             'signature' => ['nullable', 'string', 'max:60'],
             'contact_email' => ['nullable', 'required_if:consent_followup,1', 'email', 'max:255'],
             'consent_followup' => ['nullable'],
-            'share_mode' => ['nullable', 'in:public,private'],
+            'share_mode' => ['nullable', 'in:public,private,members'],
             'episode_ref' => ['nullable', 'string', 'max:64'],
             'prompt_key' => ['nullable', 'string', 'max:255'],
             'intent_type' => ['nullable', 'string', 'max:32'],
@@ -198,6 +198,10 @@ final class AdiSaanSiteController extends Controller
             'city' => ['nullable', 'string', 'max:120'],
             'age_band' => ['nullable', 'string', 'max:16'],
         ]);
+
+        if (($validated['share_mode'] ?? '') === 'members' && strlen((string) config('tbwim.member_bridge_secret', '')) < 32) {
+            abort(503, 'Members-only sharing is not available yet.');
+        }
 
         $media = $request->file('answer_media');
         $body = trim((string) ($validated['body'] ?? ''));
@@ -266,6 +270,7 @@ final class AdiSaanSiteController extends Controller
             'decision' => $decision->outcome ?? ($decision->quarantined() ? 'quarantined' : 'accepted'),
             'respondent_type' => 'human',
             'review_status' => 'pending',
+            'member_sharing' => (! $media && ($validated['share_mode'] ?? '') === 'members') ? ['status' => 'approved', 'basis' => 'sender_selected_members_only', 'confirmed_at' => now()->toIso8601String()] : null,
             'intent_type' => $intentType,
             'source_channel' => $sourceChannel,
             'source_channel_label' => self::BAROMETRU_CHANNELS[$sourceChannel] ?? 'Direct / Sanctuary Search',

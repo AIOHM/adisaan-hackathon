@@ -102,7 +102,9 @@ final class ReviewService
         if ($submission->isAgent()) {
             throw new \LogicException('Agent answers are released by the reviewer, not by this path.');
         }
-        if ($approve && (! $submission->consent_quote || $submission->status === EchoSubmission::STATUS_QUARANTINED)) {
+        $memberConsent = data_get($submission->metadata, 'member_sharing.status') === 'approved'
+            && data_get($submission->metadata, 'member_sharing.basis') === 'sender_selected_members_only';
+        if ($approve && ((! $submission->consent_quote && ! $memberConsent) || $submission->status === EchoSubmission::STATUS_QUARANTINED)) {
             throw new \LogicException('This answer is not eligible for public release (no consent, or quarantined).');
         }
         $meta = is_array($submission->metadata) ? $submission->metadata : [];

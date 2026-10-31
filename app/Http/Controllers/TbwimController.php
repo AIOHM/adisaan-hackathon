@@ -157,6 +157,28 @@ final class TbwimController extends Controller
 
     // ------------------------------------------------------------------ agents
 
+    /** Authenticated server-to-server feed; never includes older private answers. */
+    public function memberAnswers(Request $request): JsonResponse
+    {
+        $secret = (string) config('tbwim.member_bridge_secret', '');
+        $provided = (string) $request->bearerToken();
+        if (strlen($secret) < 32 || ! hash_equals($secret, $provided)) {
+            return response()->json(['error' => 'Not found'], 404)->header('Cache-Control', 'no-store');
+        }
+        $ref = (string) $request->query('question', '');
+        if ($ref === '' || strlen($ref) > 120 || $this->questions->find($ref) === null) {
+            return response()->json(['answers' => []])->header('Cache-Control', 'no-store');
+        }
+        $answers = EchoSubmission::query()->countable()->humans()->where('episode_ref', $ref)
+            ->where('consent_quote', false)->whereNotNull('released_at')->whereNotNull('reviewed_at')
+            ->where('metadata->review_status', 'approved')->where('metadata->decided_by', 'human')
+            ->where('metadata->member_sharing->status', 'approved')
+            ->where('metadata->member_sharing->basis', 'sender_selected_members_only')
+            ->latest()->limit(100)->get(['body', 'display_body'])
+            ->map(fn (EchoSubmission $e) => ['body' => $e->displayBody()])->values();
+        return response()->json(['answers' => $answers])->header('Cache-Control', 'private, no-store');
+    }
+
     public function agentAnswerInfo(Request $request): JsonResponse
     {
         $story = $this->questions->findOpen($request->query('story')) ?? $this->questions->current();
