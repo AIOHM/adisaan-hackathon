@@ -144,13 +144,17 @@ final class SitePagesTest extends TestCase
             ->assertDontSee('id="breath"', false);
     }
 
-    public function test_about_is_a_local_page_and_construction_is_gone(): void
+    public function test_about_shows_the_classic_homepage(): void
     {
+        config()->set('tbwim.url', 'https://tbwim.adisaan.com');
         $this->get('/construction')->assertNotFound();
+        $this->get('/ro')->assertNotFound();
         $this->get('/about')->assertOk()
-            ->assertSee('One question, a million answers.', false)
             ->assertSee('id="join"', false)
-            ->assertSee('name="email"', false);
+            ->assertSee('name="email"', false)
+            ->assertSee('tbwim.adisaan.com/api/agent/answer', false)
+            ->assertDontSee('at adisaan.com/api/agent/answer', false)
+            ->assertDontSee('One question, a million answers.', false);
     }
 
     public function test_join_form_lands_back_on_the_about_page(): void

@@ -19,7 +19,7 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     // The root serves the million page (the hackathon entry point); the
     // question experience lives on at /question.
     Route::get('/', 'million')->name('adisaan.public.home');
-    Route::get('/about', 'about')->name('adisaan.public.about');
+    Route::get('/about', 'home')->name('adisaan.public.about');
     Route::post('/', 'lead')->middleware('throttle:30,1')->name('adisaan.public.construction.lead');
     Route::get('/question', 'question')->name('adisaan.public.question');
     Route::redirect('/questions', '/question', 301);

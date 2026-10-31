@@ -1,7 +1,7 @@
 @php
-    // Every page renders the compact header (wordmark + the menu row); the
-    // hero homepage was removed with /construction and /ro (2026-10-31).
-    $compactHeader = true;
+    // Only the about page renders the full hero; every other page gets
+    // the compact header (wordmark + the menu row).
+    $compactHeader = ($active ?? '') !== 'about';
     $followersTotal = isset($board['total_followers']) && $board['total_followers'] !== null ? number_format((int) $board['total_followers']) : null;
     $countedOn = !empty($board['last_synced_at']) ? \Illuminate\Support\Carbon::parse($board['last_synced_at'])->format($home['date_format'] ?? 'j M Y') : null;
     $countWords = ($home['count_words'] ?? null) ?: ['none' => 'No measured count yet', 'follow' => 'follow so far', 'counted' => 'counted'];

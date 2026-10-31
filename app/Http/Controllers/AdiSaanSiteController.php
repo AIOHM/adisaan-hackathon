@@ -88,6 +88,34 @@ final class AdiSaanSiteController extends Controller
 
     // ------------------------------------------------------------------ pages
 
+    /** The classic homepage content, served at /about since 2026-10-31. */
+    public function home(Request $request, SpamGuard $guard): View
+    {
+        $shared = $this->shared('about');
+        $home = config('adisaan_public.home', []);
+        unset($home['ro']);
+        $home['faq'] = $this->localizeFaq($home['faq'] ?? null);
+        $episode = $this->currentEpisode($shared['stories'], $home['episode_ref'] ?? null);
+        $arena = $this->loadArena($shared['stories']);
+        $questionCounts = collect($arena['questions'] ?? [])->keyBy('ref');
+        $perspectives = $this->loadPublicPerspectives($episode['id'] ?? null);
+
+        return view('adisaan-site.home', $shared + [
+            'livingMap' => $this->loadLivingMap(),
+            'canonicalPath' => '/about',
+            'lang' => 'en',
+            'home' => $home,
+            'homeEpisode' => $episode,
+            'loop' => $this->loopState($episode, $shared['board'], $home['date_format'] ?? 'j M Y'),
+            'homeAnswers' => $perspectives->take(5)->values(),
+            'lifeAreas' => (array) config('adisaan_public.life_areas', []),
+            'questionCounts' => $questionCounts->all(),
+            'answersTotal' => (int) ($arena['total'] ?? 0),
+            'answerGoal' => (int) ($arena['goal'] ?? config('adisaan_public.answer_goal', 1000000)),
+            'form' => $this->formData($guard, $episode),
+        ]);
+    }
+
     public function question(Request $request, SpamGuard $guard): View
     {
         $visitorId = $this->visitors->existing($request);
@@ -437,15 +465,6 @@ final class AdiSaanSiteController extends Controller
             'arena' => $this->loadArena($shared['stories']),
             'publicAnswers' => $this->loadPublicPerspectives($episode['id'] ?? null, true),
             'rejectedAgents' => $this->loadRejectedAgentAnswers($episode['id'] ?? null, 24),
-        ]);
-    }
-
-    public function about(Request $request): View
-    {
-        $shared = $this->shared('about');
-
-        return view('adisaan-site.about', $shared + [
-            'question' => $this->currentEpisode($shared['stories'], config('adisaan_public.home.episode_ref')),
         ]);
     }
 
@@ -968,6 +987,69 @@ final class AdiSaanSiteController extends Controller
         $state['site_count'] = EchoSubmission::query()->publiclyVisible()->where('episode_ref', $questionRef)->count();
 
         return $state;
+    }
+
+    private function loopState(array $story, array $board, string $dateFormat = 'j M Y'): ?array
+    {
+        $loop = $story['loop'] ?? null;
+        if (! is_array($loop) || empty($loop['enabled'])) {
+            return null;
+        }
+        try {
+            $opensAt = ! empty($loop['opens_at']) ? Carbon::parse($loop['opens_at'], self::TZ) : null;
+            $unlockAt = ! empty($loop['unlock_at']) ? Carbon::parse($loop['unlock_at'], self::TZ) : null;
+            $countedAt = ! empty($board['last_synced_at']) ? Carbon::parse($board['last_synced_at']) : null;
+        } catch (\Throwable) {
+            return null;
+        }
+        $target = isset($loop['unlock_followers']) ? (int) $loop['unlock_followers'] : null;
+        $now = isset($board['total_followers']) && $board['total_followers'] !== null ? (int) $board['total_followers'] : null;
+        $fmtDateTime = $dateFormat.' H:i';
+        $byFollowers = $target !== null && $now !== null && $now >= $target;
+        $byTime = $unlockAt !== null && $unlockAt->isPast();
+        $reason = $byTime && (! $byFollowers || ($countedAt !== null && $unlockAt->lte($countedAt))) ? 'time' : ($byFollowers ? 'followers' : null);
+        $releasedAt = match ($reason) {
+            'time' => $unlockAt,
+            'followers' => $countedAt,
+            default => null,
+        };
+
+        return [
+            'state' => $reason === null ? 'open' : 'released',
+            'question' => $story['lead'] ?? $story['question'] ?? '',
+            'opened_at' => $opensAt?->format($fmtDateTime),
+            'followers_at_open' => isset($loop['followers_at_open']) ? (int) $loop['followers_at_open'] : null,
+            'followers_now' => $now,
+            'counted_on' => $countedAt?->format($dateFormat),
+            'target' => $target,
+            'to_go' => $target !== null && $now !== null ? max(0, $target - $now) : null,
+            'deadline' => $unlockAt?->format($fmtDateTime),
+            'unlock_reason' => $reason,
+            'released_at' => $releasedAt?->format($fmtDateTime),
+            'answer_video' => $loop['answer_video'] ?? null,
+            'answer_sha256' => $loop['answer_sha256'] ?? null,
+            'answer_url' => $story['answer_url'] ?? route('adisaan.public.answer'),
+        ];
+    }
+
+    /**
+     * The platform FAQ names the brand site's agent endpoint; this app
+     * answers at its own host, so point agents here. The config extract
+     * itself stays byte-identical to the platform's.
+     */
+    private function localizeFaq(mixed $faq): mixed
+    {
+        if (! is_array($faq) || ! is_array($faq['items'] ?? null)) {
+            return $faq;
+        }
+        $host = (string) parse_url((string) config('tbwim.url'), PHP_URL_HOST);
+        foreach ($faq['items'] as $i => $item) {
+            if (is_array($item) && is_string($item['a'] ?? null)) {
+                $faq['items'][$i]['a'] = str_replace('adisaan.com/api/agent/answer', $host.'/api/agent/answer', $item['a']);
+            }
+        }
+
+        return $faq;
     }
 
     private function formData(SpamGuard $guard, ?array $story): array
