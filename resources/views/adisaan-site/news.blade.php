@@ -56,12 +56,18 @@
         @if($lead !== null)
             <section class="news-lead-section">
                 <article class="news-lead-card">
-                    @if(!empty($lead['image']))
                     <div class="news-lead-card__media">
+                        @if(!empty($lead['image']))
                         <img src="{{ $lead['image'] }}" alt="{{ $lead['title'] }}" fetchpriority="high" onerror="this.closest('.news-lead-card__media')?.remove()">
+                        @else
+                        <div class="news-fallback-media">
+                            <span class="news-fallback-brand">{{ $lead['source'] }}</span>
+                            <span class="news-fallback-symbol">{{ $categories[$lead['category']]['icon'] ?? '◈' }}</span>
+                            <span class="news-fallback-meta">{{ $lead['category_label'] }}</span>
+                        </div>
+                        @endif
                         <span class="news-badge">Lead Story</span>
                     </div>
-                    @endif
 
                     <div class="news-lead-card__content">
                         <div class="news-lead-card__meta">
@@ -143,11 +149,17 @@
                     <div class="news-cards-grid">
                         @foreach($grid as $item)
                             <article class="news-article-card">
-                                @if(!empty($item['image']))
                                 <div class="news-article-card__media">
+                                    @if(!empty($item['image']))
                                     <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" loading="lazy" onerror="this.closest('.news-article-card__media')?.remove()">
+                                    @else
+                                    <div class="news-fallback-media">
+                                        <span class="news-fallback-brand">{{ $item['source'] }}</span>
+                                        <span class="news-fallback-symbol">{{ $categories[$item['category']]['icon'] ?? '◈' }}</span>
+                                        <span class="news-fallback-meta">{{ $item['category_label'] }}</span>
+                                    </div>
+                                    @endif
                                 </div>
-                                @endif
 
                                 <div class="news-article-card__body">
                                     <div class="news-article-card__meta">

@@ -11,9 +11,14 @@ return [
      */
     'feeds' => array_merge(
         [
-            // The owner pastes feed rows here (URL + category slug); rows can
-            // also arrive as JSON through TBWIM_NEWS_FEEDS_JSON without a
-            // redeploy. Shape: ['url' => ..., 'category' => ..., 'label' => ...].
+            // The dispatch's own wires, curated 2026-10-31: new AI models for
+            // avatars, video generation, and voice, plus the creator-tools and
+            // builder wires. More rows can arrive as JSON through
+            // TBWIM_NEWS_FEEDS_JSON without a redeploy.
+            ['url' => 'https://news.google.com/rss/search?q=%22AI%20avatar%22%20OR%20%22AI%20video%20generator%22%20OR%20%22video%20generation%20model%22%20OR%20%22text%20to%20video%22&hl=en-US&gl=US&ceid=US:en', 'category' => 'avatars-voice-tech', 'label' => 'Avatar & Video Models'],
+            ['url' => 'https://news.google.com/rss/search?q=%22voice%20cloning%22%20OR%20%22voice%20synthesis%22%20OR%20%22AI%20voice%20generator%22%20OR%20%22text%20to%20speech%20AI%22&hl=en-US&gl=US&ceid=US:en', 'category' => 'avatars-voice-tech', 'label' => 'Voice Models'],
+            ['url' => 'https://news.google.com/rss/search?q=%22AI%20creator%20tools%22%20OR%20%22AI%20video%20editing%22%20OR%20%22AI%20content%20creation%22&hl=en-US&gl=US&ceid=US:en', 'category' => 'creator-journey-tips', 'label' => 'Creator Tools'],
+            ['url' => 'https://news.google.com/rss/search?q=%22AI%20agents%22%20OR%20%22AI%20startup%22%20OR%20%22open%20source%20AI%20model%22&hl=en-US&gl=US&ceid=US:en', 'category' => 'aiohm-journey', 'label' => 'Builder Wire'],
         ],
         json_decode((string) env('TBWIM_NEWS_FEEDS_JSON', '[]'), true) ?: []
     ),

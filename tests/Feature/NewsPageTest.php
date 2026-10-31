@@ -97,6 +97,28 @@ final class NewsPageTest extends TestCase
             ->assertSee('AdiSaan Video Chronicles', false);
     }
 
+    public function test_configured_wires_point_at_known_categories(): void
+    {
+        $feeds = config('tbwim_news.feeds');
+        $this->assertNotEmpty($feeds);
+        foreach ($feeds as $feed) {
+            $this->assertStringStartsWith('https://', $feed['url']);
+            $this->assertArrayHasKey($feed['category'], config('tbwim_news.categories'));
+            $this->assertNotEmpty($feed['label']);
+        }
+    }
+
+    public function test_imageless_items_render_the_green_fallback_block(): void
+    {
+        Http::fake([
+            self::FEED_AVATARS => Http::response($this->rssWithoutImage(), 200, ['Content-Type' => 'application/rss+xml']),
+            self::FEED_CREATOR => Http::response($this->rss('Cut Your Edit Time In Half', 'edit-faster', '2026-10-29T10:00:00+00:00'), 200),
+            'www.youtube.com/*' => Http::response($this->youtube(), 200),
+        ]);
+
+        $this->get('/news')->assertOk()->assertSee('news-fallback-media', false);
+    }
+
     public function test_menu_links_news_locally_and_sitemap_lists_it(): void
     {
         $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.news').'"', false);
@@ -125,6 +147,24 @@ final class NewsPageTest extends TestCase
               <pubDate>{$date}</pubDate>
               <description><![CDATA[<p>An excerpt about {$title} with enough words to render.</p><img src="https://source.example.test/{$slug}.jpg">]]></description>
               <media:thumbnail url="https://source.example.test/{$slug}-thumb.jpg"/>
+            </item>
+          </channel>
+        </rss>
+        XML;
+    }
+
+    private function rssWithoutImage(): string
+    {
+        return <<<'XML'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+          <channel>
+            <title>Test Feed</title>
+            <item>
+              <title>Avatar Engine X Ships Expressive Voices</title>
+              <link>https://source.example.test/avatar-engine-x</link>
+              <pubDate>2026-10-30T10:00:00+00:00</pubDate>
+              <description>Plain text excerpt with no image anywhere in it.</description>
             </item>
           </channel>
         </rss>
