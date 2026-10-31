@@ -37,11 +37,14 @@
                             <li class="wall__card wall__empty"><p class="wall__full">{{ $column['empty'] }}</p></li>
                         @endforelse
                     </ol>
-                    @if($column['rows']->count() > 5)
-                        <button type="button" class="wall__more-btn" data-wall-more aria-expanded="false" data-more="Show {{ $column['rows']->count() - 5 }} more" data-less="Show less">Show {{ $column['rows']->count() - 5 }} more <span aria-hidden="true">↓</span></button>
-                    @endif
+
                 </section>
             @endforeach
         </div>
+        @php($hiddenTotal = $people->count() > 5 ? $people->count() - 5 : 0)
+        @php($hiddenTotal += $machines->count() > 5 ? $machines->count() - 5 : 0)
+        @if($hiddenTotal > 0)
+            <button type="button" class="wall__more-btn" data-wall-more aria-expanded="false" data-more="Show {{ $hiddenTotal }} more" data-less="Show less">Show {{ $hiddenTotal }} more <span aria-hidden="true">↓</span></button>
+        @endif
     @endif
 </div>
