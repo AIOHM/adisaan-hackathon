@@ -43,6 +43,19 @@ final class NewsPageTest extends TestCase
             ->assertSee('news-dispatch.css', false);
     }
 
+    public function test_feed_entities_are_decoded_not_shown_raw(): void
+    {
+        Http::fake([
+            self::FEED_AVATARS => Http::response($this->rssWithEntities(), 200, ['Content-Type' => 'application/rss+xml']),
+            self::FEED_CREATOR => Http::response($this->rss('Cut Your Edit Time In Half', 'edit-faster', '2026-10-29T10:00:00+00:00'), 200, ['Content-Type' => 'application/rss+xml']),
+            'www.youtube.com/*' => Http::response($this->youtube(), 200, ['Content-Type' => 'application/atom+xml']),
+        ]);
+
+        $this->get('/news')->assertOk()
+            ->assertSee('Alpha beta &amp; gamma', false)
+            ->assertDontSee('&nbsp;', false);
+    }
+
     public function test_dead_youtube_feed_falls_back_to_known_videos(): void
     {
         Http::fake([
@@ -148,6 +161,24 @@ final class NewsPageTest extends TestCase
               <pubDate>{$date}</pubDate>
               <description><![CDATA[<p>An excerpt about {$title} with enough words to render.</p><img src="https://source.example.test/{$slug}.jpg">]]></description>
               <media:thumbnail url="https://source.example.test/{$slug}-thumb.jpg"/>
+            </item>
+          </channel>
+        </rss>
+        XML;
+    }
+
+    private function rssWithEntities(): string
+    {
+        return <<<'XML'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0">
+          <channel>
+            <title>Test Feed</title>
+            <item>
+              <title><![CDATA[Voices&nbsp;United]]></title>
+              <link>https://source.example.test/voices-united</link>
+              <pubDate>2026-10-30T10:00:00+00:00</pubDate>
+              <description><![CDATA[<p>Alpha&nbsp;beta &amp; gamma</p>]]></description>
             </item>
           </channel>
         </rss>

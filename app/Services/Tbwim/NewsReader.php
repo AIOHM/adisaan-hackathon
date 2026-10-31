@@ -160,7 +160,7 @@ final class NewsReader
         $nodes = isset($doc->channel->item) ? $doc->channel->item : $doc->xpath('//*[local-name()="entry"]');
         $items = [];
         foreach ($nodes ?: [] as $node) {
-            $title = trim((string) ($node->title ?? ''));
+            $title = trim(html_entity_decode((string) ($node->title ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
             if ($title === '') {
                 continue;
             }
@@ -171,7 +171,7 @@ final class NewsReader
                 'link' => $link !== '' ? $link : '#',
                 'source' => $this->nodeSource($node, $link),
                 'published_at' => $this->nodeDate((string) ($node->pubDate ?? $node->published ?? $node->updated ?? '')),
-                'excerpt' => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($html)) ?? ''), 180),
+                'excerpt' => Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?? ''), 180),
                 'image' => $this->nodeImage($node, $html),
                 'category' => $category,
                 'category_label' => $label,
