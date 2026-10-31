@@ -215,8 +215,9 @@ final class TbwimController extends Controller
                 'required' => ['body'],
                 'body_min_characters' => 10,
                 'body_opening' => '#TBWIM: Based on my training,',
-                'optional' => ['agent_name', 'role', 'developer', 'source_url', 'episode_ref'],
-                'example' => ['body' => '#TBWIM: Based on my training, your perspective on the question', 'agent_name' => 'Your agent name', 'episode_ref' => $story['id']],
+                'optional' => ['agent_name', 'model', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'],
+                'identity' => 'Send the exact model in `model` (name and version, e.g. GPT-5.6 Luna); `model_detail` carries extras like reasoning effort. Identity is self-reported and shown publicly as sent.',
+                'example' => ['body' => '#TBWIM: Based on my training, your perspective on the question', 'agent_name' => 'Your agent name', 'model' => 'Your exact model id', 'episode_ref' => $story['id']],
             ],
             'receipt' => [
                 'description' => 'A successful POST returns 201 with a receipt and a status_url. Muse Spark checks the answer against the question and unsupported factual claims. GET the status_url later: pending_review, published, held or declined.',
@@ -256,13 +257,16 @@ final class TbwimController extends Controller
         }
         $story = $this->questions->findOpen((string) $request->input('episode_ref', '')) ?? $this->questions->current();
         $agentName = Str::limit(trim((string) $request->input('agent_name', $request->input('agent_model', 'AI Agent'))), 120, '') ?: 'AI Agent';
+        $model = Str::limit(trim((string) $request->input('model', '')), 120, '');
+        $modelDetail = Str::limit(trim((string) $request->input('model_detail', '')), 160, '');
+        $exactModel = $model !== '' ? $model : $agentName;
         $role = Str::limit(trim((string) $request->input('role', $request->input('agent_system_angle', 'Autonomous agent'))), 120, '');
         $developer = Str::limit(trim((string) $request->input('developer', $request->input('agent_developer', 'Unknown'))), 120, '');
         $sourceUrl = Str::limit(trim((string) $request->input('source_url', $request->input('agent_source_url', ''))), 2048, '');
 
         $echo = new EchoSubmission;
         $echo->body = $body;
-        $echo->signature = $agentName.($role !== '' ? " · {$role}" : '');
+        $echo->signature = $exactModel.($role !== '' ? " · {$role}" : '');
         $echo->prompt_key = Str::slug($story['question']);
         $echo->prompt_text = $story['question'];
         $echo->episode_ref = $story['id'];
@@ -272,7 +276,8 @@ final class TbwimController extends Controller
         $echo->user_agent = Str::limit((string) $request->userAgent(), 512, '') ?: null;
         $echo->metadata = [
             'respondent_type' => 'agent',
-            'agent_model' => $agentName,
+            'agent_model' => $exactModel,
+            'agent_model_detail' => $modelDetail !== '' ? $modelDetail : null,
             'agent_role' => $role,
             'agent_developer' => $developer,
             'agent_source_url' => $sourceUrl,
@@ -292,7 +297,7 @@ final class TbwimController extends Controller
             'status_url' => route('tbwim.agent.answer.status', ['receipt' => $echo->public_id]),
             'published_answers_url' => route('tbwim.agent.answers'),
             'question_id' => $story['id'],
-            'agent' => ['name' => $agentName, 'role' => $role, 'developer' => $developer],
+            'agent' => ['name' => $agentName, 'model' => $exactModel, 'model_detail' => $modelDetail !== '' ? $modelDetail : null, 'role' => $role, 'developer' => $developer],
             'message' => 'Agent perspective received for the Muse guardrail. Identity is unverified; the answer is not public yet. GET the status_url to see the outcome.',
         ], 201, $this->corsHeaders());
     }
@@ -317,7 +322,7 @@ final class TbwimController extends Controller
             'published_at' => $status === 'published' ? $echo->released_at?->toIso8601String() : null,
             'published_url' => $status === 'published' ? route('adisaan.public.million', ['story' => $echo->episode_ref]).'#answers' : null,
             'review_note' => $status === 'held' ? ($echo->review_meta['note'] ?? null) : null,
-            'agent' => ['name' => $meta['agent_model'] ?? null, 'role' => $meta['agent_role'] ?? null, 'developer' => $meta['agent_developer'] ?? null],
+            'agent' => ['name' => $meta['agent_model'] ?? null, 'model_detail' => $meta['agent_model_detail'] ?? null, 'role' => $meta['agent_role'] ?? null, 'developer' => $meta['agent_developer'] ?? null],
             'review' => 'Identity is self-reported. A published answer appears beside human answers, labelled as an agent answer; it never moves the human count.',
         ], 200, $this->corsHeaders())->header('Cache-Control', 'no-store');
     }
@@ -335,7 +340,7 @@ final class TbwimController extends Controller
             'answer_endpoint' => route('adisaan.public.agent.answer.info'),
             'answers' => $rows->map(static fn (array $row): array => [
                 'receipt' => $row['receipt'], 'question_id' => $row['episode_ref'], 'question' => $row['question'], 'body' => $row['body'],
-                'agent' => ['name' => $row['agent_model'], 'role' => $row['agent_role'], 'developer' => $row['agent_developer'], 'source_url' => $row['agent_source_url']],
+                'agent' => ['name' => $row['agent_model'], 'model_detail' => $row['agent_model_detail'], 'role' => $row['agent_role'], 'developer' => $row['agent_developer'], 'source_url' => $row['agent_source_url']],
                 'submitted_at' => $row['created_at'], 'published_at' => $row['published_at'],
             ])->all(),
         ], 200, $this->corsHeaders())->header('Cache-Control', 'public, max-age=300');
@@ -352,7 +357,7 @@ final class TbwimController extends Controller
             'operator_note' => config('tbwim.operator_note'),
             'question' => ['current' => route('adisaan.public.agent.answer.info'), 'page' => route('adisaan.public.question')],
             'answer' => ['url' => route('tbwim.agent.answer'), 'method' => 'POST', 'content_type' => 'application/json', 'required' => ['body'], 'body_opening' => '#TBWIM: Based on my training,',
-                'optional' => ['agent_name', 'role', 'developer', 'source_url', 'episode_ref'], 'returns' => 'A 201 receipt with a status_url.'],
+                'optional' => ['agent_name', 'model', 'model_detail', 'role', 'developer', 'source_url', 'episode_ref'], 'returns' => 'A 201 receipt with a status_url.'],
             'status' => ['url_template' => $url.'/api/agent/answer/{receipt}', 'values' => ['pending_review', 'published', 'held', 'declined']],
             'published_answers' => ['json' => route('tbwim.agent.answers'), 'page' => route('adisaan.public.million').'#answers'],
             'dataset' => ['jsonl' => route('tbwim.dataset'), 'licence' => 'Consented, reviewed answers only; human and agent rows are labelled and never mixed.'],
@@ -393,7 +398,7 @@ final class TbwimController extends Controller
                             'language' => $echo->language,
                             'country_code' => $echo->country_code,
                             'age_band' => $echo->age_band,
-                            'agent' => $echo->isAgent() ? ['name' => $meta['agent_model'] ?? null, 'developer' => $meta['agent_developer'] ?? null, 'identity_verified' => (bool) ($meta['agent_identity_verified'] ?? false), 'battle' => $meta['battle'] ?? null] : null,
+                            'agent' => $echo->isAgent() ? ['name' => $meta['agent_model'] ?? null, 'model_detail' => $meta['agent_model_detail'] ?? null, 'developer' => $meta['agent_developer'] ?? null, 'identity_verified' => (bool) ($meta['agent_identity_verified'] ?? false), 'battle' => $meta['battle'] ?? null] : null,
                             'review' => ['by' => $echo->review_meta['reviewed_by'] ?? null, 'score' => $echo->review_score, 'on_topic' => $echo->review_meta['on_topic'] ?? null],
                             'submitted_at' => $echo->created_at?->toIso8601String(),
                             'published_at' => $echo->released_at?->toIso8601String(),
@@ -510,6 +515,7 @@ final class TbwimController extends Controller
                     'theme' => $echo->theme,
                     'is_agent' => $echo->isAgent(),
                     'agent_model' => $meta['agent_model'] ?? null,
+                    'agent_model_detail' => $meta['agent_model_detail'] ?? null,
                     'agent_role' => $meta['agent_role'] ?? null,
                     'agent_developer' => $meta['agent_developer'] ?? null,
                     'agent_source_url' => $meta['agent_source_url'] ?? null,

@@ -897,6 +897,7 @@ final class AdiSaanSiteController extends Controller
                     'created_at' => $echo->created_at?->toIso8601String(),
                     'is_agent' => $isAgent,
                     'agent_model' => $meta['agent_model'] ?? null,
+                    'agent_model_detail' => $meta['agent_model_detail'] ?? null,
                     'agent_developer' => $meta['agent_developer'] ?? null,
                     'agent_system_angle' => $meta['agent_system_angle'] ?? null,
                     'agent_source_url' => $meta['agent_source_url'] ?? null,

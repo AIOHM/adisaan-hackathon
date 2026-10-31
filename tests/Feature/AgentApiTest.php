@@ -74,6 +74,33 @@ final class AgentApiTest extends TestCase
         $this->get('/ro')->assertOk();
     }
 
+    public function test_agent_post_accepts_the_exact_model_and_its_detail(): void
+    {
+        Queue::fake();
+        $this->postJson('/api/agent/answer', ['body' => '#TBWIM: Based on my training, exact identity here please.', 'agent_name' => 'Codex', 'model' => 'GPT-5.6 Luna', 'model_detail' => 'reasoning: extra high', 'developer' => 'Acme'])->assertCreated()
+            ->assertJsonPath('agent.model', 'GPT-5.6 Luna')
+            ->assertJsonPath('agent.model_detail', 'reasoning: extra high');
+        $echo = EchoSubmission::query()->firstOrFail();
+        $this->assertSame('GPT-5.6 Luna', $echo->metadata['agent_model']);
+        $this->assertSame('reasoning: extra high', $echo->metadata['agent_model_detail']);
+        $this->assertStringStartsWith('GPT-5.6 Luna', (string) $echo->signature);
+
+        $optional = $this->getJson('/api/agent/answer')->assertOk()->json('submit.optional');
+        $this->assertContains('model', $optional);
+        $this->assertContains('model_detail', $optional);
+    }
+
+    public function test_answers_wall_shows_the_exact_model_with_its_detail(): void
+    {
+        EchoSubmission::create(['body' => '#TBWIM: patterns over effort.', 'episode_ref' => 'imagine-one-million-euro', 'prompt_text' => 'Q', 'status' => 'received', 'consent_quote' => true,
+            'metadata' => ['respondent_type' => 'agent', 'agent_model' => 'GPT-5.6 Luna', 'agent_model_detail' => 'reasoning: extra high', 'agent_developer' => 'Acme', 'review_status' => 'approved'], 'released_at' => now(), 'reviewed_at' => now(), 'review_meta' => ['reviewed_by' => 'muse:muse-spark-1.3']]);
+
+        $this->get('/million')->assertOk()->assertSee('GPT-5.6 Luna', false)->assertSee('reasoning: extra high', false);
+        $lines = array_filter(explode("\n", $this->get('/api/dataset.jsonl')->assertOk()->streamedContent()));
+        $this->assertStringContainsString('GPT-5.6 Luna', (string) $lines[0]);
+        $this->getJson('/api/agent/answers')->assertOk()->assertJsonPath('answers.0.agent.model_detail', 'reasoning: extra high');
+    }
+
     public function test_published_receipt_points_at_the_live_answers_wall(): void
     {
         $agent = EchoSubmission::create(['body' => '#TBWIM: patterns over effort.', 'episode_ref' => 'imagine-one-million-euro', 'prompt_text' => 'Q', 'status' => 'received', 'consent_quote' => true,
