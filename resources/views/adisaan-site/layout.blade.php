@@ -115,7 +115,7 @@
     <script src="/assets/adisaan/site/site.js?v=20261026-chart-windows" defer></script>
     <script src="/assets/adisaan/site/analytics-consent.js?v=20261024-1" defer></script>
 </head>
-<body class="@if(($active ?? '') === 'about') manifesto-page @endif @if(($active ?? '') === 'journey') journey-page @endif @if(($active ?? '') === 'question') question-template @endif @if(($active ?? '') === 'answer') answer-template @endif @if(isset($livingMap)) home-living-map @endif" data-public-url="{{ $publicUrl }}" data-public-path="{{ $canonicalPath }}" data-board-url="{{ route('adisaan.public.board') }}">
+<body class="@if(in_array($active ?? '', ['about', 'manifesto'], true)) manifesto-page @endif @if(($active ?? '') === 'journey') journey-page @endif @if(($active ?? '') === 'question') question-template @endif @if(($active ?? '') === 'answer') answer-template @endif @if(isset($livingMap)) home-living-map @endif" data-public-url="{{ $publicUrl }}" data-public-path="{{ $canonicalPath }}" data-board-url="{{ route('adisaan.public.board') }}">
 <a class="skip-link" href="#main">Skip to the story</a>
 @if(isset($livingMap))
 <div class="living-map" aria-hidden="true">
