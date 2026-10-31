@@ -99,4 +99,8 @@
 @media(max-width:900px){.wall__duel{grid-template-columns:1fr}}
 @media(max-width:600px){.wall__bar{align-items:flex-start;flex-direction:column}}
 .wall__blur{filter:blur(7px);user-select:none;pointer-events:none}
+.wall__card--extra[hidden]{display:none}
+.wall__more-btn{display:inline-block;margin-top:14px;padding:0;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:#e9c775;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.wall__more-btn:hover{color:#f4f0e8}
+.wall__more-btn:focus-visible{outline:2px solid #e9c775;outline-offset:3px;border-radius:4px}
 .wall__unlock{min-height:34px;padding:6px 14px;font-size:13px}

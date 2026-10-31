@@ -32,11 +32,14 @@
                     <h3 class="wall__column-title">{{ $column['title'] }} <span>{{ number_format($column['rows']->count()) }}</span></h3>
                     <ol class="wall__grid">
                         @forelse($column['rows'] as $answer)
-                            @include('adisaan-site.partials.answers-wall-card', ['answer' => $answer])
+                            @include('adisaan-site.partials.answers-wall-card', ['answer' => $answer, 'wallExtra' => $loop->index >= 5])
                         @empty
                             <li class="wall__card wall__empty"><p class="wall__full">{{ $column['empty'] }}</p></li>
                         @endforelse
                     </ol>
+                    @if($column['rows']->count() > 5)
+                        <button type="button" class="wall__more-btn" data-wall-more aria-expanded="false" data-more="Show {{ $column['rows']->count() - 5 }} more" data-less="Show less">Show {{ $column['rows']->count() - 5 }} more <span aria-hidden="true">↓</span></button>
+                    @endif
                 </section>
             @endforeach
         </div>

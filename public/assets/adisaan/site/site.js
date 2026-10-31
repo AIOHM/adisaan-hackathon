@@ -722,4 +722,23 @@
     });
   });
 
+  // The wall shows five cards per column; the rest wait behind a small toggle.
+  document.querySelectorAll('[data-wall-more]').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const column = toggle.closest('.wall__column');
+      const extras = column ? Array.from(column.querySelectorAll('.wall__card--extra')) : [];
+      if (!extras.length) return;
+      const opening = extras[0].hasAttribute('hidden');
+      extras.forEach((card) => {
+        if (opening) card.removeAttribute('hidden');
+        else card.setAttribute('hidden', '');
+      });
+      toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+      const label = opening ? toggle.dataset.less : toggle.dataset.more;
+      const arrow = toggle.querySelector('[aria-hidden]');
+      toggle.childNodes[0].textContent = `${label} `;
+      if (arrow) arrow.textContent = opening ? '↑' : '↓';
+    });
+  });
+
 })();

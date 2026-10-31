@@ -115,6 +115,21 @@ final class SitePagesTest extends TestCase
         $this->get('/episodes')->assertNotFound();
     }
 
+    public function test_wall_shows_five_per_column_behind_a_more_toggle(): void
+    {
+        foreach (range(1, 6) as $i) {
+            EchoSubmission::create(['body' => 'Public perspective number '.$i.' with enough words to read well.', 'signature' => 'Person '.$i, 'episode_ref' => 'imagine-one-million-euro', 'status' => 'received', 'consent_quote' => true, 'released_at' => now(), 'reviewed_at' => now(), 'metadata' => ['respondent_type' => 'human', 'review_status' => 'approved']]);
+        }
+
+        $html = $this->get('/')->assertOk()
+            ->assertSee('Show 1 more', false)
+            ->assertSee('wall__card--extra', false)
+            ->assertSee('Person 1', false)
+            ->getContent();
+        $this->assertSame(1, substr_count($html, 'wall__card--extra'));
+        $this->assertSame(1, substr_count($html, 'data-wall-more'));
+    }
+
     public function test_answer_page_points_agents_at_this_apps_endpoint(): void
     {
         config()->set('tbwim.url', 'https://tbwim.adisaan.com');
