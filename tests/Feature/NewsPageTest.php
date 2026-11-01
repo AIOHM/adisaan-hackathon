@@ -149,6 +149,19 @@ final class NewsPageTest extends TestCase
             ->assertSee('https://source.example.test/story.jpg', false);
     }
 
+    public function test_media_content_image_publishes_the_story(): void
+    {
+        Http::fake([
+            self::FEED_AVATARS => Http::response($this->rssWithMedia(), 200, ['Content-Type' => 'application/rss+xml']),
+            self::FEED_CREATOR => Http::response($this->rss('Cut Your Edit Time In Half', 'edit-faster', '2026-10-29T10:00:00+00:00'), 200),
+            'www.youtube.com/*' => Http::response($this->youtube(), 200),
+        ]);
+
+        $this->get('/news')->assertOk()
+            ->assertSee('Avatar Engine X Ships Expressive Voices', false)
+            ->assertSee('https://cdn.example.test/story-wide.jpg', false);
+    }
+
     public function test_menu_links_news_locally_and_sitemap_lists_it(): void
     {
         $this->get('/')->assertOk()->assertSee('href="'.route('adisaan.public.news').'"', false)
@@ -196,6 +209,27 @@ final class NewsPageTest extends TestCase
               <link>https://source.example.test/voices-united</link>
               <pubDate>2026-10-30T10:00:00+00:00</pubDate>
               <description><![CDATA[<p>Alpha&nbsp;beta &amp; gamma</p><img src="https://source.example.test/voices-united.jpg">]]></description>
+            </item>
+          </channel>
+        </rss>
+        XML;
+    }
+
+    private function rssWithMedia(): string
+    {
+        return <<<'XML'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+          <channel>
+            <title>Test Feed</title>
+            <item>
+              <title>Avatar Engine X Ships Expressive Voices</title>
+              <link>https://source.example.test/avatar-engine-x</link>
+              <pubDate>2026-10-30T10:00:00+00:00</pubDate>
+              <description>Plain text excerpt with no image anywhere in it.</description>
+              <media:content url="https://cdn.example.test/story-wide.jpg" type="image/jpeg" medium="image">
+                <media:thumbnail url="https://cdn.example.test/story-thumb.jpg" width="500" height="500"/>
+              </media:content>
             </item>
           </channel>
         </rss>

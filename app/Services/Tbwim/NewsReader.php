@@ -349,7 +349,10 @@ final class NewsReader
             foreach ($patterns as $pattern) {
                 if (preg_match($pattern, $html, $match) === 1) {
                     $src = trim(html_entity_decode($match[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                    if ($src !== '') {
+                    // Google's splash page names its generic brand graphic as
+                    // og:image for every story. That is not the article's
+                    // picture and never satisfies the publish rule.
+                    if ($src !== '' && ! str_contains($src, 'J6_coFbogxhRI9iM864NL_liGXvsQp2AupsKei7z0cNNfDvGUmWUy20nuUhkREQyrpY4bEeIBuc')) {
                         return $this->absoluteUrl($src, $pageUrl);
                     }
                 }
@@ -427,9 +430,18 @@ final class NewsReader
                 return $url;
             }
         }
+        // Attributes of a namespaced element read as null through array
+        // access ($media->content['url']); attributes() sees them. This
+        // silently emptied every media:* image until 2026-11-01.
         $media = $node->children('media', true);
         foreach (['content', 'thumbnail'] as $tag) {
-            $url = trim((string) ($media->{$tag}['url'] ?? ''));
+            $url = trim((string) ($media->{$tag}->attributes()->url ?? ''));
+            if ($url !== '') {
+                return $url;
+            }
+            // media:thumbnail often nests inside media:content (Ars Technica).
+            $nested = $media->{$tag}->children('media', true);
+            $url = trim((string) ($nested?->thumbnail?->attributes()->url ?? ''));
             if ($url !== '') {
                 return $url;
             }
