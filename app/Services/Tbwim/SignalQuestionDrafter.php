@@ -56,10 +56,13 @@ PROMPT;
         $lastResponse = '';
         for ($attempt = 1; $attempt <= 2; $attempt++) {
             $prompt = $attempt === 1 ? $input : $input."\n\nYour previous answer was rejected: {$lastProblem}. Fix exactly that and answer again with the JSON only.";
+            // Muse Spark reasons before it writes; measured on production:
+            // 4096 tokens can be consumed by reasoning alone and the answer
+            // comes back empty. 8192 leaves room for the brief as well.
             $result = $this->meta->chat([
                 ['role' => 'system', 'content' => self::INSTRUCTIONS],
                 ['role' => 'user', 'content' => $prompt],
-            ], (string) config('tbwim.signal_question.model'), 4096, 0.4);
+            ], (string) config('tbwim.signal_question.model'), 8192, 0.4);
             $lastResponse = $result['text'];
             $parsed = $this->parse($result['text'], count($signals));
             if (isset($parsed['error'])) {
@@ -78,6 +81,9 @@ PROMPT;
     /** @return array{signal_index: int, question: string, why: string, brief_script: string}|array{error: string} */
     public function parse(string $text, int $signalCount): array
     {
+        if (trim($text) === '') {
+            return ['error' => 'the response was empty (reasoning may have consumed the token budget)'];
+        }
         $data = MetaClient::extractJson($text);
         if ($data === null) {
             return ['error' => 'the response was not a JSON object'];
