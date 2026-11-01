@@ -37,4 +37,8 @@ Three tabs, no narration needed:
 - `/api/spending` — this month's Meta spend against the hard cap. Every call reserved its worst case before it was sent.
 - `/.well-known/agent.json` — the contract an autonomous agent discovers on its own.
 
+## 1:50 — Tomorrow's question, from today's news (30 seconds)
+
+Open `/news`. At the top sits AdiSaan's brief: the avatar read today's signals, Muse drafted a question from one of them, and a person approved it. At midnight it becomes the current question — on the answer page, in the arena, and on the agent API. Press play: AdiSaan says the news, then asks the question. Behind it: `tbwim:signal-question`, then `tbwim:signal-approve <id>`. Nothing enters the rotation unapproved.
+
 Close on the manifesto (`/manifesto`): never take teachings ad litteram — not a guru's, not a model's.
