@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
  * that fails returns no items (marked not-ok for the status widget) —
  * the page never 500s because a source is down.
  *
- * @phpstan-type NewsItem array{title: string, link: string, source: string, source_url: string, published_at: ?Carbon, excerpt: string, image: ?string, category: string, category_label: string}
+ * @phpstan-type NewsItem array{title: string, link: string, source: string, published_at: ?Carbon, excerpt: string, image: ?string, category: string, category_label: string}
  */
 final class NewsReader
 {
@@ -172,7 +172,6 @@ final class NewsReader
                 'title' => $title,
                 'link' => $link !== '' ? $link : '#',
                 'source' => $this->nodeSource($node, $link),
-                'source_url' => trim((string) ($node->source['url'] ?? '')),
                 'published_at' => $this->nodeDate((string) ($node->pubDate ?? $node->published ?? $node->updated ?? '')),
                 'excerpt' => Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?? ''), 180),
                 'image' => $this->nodeImage($node, $html),
@@ -188,18 +187,20 @@ final class NewsReader
     }
 
     /**
-     * Google News items arrive without pictures. Fill what we can from each
-     * article's own og:image — the publisher's chosen picture for that story —
-     * cached per article (a week when found, a day when not). A story whose
-     * publisher gives nothing keeps the template's green fallback block,
-     * never a stock photo. Never runs in tests: the suite stays offline.
+     * Publish only stories that carry the article's own picture (owner's
+     * rule, 2026-11-01). A story whose feed gives no image gets one attempt
+     * from the article page itself — its og:image or twitter:image, cached
+     * per article (a week when found, a day when not). Whatever still has
+     * no picture is not published at all; there is no homepage, front-page
+     * or stock substitute. Publisher feeds that embed the story image in
+     * the item already satisfy the rule in nodeImage().
      *
      * @param  list<NewsItem>  $items
      * @return list<NewsItem>
      */
     private function resolveImages(array $items): array
     {
-        if (! (bool) config('tbwim_news.og_images', true) || app()->runningUnitTests()) {
+        if (! (bool) config('tbwim_news.og_images', true)) {
             return $items;
         }
 
@@ -208,93 +209,133 @@ final class NewsReader
             if (! empty($item['image']) || ! str_starts_with((string) $item['link'], 'http')) {
                 continue;
             }
-            // Google walls its article pages for server clients (consent
-            // page, no og:image); those stories go straight to wave two.
-            if (parse_url((string) $item['link'], PHP_URL_HOST) === 'news.google.com') {
-                continue;
-            }
             $cached = Cache::get('tbwim.news.og.'.md5((string) $item['link']));
             if (is_array($cached)) {
                 $items[$i]['image'] = $cached['image'];
-            } elseif (count($missing) < 24) {
+            } elseif (count($missing) < max(1, (int) config('tbwim_news.max_items_per_feed', 60))) {
                 $missing[$i] = (string) $item['link'];
             }
         }
+
         if ($missing !== []) {
-            try {
-                $indexes = array_keys($missing);
-                $responses = Http::pool(fn (Pool $pool) => array_map(
-                    fn (string $url) => $pool->timeout(5)->get($url),
-                    array_values($missing),
-                ));
-                foreach ($indexes as $position => $i) {
-                    $url = $missing[$i];
-                    $response = $responses[$position] ?? null;
-                    $image = null;
-                    if ($response instanceof Response && $response->ok()) {
-                        $image = $this->ogImage($response->body(), (string) ($response->effectiveUri() ?? $url));
-                    }
-                    Cache::put('tbwim.news.og.'.md5($url), ['image' => $image], now()->addDays($image !== null ? 7 : 1));
-                    $items[$i]['image'] = $image;
+            $google = [];
+            $direct = [];
+            foreach ($missing as $i => $url) {
+                if (parse_url($url, PHP_URL_HOST) === 'news.google.com') {
+                    $google[$i] = $url;
+                } else {
+                    $direct[$i] = $url;
                 }
-            } catch (\Throwable) {
-                // Wave two below can still fill these from the publisher.
+            }
+            $pages = $this->fetchDirect($direct) + $this->fetchViaCurl($google);
+            foreach ($missing as $i => $url) {
+                if (! isset($pages[$i])) {
+                    continue; // Fetch failed; the next parse retries instead of caching a miss.
+                }
+                $image = $this->ogImage($pages[$i][0], $pages[$i][1]);
+                Cache::put('tbwim.news.og.'.md5($url), ['image' => $image], $image !== null ? now()->addDays(7) : now()->addHour());
+                $items[$i]['image'] = $image;
             }
         }
 
-        // Second wave: Google walls its article pages for server clients, so
-        // a story whose article gave nothing falls back to its publisher's
-        // own homepage picture — the feed names the source. One fetch per
-        // domain, cached a month: the card still shows the publisher's real
-        // image instead of the green block.
-        $homes = [];
-        $waiters = [];
-        foreach ($items as $i => $item) {
-            if (! empty($item['image']) || empty($item['source_url'])) {
-                continue;
-            }
-            $domain = (string) parse_url((string) $item['source_url'], PHP_URL_HOST);
-            if ($domain === '') {
-                continue;
-            }
-            $cached = Cache::get('tbwim.news.og.home.'.md5($domain));
-            if (is_array($cached)) {
-                $items[$i]['image'] = $cached['image'];
-                continue;
-            }
-            if (! isset($homes[$domain]) && count($homes) < 60) {
-                $homes[$domain] = (string) $item['source_url'];
-            }
-            if (isset($homes[$domain])) {
-                $waiters[$domain][] = $i;
-            }
+        return array_values(array_filter($items, static fn (array $item): bool => ! empty($item['image'])));
+    }
+
+    /**
+     * Article pages through the Http client (also what tests fake).
+     *
+     * @param  array<int, string>  $urls
+     * @return array<int, array{string, string}> item index => [body, effective URL]
+     */
+    private function fetchDirect(array $urls): array
+    {
+        if ($urls === []) {
+            return [];
         }
-        if ($homes !== []) {
-            try {
-                $domains = array_keys($homes);
-                $responses = Http::pool(fn (Pool $pool) => array_map(
-                    fn (string $url) => $pool->timeout(5)->get($url),
-                    array_values($homes),
-                ));
-                foreach ($domains as $position => $domain) {
-                    $response = $responses[$position] ?? null;
-                    $image = null;
-                    if ($response instanceof Response && $response->ok()) {
-                        $pageUrl = (string) ($response->effectiveUri() ?? $homes[$domain]);
-                        $image = $this->ogImage($response->body(), $pageUrl)
-                            ?? $this->firstImage($response->body(), $pageUrl);
-                    }
-                    Cache::put('tbwim.news.og.home.'.md5($domain), ['image' => $image], now()->addDays($image !== null ? 30 : 1));
-                    foreach ($waiters[$domain] ?? [] as $i) {
-                        $items[$i]['image'] = $image;
-                    }
-                }
-            } catch (\Throwable) {
-                // Pictures are decoration here; the green block remains.
+        try {
+            $indexes = array_keys($urls);
+            $responses = Http::pool(fn (Pool $pool) => array_map(
+                fn (string $url) => $pool->timeout(5)->get($url),
+                array_values($urls),
+            ));
+        } catch (\Throwable) {
+            return [];
+        }
+        $pages = [];
+        foreach ($indexes as $position => $i) {
+            $response = $responses[$position] ?? null;
+            if ($response instanceof Response && $response->ok()) {
+                $pages[$i] = [$response->body(), (string) ($response->effectiveUri() ?? $urls[$i])];
             }
         }
 
-        return $items;
+        return $pages;
+    }
+
+    /**
+     * Google News links through the curl extension. Measured 2026-11-01:
+     * Google consent-walls the Http client's request fingerprint (200 on
+     * consent.google.com, no og:image) while the same URL through ext-curl
+     * with a browser user-agent returns the article page and its picture.
+     * Do not "simplify" this back to the Http client without re-measuring.
+     *
+     * @param  array<int, string>  $urls
+     * @return array<int, array{string, string}> item index => [body, effective URL]
+     */
+    private function fetchViaCurl(array $urls): array
+    {
+        if ($urls === [] || ! function_exists('curl_multi_init')) {
+            return [];
+        }
+        // Google throttles bursts: past ~15 simultaneous fetches the og
+        // pages stop coming back. Small sequential chunks stay under it.
+        $pages = [];
+        foreach (array_chunk($urls, 10, true) as $chunk) {
+            $pages += $this->fetchViaCurlChunk($chunk);
+        }
+
+        return $pages;
+    }
+
+    /** @param  array<int, string>  $urls
+     *  @return array<int, array{string, string}> */
+    private function fetchViaCurlChunk(array $urls): array
+    {
+        $multi = curl_multi_init();
+        $handles = [];
+        foreach ($urls as $i => $url) {
+            $handle = curl_init($url);
+            curl_setopt_array($handle, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_MAXREDIRS => 5,
+                CURLOPT_TIMEOUT => 6,
+                CURLOPT_CONNECTTIMEOUT => 4,
+                CURLOPT_USERAGENT => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+            ]);
+            curl_multi_add_handle($multi, $handle);
+            $handles[$i] = $handle;
+        }
+        do {
+            $status = curl_multi_exec($multi, $active);
+            if ($active) {
+                curl_multi_select($multi, 1.0);
+            }
+        } while ($active && $status === CURLM_OK);
+
+        $pages = [];
+        foreach ($handles as $i => $handle) {
+            $code = (int) curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
+            $body = curl_multi_getcontent($handle);
+            if ($code >= 200 && $code < 300 && is_string($body)) {
+                $pages[$i] = [$body, (string) curl_getinfo($handle, CURLINFO_EFFECTIVE_URL)];
+            }
+            curl_multi_remove_handle($multi, $handle);
+            curl_close($handle);
+        }
+        curl_multi_close($multi);
+
+        return $pages;
     }
 
     /** The publisher's picture for a page: og:image, then twitter:image, made absolute. */
@@ -312,36 +353,6 @@ final class NewsReader
                         return $this->absoluteUrl($src, $pageUrl);
                     }
                 }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Last resort for a publisher page: its first real content photograph.
-     * Chrome and tracking pixels are filtered by name; what survives is the
-     * front-page picture the publisher is leading with today.
-     */
-    private function firstImage(string $html, string $pageUrl): ?string
-    {
-        if (preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', $html, $matches) < 1) {
-            return null;
-        }
-        foreach ($matches[1] as $src) {
-            $src = trim(html_entity_decode($src, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            if ($src === '' || str_starts_with($src, 'data:')) {
-                continue;
-            }
-            if (preg_match('/logo|icon|sprite|avatar|gravatar|favicon|template|placeholder|spacer|blank|1x1|pixel|tracking/i', $src) === 1) {
-                continue;
-            }
-            if (preg_match('/\.(jpe?g|png|webp)(\?|#|$)/i', $src) !== 1) {
-                continue;
-            }
-            $absolute = $this->absoluteUrl($src, $pageUrl);
-            if ($absolute !== null) {
-                return $absolute;
             }
         }
 

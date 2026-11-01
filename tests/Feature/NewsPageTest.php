@@ -121,15 +121,32 @@ final class NewsPageTest extends TestCase
         }
     }
 
-    public function test_imageless_items_render_the_green_fallback_block(): void
+    public function test_stories_without_an_article_picture_are_not_published(): void
     {
         Http::fake([
             self::FEED_AVATARS => Http::response($this->rssWithoutImage(), 200, ['Content-Type' => 'application/rss+xml']),
             self::FEED_CREATOR => Http::response($this->rss('Cut Your Edit Time In Half', 'edit-faster', '2026-10-29T10:00:00+00:00'), 200),
             'www.youtube.com/*' => Http::response($this->youtube(), 200),
+            'source.example.test/*' => Http::response('<html><head><title>No picture here</title></head></html>', 200),
         ]);
 
-        $this->get('/news')->assertOk()->assertSee('news-fallback-media', false);
+        $this->get('/news')->assertOk()
+            ->assertDontSee('Avatar Engine X Ships Expressive Voices')
+            ->assertSee('Cut Your Edit Time In Half', false);
+    }
+
+    public function test_article_og_image_publishes_an_otherwise_imageless_story(): void
+    {
+        Http::fake([
+            self::FEED_AVATARS => Http::response($this->rssWithoutImage(), 200, ['Content-Type' => 'application/rss+xml']),
+            self::FEED_CREATOR => Http::response($this->rss('Cut Your Edit Time In Half', 'edit-faster', '2026-10-29T10:00:00+00:00'), 200),
+            'www.youtube.com/*' => Http::response($this->youtube(), 200),
+            'source.example.test/avatar-engine-x' => Http::response('<html><head><meta property="og:image" content="https://source.example.test/story.jpg"></head></html>', 200),
+        ]);
+
+        $this->get('/news')->assertOk()
+            ->assertSee('Avatar Engine X Ships Expressive Voices', false)
+            ->assertSee('https://source.example.test/story.jpg', false);
     }
 
     public function test_menu_links_news_locally_and_sitemap_lists_it(): void
@@ -178,7 +195,7 @@ final class NewsPageTest extends TestCase
               <title><![CDATA[Voices&nbsp;United]]></title>
               <link>https://source.example.test/voices-united</link>
               <pubDate>2026-10-30T10:00:00+00:00</pubDate>
-              <description><![CDATA[<p>Alpha&nbsp;beta &amp; gamma</p>]]></description>
+              <description><![CDATA[<p>Alpha&nbsp;beta &amp; gamma</p><img src="https://source.example.test/voices-united.jpg">]]></description>
             </item>
           </channel>
         </rss>
