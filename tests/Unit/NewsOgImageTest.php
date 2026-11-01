@@ -42,4 +42,22 @@ final class NewsOgImageTest extends TestCase
     {
         $this->assertNull($this->ogImage('<html><head><title>Plain</title></head></html>', 'https://example.test/story'));
     }
+
+    public function test_first_image_skips_chrome_and_takes_the_photo(): void
+    {
+        $html = '<img src="/assets/logo.png"><img src="https://cdn.example.test/lead-story.jpg?w=900">';
+
+        $method = new ReflectionMethod(NewsReader::class, 'firstImage');
+
+        $this->assertSame('https://cdn.example.test/lead-story.jpg?w=900', $method->invoke(new NewsReader, $html, 'https://example.test/'));
+    }
+
+    public function test_first_image_with_only_chrome_means_no_picture(): void
+    {
+        $html = '<img src="/img/spacer.gif"><img src="data:image/png;base64,AAAA">';
+
+        $method = new ReflectionMethod(NewsReader::class, 'firstImage');
+
+        $this->assertNull($method->invoke(new NewsReader, $html, 'https://example.test/'));
+    }
 }

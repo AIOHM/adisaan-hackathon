@@ -280,7 +280,9 @@ final class NewsReader
                     $response = $responses[$position] ?? null;
                     $image = null;
                     if ($response instanceof Response && $response->ok()) {
-                        $image = $this->ogImage($response->body(), (string) ($response->effectiveUri() ?? $homes[$domain]));
+                        $pageUrl = (string) ($response->effectiveUri() ?? $homes[$domain]);
+                        $image = $this->ogImage($response->body(), $pageUrl)
+                            ?? $this->firstImage($response->body(), $pageUrl);
                     }
                     Cache::put('tbwim.news.og.home.'.md5($domain), ['image' => $image], now()->addDays($image !== null ? 30 : 1));
                     foreach ($waiters[$domain] ?? [] as $i) {
@@ -310,6 +312,36 @@ final class NewsReader
                         return $this->absoluteUrl($src, $pageUrl);
                     }
                 }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Last resort for a publisher page: its first real content photograph.
+     * Chrome and tracking pixels are filtered by name; what survives is the
+     * front-page picture the publisher is leading with today.
+     */
+    private function firstImage(string $html, string $pageUrl): ?string
+    {
+        if (preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', $html, $matches) < 1) {
+            return null;
+        }
+        foreach ($matches[1] as $src) {
+            $src = trim(html_entity_decode($src, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($src === '' || str_starts_with($src, 'data:')) {
+                continue;
+            }
+            if (preg_match('/logo|icon|sprite|avatar|gravatar|favicon|template|placeholder|spacer|blank|1x1|pixel|tracking/i', $src) === 1) {
+                continue;
+            }
+            if (preg_match('/\.(jpe?g|png|webp)(\?|#|$)/i', $src) !== 1) {
+                continue;
+            }
+            $absolute = $this->absoluteUrl($src, $pageUrl);
+            if ($absolute !== null) {
+                return $absolute;
             }
         }
 
