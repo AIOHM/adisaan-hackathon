@@ -144,6 +144,10 @@ return [
         'model' => env('TBWIM_EXTRACTION_MODEL', 'muse-spark-1.3'),
     ],
 
+    'signal_question' => [
+        'model' => env('TBWIM_SIGNAL_MODEL', 'muse-spark-1.3'),
+    ],
+
     'poster' => [
         'prompt' => 'Cinematic poster illustration for the community question ":question" (:lead). Deep green (#073209) and warm cream (#F4F0E8) palette, hopeful human imagination theme, one dreamer silhouette looking at a rising horizon, painterly, no text, no words, no letters, no watermark, no logo.',
     ],

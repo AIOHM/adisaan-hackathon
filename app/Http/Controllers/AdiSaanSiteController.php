@@ -10,6 +10,7 @@ use App\Jobs\TranscribeVoiceAnswer;
 use App\Models\AnswerVote;
 use App\Models\EchoSubmission;
 use App\Models\QuestionSynthesis;
+use App\Models\SignalQuestion;
 use App\Services\AdiSaan\GratitudeLedger;
 use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\AdiSaan\VisitorIdentity;
@@ -564,7 +565,17 @@ final class AdiSaanSiteController extends Controller
             return $request->fullUrlWithQuery(['page' => $target]);
         };
 
+        // The avatar's brief: the next approved signal question, announced
+        // here before it enters tomorrow's rotation.
+        $signalBrief = null;
+        if (Schema::hasTable('signal_questions')) {
+            $today = Carbon::now(LaunchSchedule::TZ)->toDateString();
+            $signalBrief = SignalQuestion::approved()->whereDate('scheduled_for', '>=', $today)->orderBy('scheduled_for')->first()
+                ?? SignalQuestion::approved()->orderByDesc('scheduled_for')->first();
+        }
+
         return view('adisaan-site.news', $this->shared('news') + [
+            'signalBrief' => $signalBrief,
             'categories' => $categories,
             'activeCategory' => $category,
             'searchQuery' => $query,
@@ -794,6 +805,32 @@ final class AdiSaanSiteController extends Controller
     /** @return list<array<string, mixed>> */
     private function stories(): array
     {
+        $configStories = (array) config('adisaan_public.stories', []);
+        // Approved signal questions ride along as stories, marked with the
+        // signal that suggested them so the templates can say so.
+        if (Schema::hasTable('signal_questions')) {
+            foreach (SignalQuestion::approved()->get() as $signal) {
+                if ($signal->episode_ref === null || $signal->scheduled_for === null) {
+                    continue;
+                }
+                $configStories[] = [
+                    'id' => $signal->episode_ref,
+                    'question_published' => true,
+                    'lead' => $signal->question,
+                    'question' => $signal->question,
+                    'question_release_at' => $signal->scheduled_for->toDateString(),
+                    'signal' => [
+                        'title' => $signal->signal_title,
+                        'url' => $signal->signal_url,
+                        'source' => $signal->signal_source,
+                        'why' => $signal->why,
+                        'brief_script' => $signal->brief_script,
+                        'scheduled_for' => $signal->scheduled_for->toDateString(),
+                    ],
+                ];
+            }
+        }
+
         return array_map(function (array $story): array {
             if (is_string($story['id'] ?? null) && ($local = $this->questions->generatedPoster($story['id'])) !== null) {
                 $story['poster'] = $local;
@@ -807,7 +844,7 @@ final class AdiSaanSiteController extends Controller
                 'film_opens_at' => $this->schedule->filmOpensAt($story)?->toIso8601String(),
                 'answer_opens_at' => $this->schedule->answerOpensAt($story)?->toIso8601String(),
             ];
-        }, $this->schedule->visibleQuestions((array) config('adisaan_public.stories', [])));
+        }, $this->schedule->visibleQuestions($configStories));
     }
 
     private function currentEpisode(array $stories, ?string $ref, string $lang = 'en'): array
@@ -823,7 +860,9 @@ final class AdiSaanSiteController extends Controller
             } catch (\Throwable) {
                 continue;
             }
-            if ($opensAt->isFuture() || ($scheduledAt !== null && $opensAt->lte($scheduledAt))) {
+            // Latest opener wins; ties go to the later story, so an approved
+            // signal question takes its day over a same-midnight config story.
+            if ($opensAt->isFuture() || ($scheduledAt !== null && $opensAt->lt($scheduledAt))) {
                 continue;
             }
             $scheduledAt = $opensAt;

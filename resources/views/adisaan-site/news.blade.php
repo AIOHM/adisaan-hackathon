@@ -52,6 +52,105 @@
     </nav>
 
     <div class="container">
+        @if($signalBrief)
+        <!-- 2b. THE AVATAR'S BRIEF — tomorrow's question, suggested by today's news -->
+        <section class="signal-brief" aria-labelledby="signal-brief-title">
+            <div class="signal-brief__stage">
+                <img class="signal-brief__avatar" data-brief-avatar src="/assets/adisaan/site/avatar-cutout-800.webp" srcset="/assets/adisaan/site/avatar-cutout-600.webp 600w, /assets/adisaan/site/avatar-cutout-800.webp 800w, /assets/adisaan/site/avatar-cutout-1084.webp 1084w" sizes="(max-width: 700px) 40vw, 220px" width="1084" height="1451" alt="AdiSaan, the animated avatar" loading="lazy" decoding="async">
+            </div>
+            <div class="signal-brief__body">
+                <p class="signal-brief__eyebrow">AdiSaan&rsquo;s brief · from today&rsquo;s news</p>
+                <h2 id="signal-brief-title">{{ $signalBrief->question }}</h2>
+                <p class="signal-brief__meta">
+                    Suggested by <a href="{{ $signalBrief->signal_url }}" rel="noopener">{{ $signalBrief->signal_title }}</a>
+                    @if($signalBrief->signal_source) · {{ $signalBrief->signal_source }} @endif
+                    · {{ $signalBrief->scheduled_for?->isTomorrow() ? 'Opens tomorrow' : ($signalBrief->scheduled_for?->isToday() ? 'Open now — today’s question' : 'Opens '.$signalBrief->scheduled_for?->format('j F')) }}
+                </p>
+                <p class="signal-brief__caption" data-brief-caption aria-live="polite">AdiSaan read today&rsquo;s signals and picked tomorrow&rsquo;s question. Press play and hear why.</p>
+                <p class="signal-brief__script" data-brief-script>{{ $signalBrief->brief_script }}</p>
+                <div class="signal-brief__controls">
+                    <button type="button" class="signal-brief__play" data-brief-play>▶ Play the brief</button>
+                    <button type="button" class="signal-brief__stop" data-brief-stop hidden>■ Stop</button>
+                    <span class="signal-brief__progress" data-brief-progress aria-hidden="true"></span>
+                </div>
+            </div>
+        </section>
+        @push('styles')
+        <style>
+        .signal-brief{display:grid;grid-template-columns:220px 1fr;gap:clamp(20px,4vw,44px);align-items:center;background:#0b3811;border:1px solid #d6b25e88;border-radius:22px;padding:clamp(22px,3.5vw,38px);margin:28px 0 8px;color:#f4f0e8}
+        .signal-brief__stage{display:grid;place-items:center}
+        .signal-brief__avatar{width:min(100%,220px);height:auto;filter:drop-shadow(0 18px 34px rgba(0,20,4,.5))}
+        .signal-brief__avatar.is-speaking{animation:brief-bob 1.6s ease-in-out infinite}
+        @keyframes brief-bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.015)}}
+        .signal-brief__eyebrow{color:#e9c775;font:700 11px/1.5 Montserrat,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px}
+        .signal-brief h2{font-size:clamp(24px,3vw,38px);line-height:1.15;margin:0 0 12px;color:#fff}
+        .signal-brief__meta{color:#b8d1b0;font-size:13px;margin:0 0 16px}
+        .signal-brief__meta a{color:#e9c775}
+        .signal-brief__caption{font-size:17px;line-height:1.6;color:#eef4e6;margin:0 0 18px;min-height:3.2em}
+        .signal-brief__script{display:none}
+        .signal-brief__controls{display:flex;align-items:center;gap:14px}
+        .signal-brief__play,.signal-brief__stop{border:0;border-radius:999px;padding:12px 22px;font:700 14px Montserrat,Arial,sans-serif;cursor:pointer}
+        .signal-brief__play{background:#d6b25e;color:#073209}
+        .signal-brief__play:hover{background:#e9c775}
+        .signal-brief__stop{background:transparent;color:#e9c775;border:1px solid #d6b25e88}
+        .signal-brief__progress{color:#b8d1b0;font-size:12px}
+        @media(max-width:700px){.signal-brief{grid-template-columns:1fr;text-align:left}.signal-brief__avatar{width:150px}}
+        @media(prefers-reduced-motion:reduce){.signal-brief__avatar.is-speaking{animation:none}}
+        </style>
+        @endpush
+        <script>
+        (function () {
+            var stage = document.currentScript.previousElementSibling;
+            var root = stage && stage.classList.contains('signal-brief') ? stage : document.querySelector('.signal-brief');
+            if (!root) return;
+            var script = root.querySelector('[data-brief-script]').textContent.trim();
+            var caption = root.querySelector('[data-brief-caption]');
+            var avatar = root.querySelector('[data-brief-avatar]');
+            var play = root.querySelector('[data-brief-play]');
+            var stop = root.querySelector('[data-brief-stop]');
+            var progress = root.querySelector('[data-brief-progress]');
+            var sentences = (script.match(/[^.!?]+[.!?]+["']?|\S[^.!?]*$/g) || [script]).map(function (s) { return s.trim(); }).filter(Boolean);
+            var timer = null, idx = 0, speaking = false;
+            function end() {
+                speaking = false; idx = 0;
+                if (timer) { clearTimeout(timer); timer = null; }
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                avatar.classList.remove('is-speaking');
+                play.hidden = false; stop.hidden = true; progress.textContent = '';
+                caption.textContent = 'That is tomorrow’s question. AdiSaan read today’s signals and picked it — press play to hear it again.';
+            }
+            function show(i) {
+                caption.textContent = sentences[i];
+                progress.textContent = (i + 1) + ' / ' + sentences.length;
+            }
+            function next() {
+                idx++;
+                if (idx >= sentences.length) { end(); return; }
+                speak(idx);
+            }
+            function speak(i) {
+                show(i);
+                if ('speechSynthesis' in window) {
+                    var u = new SpeechSynthesisUtterance(sentences[i]);
+                    u.lang = 'en-US'; u.rate = 1.0;
+                    u.onend = next; u.onerror = next;
+                    speechSynthesis.speak(u);
+                } else {
+                    timer = setTimeout(next, 3000);
+                }
+            }
+            play.addEventListener('click', function () {
+                if (speaking) return;
+                speaking = true; idx = 0;
+                avatar.classList.add('is-speaking');
+                play.hidden = true; stop.hidden = false;
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                speak(0);
+            });
+            stop.addEventListener('click', end);
+        })();
+        </script>
+        @endif
         <!-- 3. COVER STORY (EDITORIAL LEAD) — Page 1 when not searching -->
         @if($lead !== null)
             <section class="news-lead-section">

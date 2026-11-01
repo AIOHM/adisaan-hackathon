@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Tbwim;
 
+use App\Models\SignalQuestion;
 use App\Services\AdiSaan\LaunchSchedule;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * The question catalogue.
@@ -28,6 +30,24 @@ final class Questions
             (array) config('adisaan_public.stories', []),
             static fn (array $s): bool => ($s['question_published'] ?? false) === true && ! empty($s['id']),
         ));
+        // Approved signal questions join the catalogue as ordinary stories:
+        // tomorrow they are simply the newest question, here and on the
+        // agent API. Unapproved drafts never reach this list.
+        if (Schema::hasTable('signal_questions')) {
+            foreach (SignalQuestion::approved()->get() as $signal) {
+                if ($signal->episode_ref === null || $signal->scheduled_for === null) {
+                    continue;
+                }
+                $stories[] = [
+                    'id' => $signal->episode_ref,
+                    'question' => $signal->question,
+                    'lead' => $signal->question,
+                    'question_release_at' => $signal->scheduled_for->toDateString(),
+                    'life_area' => 'signal',
+                    'tag' => '#TBWIMSignal',
+                ];
+            }
+        }
         if ($stories === []) {
             return $this->fallback($base);
         }
@@ -80,7 +100,10 @@ final class Questions
         $currentAt = null;
         foreach ($this->open() as $q) {
             $at = $this->parse($q['opens_at']) ?? Carbon::createFromTimestamp(0);
-            if ($currentAt === null || $at->gt($currentAt)) {
+            // Newest open wins; on a tie the later catalogue entry wins, so
+            // an approved signal question (appended last) takes its day even
+            // when a config story opens the same midnight.
+            if ($currentAt === null || $at->gte($currentAt)) {
                 $current = $q;
                 $currentAt = $at;
             }
