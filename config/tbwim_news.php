@@ -45,6 +45,10 @@ return [
 
     'cache_minutes' => (int) env('TBWIM_NEWS_CACHE_MINUTES', 60),
 
+    // Stories arrive without pictures (Google News carries none). Fill each
+    // one from the article's own og:image; TBWIM_NEWS_OG_IMAGES=false stops it.
+    'og_images' => (bool) env('TBWIM_NEWS_OG_IMAGES', true),
+
     'per_page' => 12,
 
     'max_items_per_feed' => 60,
