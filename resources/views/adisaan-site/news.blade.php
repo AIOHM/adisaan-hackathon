@@ -68,11 +68,17 @@
                 </p>
                 <p class="signal-brief__caption" data-brief-caption aria-live="polite">AdiSaan read today&rsquo;s signals and picked tomorrow&rsquo;s question. Press play and hear why.</p>
                 <p class="signal-brief__script" data-brief-script>{{ $signalBrief->brief_script }}</p>
+                @if($signalBrief->brief_audio_path)
+                <audio data-brief-audio src="{{ $signalBrief->brief_audio_path }}" preload="metadata"></audio>
+                @endif
                 <div class="signal-brief__controls">
-                    <button type="button" class="signal-brief__play" data-brief-play>▶ Play the brief</button>
+                    <button type="button" class="signal-brief__play" data-brief-play>{{ $signalBrief->brief_audio_path ? '▶ Play the brief' : '▶ Read the brief' }}</button>
                     <button type="button" class="signal-brief__stop" data-brief-stop hidden>■ Stop</button>
                     <span class="signal-brief__progress" data-brief-progress aria-hidden="true"></span>
                 </div>
+                @unless($signalBrief->brief_audio_path)
+                <p class="signal-brief__meta">AdiSaan&rsquo;s voice recording arrives with the brief; until then, read it here.</p>
+                @endunless
             </div>
         </section>
         @push('styles')
@@ -110,43 +116,56 @@
             var stop = root.querySelector('[data-brief-stop]');
             var progress = root.querySelector('[data-brief-progress]');
             var sentences = (script.match(/[^.!?]+[.!?]+["']?|\S[^.!?]*$/g) || [script]).map(function (s) { return s.trim(); }).filter(Boolean);
-            var timer = null, idx = 0, speaking = false;
-            function end() {
-                speaking = false; idx = 0;
-                if (timer) { clearTimeout(timer); timer = null; }
-                if ('speechSynthesis' in window) speechSynthesis.cancel();
-                avatar.classList.remove('is-speaking');
-                play.hidden = false; stop.hidden = true; progress.textContent = '';
-                caption.textContent = 'That is tomorrow’s question. AdiSaan read today’s signals and picked it — press play to hear it again.';
-            }
+            var audio = root.querySelector('[data-brief-audio]');
+            var timer = null, idx = 0, playing = false;
+            // Sentence boundaries by share of the whole text, used to caption
+            // the recorded audio (no timestamps are stored with the file).
+            var bounds = [], acc = 0, totalWords = sentences.join(' ').split(/\s+/).length;
+            sentences.forEach(function (s) { acc += s.split(/\s+/).length / totalWords; bounds.push(acc); });
             function show(i) {
                 caption.textContent = sentences[i];
                 progress.textContent = (i + 1) + ' / ' + sentences.length;
             }
+            function end() {
+                playing = false; idx = 0;
+                if (timer) { clearTimeout(timer); timer = null; }
+                if (audio) { audio.pause(); audio.currentTime = 0; }
+                avatar.classList.remove('is-speaking');
+                play.hidden = false; stop.hidden = true; progress.textContent = '';
+                caption.textContent = audio
+                    ? 'That is tomorrow’s question, in AdiSaan’s voice. Press play to hear it again.'
+                    : 'That is tomorrow’s question. AdiSaan read today’s signals and picked it.';
+            }
             function next() {
                 idx++;
                 if (idx >= sentences.length) { end(); return; }
-                speak(idx);
-            }
-            function speak(i) {
-                show(i);
-                if ('speechSynthesis' in window) {
-                    var u = new SpeechSynthesisUtterance(sentences[i]);
-                    u.lang = 'en-US'; u.rate = 1.0;
-                    u.onend = next; u.onerror = next;
-                    speechSynthesis.speak(u);
-                } else {
-                    timer = setTimeout(next, 3000);
-                }
+                show(idx);
+                timer = setTimeout(next, 3000);
             }
             play.addEventListener('click', function () {
-                if (speaking) return;
-                speaking = true; idx = 0;
+                if (playing) return;
+                playing = true; idx = 0;
                 avatar.classList.add('is-speaking');
                 play.hidden = true; stop.hidden = false;
-                if ('speechSynthesis' in window) speechSynthesis.cancel();
-                speak(0);
+                if (audio) {
+                    show(0);
+                    audio.currentTime = 0;
+                    audio.play();
+                } else {
+                    show(0);
+                    timer = setTimeout(next, 3000);
+                }
             });
+            if (audio) {
+                audio.addEventListener('timeupdate', function () {
+                    if (!audio.duration) return;
+                    var share = audio.currentTime / audio.duration;
+                    var i = bounds.findIndex(function (b) { return share <= b; });
+                    if (i === -1) i = sentences.length - 1;
+                    if (i !== idx) { idx = i; show(i); }
+                });
+                audio.addEventListener('ended', end);
+            }
             stop.addEventListener('click', end);
         })();
         </script>

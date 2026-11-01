@@ -30,3 +30,5 @@ Thumbs.db
 
 # Generated question posters stay out of git (regenerate for $0.01 each)
 /public/assets/tbwim/posters/*.webp
+/ops/brief-voice/.venv/
+/ops/brief-voice/*.mp3

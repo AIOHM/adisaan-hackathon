@@ -22,7 +22,7 @@ class SignalQuestion extends Model
 
     protected $fillable = [
         'signal_title', 'signal_url', 'signal_source', 'signal_category',
-        'question', 'why', 'brief_script',
+        'question', 'why', 'brief_script', 'brief_audio_path',
         'status', 'episode_ref', 'scheduled_for',
         'model', 'prompt_version', 'prompt_tokens', 'completion_tokens',
         'reviewed_at',

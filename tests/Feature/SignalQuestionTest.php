@@ -71,7 +71,33 @@ final class SignalQuestionTest extends TestCase
             ->assertSee('AdiSaan&rsquo;s brief', false)
             ->assertSee(self::QUESTION)
             ->assertSee('Voice Clones Learn Three Seconds')
-            ->assertSee('Play the brief', false);
+            ->assertSee('Read the brief', false)
+            ->assertDontSee('<audio', false);
+    }
+
+    public function test_attached_audio_plays_instead_of_the_captions_only_brief(): void
+    {
+        $this->fakeWireOnly();
+        $this->travelTo(Carbon::parse('2026-11-01 10:00:00', LaunchSchedule::TZ));
+        $draft = $this->makeApprovedDraft();
+
+        $mp3 = tempnam(sys_get_temp_dir(), 'brief-').'.mp3';
+        file_put_contents($mp3, 'fake-audio');
+        $this->artisan('tbwim:signal-audio', ['id' => $draft->id, 'file' => $mp3])->assertSuccessful();
+
+        $draft->refresh();
+        $this->assertSame('/assets/adisaan/site/briefs/'.$draft->episode_ref.'.mp3', $draft->brief_audio_path);
+        $attached = public_path('assets/adisaan/site/briefs/'.$draft->episode_ref.'.mp3');
+        $this->assertFileExists($attached);
+
+        try {
+            $this->get('/news')->assertOk()
+                ->assertSee('<audio data-brief-audio src="/assets/adisaan/site/briefs/'.$draft->episode_ref.'.mp3"', false)
+                ->assertSee('Play the brief', false);
+        } finally {
+            unlink($attached);
+            unlink($mp3);
+        }
     }
 
     public function test_drafter_rejects_a_question_outside_the_brand_frame(): void
