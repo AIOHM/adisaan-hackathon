@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Jobs\ExtractThought;
+use App\Jobs\IngestCaptureLink;
 use App\Jobs\TranscribeVoiceAnswer;
 use App\Models\EchoSubmission;
+use App\Services\Tbwim\DocumentTextExtractor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,12 +16,16 @@ use Illuminate\Support\Str;
 
 /**
  * Founder capture intake: the platform's Telegram forward posts the
- * founder's thoughts here (text or one recording). Each becomes a private
- * founder echo, then transcription and Muse distillation into a draft.
+ * founder's thoughts here — typed words, one recording, a document with
+ * words, or a link to a page, video or audio. Each becomes a private
+ * founder echo, then transcription/reading and Muse distillation into
+ * the question–answer–why draft a person approves.
  */
 class CaptureController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    private const MEDIA_EXT = ['mp3', 'm4a', 'wav', 'ogg', 'oga', 'webm', 'mp4', 'mov'];
+
+    public function store(Request $request, DocumentTextExtractor $documents): JsonResponse
     {
         $secret = (string) config('tbwim.capture.intake_secret', '');
         if ($secret === '' || ! hash_equals($secret, (string) $request->bearerToken())) {
@@ -29,7 +35,8 @@ class CaptureController extends Controller
         $maxKb = max(1, intdiv((int) config('tbwim.capture.max_bytes', 40 * 1024 * 1024), 1024));
         $validated = $request->validate([
             'text' => ['nullable', 'string', 'max:6000'],
-            'file' => ['nullable', 'file', 'mimes:mp3,m4a,wav,ogg,oga,webm,mp4,mov', "max:{$maxKb}"],
+            'url' => ['nullable', 'url', 'max:2048'],
+            'file' => ['nullable', 'file', "max:{$maxKb}"],
             'from_id' => ['required'],
             'message_id' => ['required'],
             'language' => ['nullable', 'string', 'max:12'],
@@ -43,8 +50,21 @@ class CaptureController extends Controller
 
         $text = trim((string) ($validated['text'] ?? ''));
         $file = $request->file('file');
-        if ($text === '' && ! $file) {
-            return response()->json(['ok' => false, 'error' => 'Nothing to capture: text or a recording is required.'], 422);
+        // A message that is only a link is a link capture, whatever field
+        // the forward put it in.
+        $url = trim((string) ($validated['url'] ?? ''));
+        if ($url === '' && $text !== '' && preg_match('#^https?://\S+$#i', $text) === 1) {
+            $url = $text;
+            $text = '';
+        }
+        if ($text === '' && $url === '' && ! $file) {
+            return response()->json(['ok' => false, 'error' => 'Nothing to capture: text, a link, a document or a recording is required.'], 422);
+        }
+
+        $fileExt = $file ? strtolower($file->getClientOriginalExtension()) : '';
+        $isDocument = $file && in_array($fileExt, DocumentTextExtractor::EXTENSIONS, true);
+        if ($file && ! $isDocument && ! in_array($fileExt, self::MEDIA_EXT, true)) {
+            return response()->json(['ok' => false, 'error' => 'That file type cannot be captured. Send audio, video, or a txt, md, csv, pdf or docx document.'], 422);
         }
 
         // Telegram retries deliveries; the same message must not distil twice.
@@ -58,7 +78,16 @@ class CaptureController extends Controller
         }
 
         $mediaPath = null;
-        if ($file) {
+        $documentText = null;
+        $documentMeta = null;
+        if ($isDocument) {
+            try {
+                $documentText = $documents->extract((string) $file->getRealPath(), $fileExt);
+            } catch (\Throwable $e) {
+                return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
+            }
+            $documentMeta = ['name' => $file->getClientOriginalName(), 'ext' => $fileExt, 'size' => $file->getSize()];
+        } elseif ($file) {
             $mediaPath = $file->store('founder-capture', 'local') ?: null;
             if ($mediaPath === null) {
                 throw new \RuntimeException('Could not store the recording.');
@@ -68,7 +97,9 @@ class CaptureController extends Controller
         $echo = new EchoSubmission;
         $echo->episode_ref = 'founder-capture';
         $echo->prompt_key = 'founder-thought';
-        $echo->body = $text !== '' ? $text : ($file && str_starts_with((string) $file->getMimeType(), 'audio/') ? '[Audio thought awaiting transcription]' : '[Video thought awaiting transcription]');
+        $echo->body = $documentText ?? ($url !== '' && $text === ''
+            ? '[Link awaiting reading]'
+            : ($text !== '' ? $text : ($file && str_starts_with((string) $file->getMimeType(), 'audio/') ? '[Audio thought awaiting transcription]' : '[Video thought awaiting transcription]')));
         $echo->signature = 'Adrian';
         $echo->language = Str::limit((string) ($validated['language'] ?? 'en'), 12, '');
         $echo->status = EchoSubmission::STATUS_RECEIVED;
@@ -81,7 +112,9 @@ class CaptureController extends Controller
             'respondent_type' => 'human',
             'source_channel' => 'telegram',
             'telegram' => ['from_id' => $fromId, 'message_id' => $messageId],
-            'media' => $file ? ['disk' => 'local', 'path' => $mediaPath, 'mime' => $file->getMimeType(), 'size' => $file->getSize()] : null,
+            'media' => $mediaPath !== null ? ['disk' => 'local', 'path' => $mediaPath, 'mime' => $file->getMimeType(), 'size' => $file->getSize()] : null,
+            'document' => $documentMeta,
+            'link' => $url !== '' && ! $file ? ['url' => $url, 'status' => 'pending'] : null,
         ];
         try {
             $echo->save();
@@ -94,6 +127,8 @@ class CaptureController extends Controller
 
         if ($mediaPath !== null) {
             TranscribeVoiceAnswer::dispatch($echo->public_id);
+        } elseif ($url !== '' && $documentText === null) {
+            IngestCaptureLink::dispatch($echo->public_id);
         } else {
             ExtractThought::dispatch($echo->public_id);
         }

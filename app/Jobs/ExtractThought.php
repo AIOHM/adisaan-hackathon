@@ -30,9 +30,10 @@ class ExtractThought implements ShouldQueue
             return;
         }
         $result = $extractor->extract($text);
+        $meta = $echo->metadata ?? [];
         FounderThought::create([
             'echo_submission_id' => $echo->id,
-            'source_type' => ! empty($echo->metadata['media']) ? 'recording' : 'text',
+            'source_type' => ! empty($meta['link']['url']) ? 'link' : (! empty($meta['document']) ? 'document' : (! empty($meta['media']) ? 'recording' : 'text')),
             'question' => $result['question'],
             'answer' => $result['answer'],
             'why_valid' => $result['why_valid'],

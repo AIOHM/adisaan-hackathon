@@ -112,9 +112,11 @@ return [
 
     /*
      * Founder capture: Adrian's phone thoughts (Telegram today, WhatsApp
-     * later as a second driver) land as private founder echoes, get
-     * transcribed by the voice pipeline, then Muse distils one question,
-     * one answer and the why into a draft for human review.
+     * later as a second driver) land as private founder echoes — typed
+     * words, a recording, a text document, or one link (page read, video
+     * captions, or media downloaded for transcription) — then Muse
+     * distils one question, one answer and the why into a draft for
+     * human review.
      */
     'capture' => [
         // Shared secret the platform's Telegram forward must present.
