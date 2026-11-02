@@ -27,6 +27,16 @@ final class ThoughtExtractionTest extends TestCase
         $this->assertSame('What is the best way I imagine to compound fastest?', $parsed['question']);
     }
 
+    public function test_instructions_make_the_answer_lead_with_the_speakers_rule(): void
+    {
+        // The founder corrected a draft that retold the source's stories:
+        // the answer must be the stance, stories compressed to evidence.
+        $this->assertStringContainsString('the one rule or stance the speaker actually lives by', ThoughtExtractor::INSTRUCTIONS);
+        $this->assertStringContainsString('compress each to a clause, never retell them', ThoughtExtractor::INSTRUCTIONS);
+        $this->assertStringContainsString('any human can read it and feel it is also about them', ThoughtExtractor::INSTRUCTIONS);
+        $this->assertSame('thought-v3-tbwim', ThoughtExtractor::PROMPT_VERSION);
+    }
+
     public function test_parse_rejects_a_question_outside_the_tbwim_frame(): void
     {
         $parsed = app(ThoughtExtractor::class)->parse(json_encode([

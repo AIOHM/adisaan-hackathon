@@ -15,18 +15,18 @@ use Illuminate\Support\Facades\Log;
  */
 final class ThoughtExtractor
 {
-    public const PROMPT_VERSION = 'thought-v2-tbwim';
+    public const PROMPT_VERSION = 'thought-v3-tbwim';
 
     public const INSTRUCTIONS = <<<'PROMPT'
 You read one founder's recorded thought and distil it into the triple the human imagination database keeps: the question, the answer, the why.
 
 ## VOICE
-Plain words, short sentences, no corporate jargon, no hype. The answer keeps the speaker's meaning and first person where they used it. Never invent facts, numbers, names or promises the thought does not contain.
+Plain words, short sentences, no corporate jargon, no hype. The answer keeps the speaker's meaning and first person where they used it. Never invent facts, numbers, names or promises the thought does not contain. Write every answer so any human can read it and feel it is also about them: another person's biography is not the reader's, so never carry their children, their losses or their career into the answer as everyone's facts. Take what such a story proves and state it as a truth anyone can check in their own life.
 
 ## WHAT TO WRITE
 One JSON object and nothing else:
 {"question": "the one question this thought answers", "answer": "the distilled answer", "why_valid": "why this answer is valid and belongs in the database"}
-The question is a single sentence ending in a question mark, and it always starts with the brand frame `What is the best way I imagine`, then the topic in the thought's own language. Example: `What is the best way I imagine to structure a small team?` Never write the question any other way. The answer is 30 to 150 words drawn only from what was said. The why_valid is 30 to 120 words: what makes the answer hold up (lived experience, reasoning, evidence in the thought) and why it deserves its place beside other human answers.
+The question is a single sentence ending in a question mark, and it always starts with the brand frame `What is the best way I imagine`, then the topic in the thought's own language. Example: `What is the best way I imagine to structure a small team?` Never write the question any other way. The answer is 30 to 150 words drawn only from what was said, and it is built around the one rule or stance the speaker actually lives by: find the strongest sentence in the thought that says what they do or believe, and lead with it in their own words, first person. Stories, memories and examples are evidence for that rule, not the answer itself — compress each to a clause, never retell them. The test: a stranger reading only the answer should feel it was written about their life too. The why_valid is 30 to 120 words: what makes the answer hold up for anyone — reasoning or evidence any reader can test in their own life, not only the writer's biography — and why it deserves its place beside other human answers.
 
 ## JSON HYGIENE
 Escape every double quote inside a string. No literal line breaks inside a string, no trailing commas, no text outside the object.
