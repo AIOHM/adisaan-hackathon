@@ -133,6 +133,9 @@ class CaptureController extends Controller
             ExtractThought::dispatch($echo->public_id);
         }
 
-        return response()->json(['ok' => true, 'receipt' => $echo->public_id], 201);
+        // The platform forwarder accepts only an exact 200 (its ok()
+        // check); a 201 made it report failure for captures that had
+        // in fact landed, and the founder sent them again.
+        return response()->json(['ok' => true, 'receipt' => $echo->public_id], 200);
     }
 }

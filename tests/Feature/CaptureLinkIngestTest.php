@@ -34,7 +34,7 @@ final class CaptureLinkIngestTest extends TestCase
     {
         $response = $this->postJson('/api/capture/thought', [
             'text' => 'https://example.com/some-talk', 'from_id' => '123', 'message_id' => '11',
-        ], $this->auth())->assertCreated();
+        ], $this->auth())->assertOk();
 
         $echo = EchoSubmission::query()->where('public_id', $response->json('receipt'))->firstOrFail();
         $this->assertSame('https://example.com/some-talk', $echo->metadata['link']['url']);
@@ -50,7 +50,7 @@ final class CaptureLinkIngestTest extends TestCase
         )]);
         $response = $this->postJson('/api/capture/thought', [
             'url' => 'https://example.com/start-small', 'from_id' => '123', 'message_id' => '12',
-        ], $this->auth())->assertCreated();
+        ], $this->auth())->assertOk();
 
         (new IngestCaptureLink((string) $response->json('receipt')))->handle(app(LinkIngestor::class));
 
@@ -66,7 +66,7 @@ final class CaptureLinkIngestTest extends TestCase
         Http::fake(['example.com/*' => Http::response('<html><body><p>tiny</p></body></html>')]);
         $response = $this->postJson('/api/capture/thought', [
             'url' => 'https://example.com/thin', 'from_id' => '123', 'message_id' => '13',
-        ], $this->auth())->assertCreated();
+        ], $this->auth())->assertOk();
 
         (new IngestCaptureLink((string) $response->json('receipt')))->handle(app(LinkIngestor::class));
 
@@ -141,7 +141,7 @@ final class CaptureLinkIngestTest extends TestCase
         $file = UploadedFile::fake()->createWithContent('idea.txt', str_repeat('Write the first version badly, then improve it in public. ', 4));
         $response = $this->post('/api/capture/thought', [
             'file' => $file, 'from_id' => '123', 'message_id' => '14',
-        ], $this->auth())->assertCreated();
+        ], $this->auth())->assertOk();
 
         $echo = EchoSubmission::query()->where('public_id', $response->json('receipt'))->firstOrFail();
         $this->assertSame('idea.txt', $echo->metadata['document']['name']);

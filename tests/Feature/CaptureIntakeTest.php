@@ -47,7 +47,7 @@ final class CaptureIntakeTest extends TestCase
             'from_id' => '123', 'message_id' => '42',
         ], $this->auth());
 
-        $response->assertCreated()->assertJsonPath('ok', true)->assertJsonStructure(['receipt']);
+        $response->assertOk()->assertJsonPath('ok', true)->assertJsonStructure(['receipt']);
         $echo = EchoSubmission::query()->where('public_id', $response->json('receipt'))->firstOrFail();
         $this->assertFalse($echo->consent_quote);
         $this->assertTrue((bool) ($echo->metadata['founder_capture'] ?? false));
@@ -58,7 +58,7 @@ final class CaptureIntakeTest extends TestCase
     public function test_repeated_delivery_returns_the_same_receipt(): void
     {
         $payload = ['text' => 'Say it once.', 'from_id' => '123', 'message_id' => '7'];
-        $first = $this->postJson('/api/capture/thought', $payload, $this->auth())->assertCreated();
+        $first = $this->postJson('/api/capture/thought', $payload, $this->auth())->assertOk();
         $second = $this->postJson('/api/capture/thought', $payload, $this->auth())->assertOk();
         $this->assertSame($first->json('receipt'), $second->json('receipt'));
         $this->assertSame(1, EchoSubmission::query()->count());
