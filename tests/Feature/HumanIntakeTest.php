@@ -17,9 +17,13 @@ final class HumanIntakeTest extends TestCase
 
     private function proof(): string
     {
-        Carbon::setTestNow(now()->subSeconds(10));
+        // Restore whatever the test had frozen rather than clearing it: a
+        // bare setTestNow() would drop a travelTo() and quietly put the test
+        // back on the wall clock.
+        $frozen = Carbon::getTestNow();
+        Carbon::setTestNow((($frozen ?? Carbon::now()))->copy()->subSeconds(10));
         $token = app(FormProofInspector::class)->issueToken('tbwim_answer');
-        Carbon::setTestNow();
+        Carbon::setTestNow($frozen);
 
         return $token;
     }
@@ -41,6 +45,12 @@ final class HumanIntakeTest extends TestCase
 
     public function test_missing_proof_and_honeypot_are_refused_and_links_are_quarantined(): void
     {
+        // The last assertion is about a question that has not opened yet, so
+        // it needs a fixed moment rather than the wall clock: it named
+        // know-when-to-stop, which opened on 2026-11-02 and turned the suite
+        // red by the calendar alone.
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+
         $this->postJson('/answer', ['body' => 'A real answer without the proof token.', 'episode_ref' => 'imagine-one-million-euro'])->assertStatus(422);
         $this->postJson('/answer', ['body' => 'A real answer with the honeypot filled.', 'episode_ref' => 'imagine-one-million-euro', '_answer_form_token' => $this->proof(), '_website_url' => 'x'])->assertStatus(422);
         $this->postJson('/answer', ['body' => 'see https://a.example and https://b.example now', 'episode_ref' => 'imagine-one-million-euro', '_answer_form_token' => $this->proof(), 'share_mode' => 'public'])->assertCreated();
