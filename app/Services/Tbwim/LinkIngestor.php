@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Tbwim;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Process;
+use Illuminate\Support\Str;
 
 /**
  * Turns a link the founder pastes into Telegram into distillable text.
@@ -18,6 +20,9 @@ final class LinkIngestor
     private const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
 
     private const MEDIA_EXT = ['mp3', 'm4a', 'wav', 'ogg', 'oga', 'mp4', 'webm', 'mov', 'm4v'];
+
+    /** @param ?callable(string): ?string $vttFetcher Test seam: video id in, raw VTT out (null = yt-dlp unavailable or failed). */
+    public function __construct(private $vttFetcher = null) {}
 
     /**
      * @return array{kind: 'text', title: string, text: string}|array{kind: 'media', media_url: string, media_ext: string}
@@ -103,6 +108,83 @@ final class LinkIngestor
     }
 
     private function youtubeTranscript(string $id): string
+    {
+        // YouTube now empties the unsigned caption endpoint for many
+        // videos, so a host with yt-dlp gets the subtitles through it
+        // first; the caption tracks stay as the fallback, and a video
+        // neither route can read fails in plain words.
+        $vtt = $this->vttFetcher !== null ? ($this->vttFetcher)($id) : $this->fetchVtt($id);
+        if ($vtt !== null) {
+            $text = $this->vttText($vtt);
+            if (mb_strlen($text) >= 80) {
+                return mb_substr($text, 0, 40000);
+            }
+        }
+
+        return $this->youtubeCaptionTracks($id);
+    }
+
+    /** Raw subtitle file from yt-dlp, or null when the host cannot get one. */
+    private function fetchVtt(string $id): ?string
+    {
+        if (! Process::run('command -v yt-dlp')->successful()) {
+            return null;
+        }
+        $dir = sys_get_temp_dir().'/tbwim-yt-'.Str::ulid();
+        if (! mkdir($dir, 0755, true)) {
+            return null;
+        }
+        try {
+            $cookies = (string) config('tbwim.capture.ytdlp_cookies', '');
+            $args = ['yt-dlp', '--skip-download', '--write-subs', '--write-auto-subs',
+                '--sub-langs', 'en.*', '--sub-format', 'vtt', '--no-playlist',
+                '-o', $dir.'/video.%(ext)s', 'https://www.youtube.com/watch?v='.$id];
+            if ($cookies !== '' && is_file($cookies)) {
+                $args = array_merge(['yt-dlp', '--cookies', $cookies], array_slice($args, 1));
+            }
+            $done = Process::timeout(150)->run($args);
+            if (! $done->successful()) {
+                return null;
+            }
+            $files = glob($dir.'/*.vtt') ?: [];
+            sort($files);
+            $chosen = null;
+            foreach ($files as $file) {
+                if (str_ends_with($file, '.en.vtt')) {
+                    $chosen = $file;
+                    break;
+                }
+            }
+            $chosen ??= $files[0] ?? null;
+
+            return $chosen !== null ? (string) file_get_contents($chosen) : null;
+        } finally {
+            foreach (glob($dir.'/*') ?: [] as $file) {
+                @unlink($file);
+            }
+            @rmdir($dir);
+        }
+    }
+
+    /** Clean subtitle text: no timing, no tags, no rolling repeats. */
+    private function vttText(string $vtt): string
+    {
+        $lines = [];
+        foreach (preg_split('/\R/', $vtt) ?: [] as $line) {
+            $line = trim(strip_tags($line));
+            if ($line === '' || $line === 'WEBVTT' || str_contains($line, '-->') || preg_match('/^(Kind|Language):/', $line) === 1) {
+                continue;
+            }
+            $line = trim(preg_replace('/\s+/u', ' ', html_entity_decode($line, ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?? '');
+            if ($line !== '' && end($lines) !== $line) {
+                $lines[] = $line;
+            }
+        }
+
+        return trim(implode(' ', $lines));
+    }
+
+    private function youtubeCaptionTracks(string $id): string
     {
         $html = $this->fetch('https://www.youtube.com/watch?v='.$id);
         $data = $this->playerResponse($html);

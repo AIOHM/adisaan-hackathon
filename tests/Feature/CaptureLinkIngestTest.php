@@ -103,10 +103,23 @@ final class CaptureLinkIngestTest extends TestCase
             'www.youtube.com/api/timedtext*' => Http::response($events),
         ]);
 
-        $result = app(LinkIngestor::class)->ingest('https://www.youtube.com/watch?v=abc123');
+        // No yt-dlp subtitles: the caption tracks must still be read.
+        $result = (new LinkIngestor(fn () => null))->ingest('https://www.youtube.com/watch?v=abc123');
 
         $this->assertSame('text', $result['kind']);
         $this->assertStringContainsString('start before they feel ready', $result['text']);
+    }
+
+    public function test_a_youtube_link_prefers_yt_dlp_subtitles_when_the_host_has_them(): void
+    {
+        Http::fake();
+        $vtt = "WEBVTT\nKind: captions\nLanguage: en\n\n00:00:01.000 --> 00:00:04.000\n<c>Readiness is not a prerequisite</c>\n\n00:00:04.000 --> 00:00:07.000\nReadiness is not a prerequisite\n\n00:00:07.000 --> 00:00:12.000\nfor action. It is a byproduct of starting small, in public, every week without waiting to feel prepared first.\n";
+        $result = (new LinkIngestor(fn () => $vtt))->ingest('https://youtu.be/abc123');
+
+        $this->assertSame('text', $result['kind']);
+        $this->assertStringContainsString('Readiness is not a prerequisite for action.', $result['text']);
+        $this->assertStringNotContainsString('-->', $result['text']);
+        Http::assertNothingSent();
     }
 
     public function test_media_links_are_handed_to_transcription_not_scraped(): void

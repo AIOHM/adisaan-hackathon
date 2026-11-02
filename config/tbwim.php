@@ -127,6 +127,10 @@ return [
             explode(',', (string) env('TELEGRAM_FOUNDER_IDS', ''))
         ))),
         'max_bytes' => 40 * 1024 * 1024,
+        // Optional yt-dlp cookies file for YouTube subtitles on hosts
+        // YouTube bot-checks. Absent = subtitles only where YouTube
+        // serves them unsigned; failures stay honest either way.
+        'ytdlp_cookies' => env('TBWIM_YTDLP_COOKIES', ''),
     ],
 
     /*
