@@ -29,6 +29,11 @@ final class NotifyPendingCommand extends Command
         $sent = 0;
         $answers = EchoSubmission::query()->humans()
             ->where('status', EchoSubmission::STATUS_RECEIVED)
+            // Founder captures have their own gate (thought approval) and
+            // are never human answers awaiting release, whatever matches.
+            ->where(function ($query): void {
+                $query->whereNull('metadata->founder_capture')->orWhere('metadata->founder_capture', false);
+            })
             ->whereNull('metadata->owner_notified_at')
             ->whereNull('metadata->decided_by')
             // Held by the doorkeeper stays silent. Unreviewed rows get a

@@ -171,6 +171,28 @@ final class OwnerAlertsTest extends TestCase
         $this->assertArrayNotHasKey('owner_notified_at', (array) $young->fresh()->metadata);
     }
 
+    public function test_founder_captures_are_never_announced_as_human_answers(): void
+    {
+        $this->ownerConfig();
+        Http::fake();
+        $now = now();
+        Carbon::setTestNow($now->copy()->subMinutes(40));
+        // A capture has its own gate (thought approval); the answer queue
+        // must stay silent about it even when everything else matches.
+        $capture = $this->humanAnswer([
+            'body' => 'Life is Short January 2016 Life is short, as everyone knows.',
+            'episode_ref' => 'founder-capture', 'prompt_text' => null,
+            'consent_quote' => false, 'reviewed_at' => now(),
+            'metadata' => ['respondent_type' => 'human', 'founder_capture' => true, 'link' => ['url' => 'https://paulgraham.com/vb.html', 'status' => 'read']],
+        ]);
+        $answer = $this->humanAnswer(['body' => 'A genuine answer that does need the owner.']);
+        Carbon::setTestNow();
+        $this->artisan('tbwim:notify-pending')->assertSuccessful();
+        Http::assertSentCount(1);
+        $this->assertArrayNotHasKey('owner_notified_at', (array) $capture->fresh()->metadata);
+        $this->assertNotNull($answer->fresh()->metadata['owner_notified_at']);
+    }
+
     public function test_decided_rows_are_never_pinged(): void
     {
         $this->ownerConfig();
