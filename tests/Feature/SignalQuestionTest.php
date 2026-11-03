@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Models\SignalQuestion;
 use App\Services\AdiSaan\LaunchSchedule;
 use App\Services\Tbwim\Questions;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -70,7 +71,7 @@ final class SignalQuestionTest extends TestCase
 
     public function test_the_drafter_runs_every_morning(): void
     {
-        $events = collect(app(\Illuminate\Console\Scheduling\Schedule::class)->events())
+        $events = collect(app(Schedule::class)->events())
             ->filter(fn ($event): bool => str_contains((string) $event->command, 'tbwim:signal-question'));
 
         $this->assertCount(1, $events);

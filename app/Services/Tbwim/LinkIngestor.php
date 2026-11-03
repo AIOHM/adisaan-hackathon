@@ -249,6 +249,7 @@ final class LinkIngestor
                 } elseif ($ch === '"') {
                     $inString = false;
                 }
+
                 continue;
             }
             if ($ch === '"') {

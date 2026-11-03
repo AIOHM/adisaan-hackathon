@@ -15,6 +15,7 @@ use App\Services\Tbwim\ThoughtExtractor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
@@ -175,14 +176,14 @@ final class CaptureLinkIngestTest extends TestCase
 
     public function test_pdf_words_are_extracted_when_the_host_can_read_them(): void
     {
-        if (! \Illuminate\Support\Facades\Process::run('command -v pdftotext')->successful()) {
+        if (! Process::run('command -v pdftotext')->successful()) {
             $this->markTestSkipped('pdftotext is not installed on this host.');
         }
         $words = 'Ship the small honest version first, then listen hard every single week.';
         $stream = "BT /F1 18 Tf 72 720 Td ({$words}) Tj ET";
         $pdf = "%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n"
             ."3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >> endobj\n"
-            ."4 0 obj << /Length ".strlen($stream)." >> stream\n{$stream}\nendstream endobj\n"
+            .'4 0 obj << /Length '.strlen($stream)." >> stream\n{$stream}\nendstream endobj\n"
             ."5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF";
         $path = tempnam(sys_get_temp_dir(), 'tbwim-pdf-').'.pdf';
         file_put_contents($path, $pdf);

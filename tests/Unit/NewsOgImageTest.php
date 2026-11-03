@@ -42,5 +42,4 @@ final class NewsOgImageTest extends TestCase
     {
         $this->assertNull($this->ogImage('<html><head><title>Plain</title></head></html>', 'https://example.test/story'));
     }
-
 }
