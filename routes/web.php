@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\AdiSaanSiteController;
 use App\Http\Controllers\CaptureController;
 use App\Http\Controllers\OwnerDecisionController;
+use App\Http\Controllers\OwnerDraftController;
 use App\Http\Controllers\TbwimController;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
@@ -47,8 +48,6 @@ Route::match(['get', 'post'], '/owner/answer/{submission}/{decision}', [OwnerDec
     ->middleware(['signed', 'throttle:30,1'])
     ->name('tbwim.owner.decide');
 
-
-
 /*
  * The movement's machine side: the agent contract, the dataset, the
  * spending ledger, the manifest. Unchanged.
@@ -70,3 +69,9 @@ Route::controller(TbwimController::class)->group(function (): void {
         Route::get('/.well-known/agent.json', 'agentManifest')->name('tbwim.agent.manifest');
     });
 });
+
+Route::get('/owner/pending', [OwnerDraftController::class, 'inbox'])
+    ->middleware(['signed', 'throttle:30,1'])->name('tbwim.owner.inbox');
+Route::match(['get', 'post'], '/owner/draft/{kind}/{id}/{decision}', [OwnerDraftController::class, 'show'])
+    ->where('kind', 'thought|signal')->whereNumber('id')->where('decision', 'approve|reject')
+    ->withoutMiddleware([ValidateCsrfToken::class])->middleware(['signed', 'throttle:30,1'])->name('tbwim.owner.draft');

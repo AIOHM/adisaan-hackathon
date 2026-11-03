@@ -96,3 +96,11 @@ Multi-tenancy, the admin panel, workflow builder, connectors, social publishing,
 ## Licence
 
 AGPL-3.0. Run it, change it, host it; if you host a changed version, publish your changes.
+
+## Owner decisions from Telegram
+
+New human-answer alerts retain their Release/Reject links. Distilled thought drafts and news-question drafts now carry Approve/Reject links too. Each link opens a private confirmation page; only pressing its confirmation button changes data. Approving a thought makes it eligible for the public dataset. Approving a news question schedules it for tomorrow in Europe/Bucharest, calculated at confirmation time.
+
+Every new owner alert includes **Review pending items**, a private list of human answers, thought drafts and future-question drafts. Agent answers are excluded and continue through automatic model review. This is a link opened from Telegram, not a new bot slash command; the shared platform webhook is unchanged. Signed links expire after seven days: use a newer alert for a fresh inbox link. Treat these links as private owner credentials.
+
+These controls require deployment before they appear in production. No database migration or new secret is required.

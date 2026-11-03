@@ -8,6 +8,8 @@ use App\Jobs\NotifyOwnerOfAnswer;
 use App\Jobs\NotifyOwnerOfLead;
 use App\Jobs\ReviewHumanAnswer;
 use App\Models\EchoSubmission;
+use App\Models\FounderThought;
+use App\Models\SignalQuestion;
 use App\Services\Tbwim\OwnerAlerts;
 use App\Support\FormProofInspector;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -207,5 +209,41 @@ final class OwnerAlertsTest extends TestCase
         $this->artisan('tbwim:notify-pending')->assertSuccessful();
         Http::assertNothingSent();
         $this->assertArrayNotHasKey('owner_notified_at', (array) $old->fresh()->metadata);
+    }
+
+    public function test_draft_links_confirm_then_decide_and_expire(): void
+    {
+        $alerts = app(OwnerAlerts::class);
+        $thought = FounderThought::create(['echo_submission_id' => $this->humanAnswer()->id, 'source_type' => 'text', 'question' => 'What is the best way I imagine to begin?', 'answer' => 'Begin small.', 'why_valid' => 'It is repeatable.', 'status' => 'draft']);
+        $url = $alerts->draftUrl('thought', $thought->id, 'approve');
+        $this->get($url)->assertOk()->assertSee('Begin small.');
+        $this->assertSame('draft', $thought->fresh()->status);
+        $this->post($url)->assertOk()->assertSee('Approved for the public dataset.');
+        $this->assertSame('approved', $thought->fresh()->status);
+        $this->post($alerts->draftUrl('thought', $thought->id, 'reject'))->assertOk()->assertSee('Already decided');
+        $this->assertSame('approved', $thought->fresh()->status);
+        $this->get($url.'tampered')->assertForbidden();
+        $this->get('/owner/pending')->assertForbidden();
+        $this->travel(8)->days();
+        $this->post($url)->assertForbidden();
+        $this->travelBack();
+    }
+
+    public function test_signal_buttons_schedule_and_inbox_excludes_agents(): void
+    {
+        $this->ownerConfig();
+        Http::fake();
+        $alerts = app(OwnerAlerts::class);
+        $row = SignalQuestion::create(['question' => 'What is the best way I imagine to begin?', 'why' => 'A reason.', 'signal_title' => 'News', 'signal_url' => 'https://example.com', 'signal_source' => 'Example', 'brief_script' => 'A brief.', 'status' => 'draft']);
+        $alerts->notifySignalDraft($row);
+        Http::assertSent(fn ($request) => isset($request['reply_markup']['inline_keyboard'][0][0]['url']) && ! str_contains($request['text'], 'php artisan'));
+        $this->humanAnswer(['body' => 'AGENT_SHOULD_NOT_APPEAR', 'metadata' => ['respondent_type' => 'agent']]);
+        $this->get($alerts->inboxUrl())->assertOk()->assertSee('Review approval')->assertDontSee('AGENT_SHOULD_NOT_APPEAR');
+        $url = $alerts->draftUrl('signal', $row->id, 'approve');
+        $this->get($url)->assertOk();
+        $this->assertSame('draft', $row->fresh()->status);
+        $this->post($url)->assertOk();
+        $this->assertSame('approved', $row->fresh()->status);
+        $this->assertSame(now('Europe/Bucharest')->addDay()->toDateString(), $row->fresh()->scheduled_for->toDateString());
     }
 }

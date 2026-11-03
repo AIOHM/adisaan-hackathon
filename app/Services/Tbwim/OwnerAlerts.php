@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Tbwim;
 
 use App\Models\EchoSubmission;
+use App\Models\FounderThought;
 use App\Models\SignalQuestion;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -71,9 +72,28 @@ final class OwnerAlerts
             'From: '.trim($row->signal_source.' · '.$row->signal_title),
             $row->signal_url,
             '',
-            'Approve: php artisan tbwim:signal-approve '.$row->id,
-            'Reject: php artisan tbwim:signal-approve '.$row->id.' --reject',
-        ]), []);
+        ]), $this->draftButtons('signal', $row->id));
+    }
+
+    public function draftUrl(string $kind, int $id, string $decision): string
+    {
+        return URL::temporarySignedRoute('tbwim.owner.draft', now()->addDays(7), compact('kind', 'id', 'decision'));
+    }
+
+    public function inboxUrl(): string
+    {
+        return URL::temporarySignedRoute('tbwim.owner.inbox', now()->addDays(7));
+    }
+
+    public function draftButtons(string $kind, int $id): array
+    {
+        return [[['text' => 'Approve', 'url' => $this->draftUrl($kind, $id, 'approve')],
+            ['text' => 'Reject', 'url' => $this->draftUrl($kind, $id, 'reject')]]];
+    }
+
+    public function notifyThought(FounderThought $thought): bool
+    {
+        return $this->send("Thought draft #{$thought->id}\n\n{$thought->question}\n\n".Str::limit($thought->answer, 1000)."\n\nWhy: ".Str::limit($thought->why_valid, 500), $this->draftButtons('thought', $thought->id));
     }
 
     public function notifyLead(string $email, string $source): bool
@@ -92,6 +112,7 @@ final class OwnerAlerts
         if (! $this->configured()) {
             return false;
         }
+        $keyboard[] = [['text' => 'Review pending items', 'url' => $this->inboxUrl()]];
         $payload = [
             'chat_id' => trim((string) config('tbwim.owner_alerts.chat_id', '')),
             'text' => $text,

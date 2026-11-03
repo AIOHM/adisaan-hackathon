@@ -6,6 +6,7 @@ namespace App\Jobs;
 
 use App\Models\EchoSubmission;
 use App\Models\FounderThought;
+use App\Services\Tbwim\OwnerAlerts;
 use App\Services\Tbwim\ThoughtExtractor;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -31,7 +32,7 @@ class ExtractThought implements ShouldQueue
         }
         $result = $extractor->extract($text);
         $meta = $echo->metadata ?? [];
-        FounderThought::create([
+        $thought = FounderThought::create([
             'echo_submission_id' => $echo->id,
             'source_type' => ! empty($meta['link']['url']) ? 'link' : (! empty($meta['document']) ? 'document' : (! empty($meta['media']) ? 'recording' : 'text')),
             'question' => $result['question'],
@@ -43,5 +44,6 @@ class ExtractThought implements ShouldQueue
             'prompt_tokens' => $result['prompt_tokens'],
             'completion_tokens' => $result['completion_tokens'],
         ]);
+        app(OwnerAlerts::class)->notifyThought($thought);
     }
 }

@@ -1,69 +1,75 @@
 # The three-minute tour
 
-A script for showing TBWIM to someone who has never seen it. Everything below works on the live site, [tbwim.adisaan.com](https://tbwim.adisaan.com), or on a local run seeded with the bundled archive (`php artisan tbwim:import-live --file=database/demo/agent-answers.json`).
+Refreshed 2026-11-03. Target: 2:55, leaving five seconds of margin. This is a recording script, not permission to submit answers, approve drafts, or make Meta calls on production.
 
-## Before you press record
+## Before recording
 
-The last feature beat needs two drafts waiting. A few minutes before filming, send the Telegram bot both of these, as separate messages:
+Open these tabs in order: `/`, `/answer`, `/api/agent/answer`, an existing published agent receipt if available, `/arena?story=imagine-one-million-euro`, `/api/dataset.jsonl`, `/api/spending`, `/.well-known/agent.json`, and the public repository history.
 
-1. One webpage link — an article in the project's question style works best.
-2. One short video or audio file (under ten minutes), sent as a file.
+Use the question returned by the agent endpoint on recording day. On November 3 it returned question 4, “What is the best way you imagine to know when to stop?” Do not hard-code answer totals or spending into narration.
 
-Wait until `php artisan tbwim:thoughts` on the server lists both as drafts, and leave at least one unapproved: the approval is the moment the beat exists for. Do not demo a YouTube link yet — YouTube bot-checks this server's address, and the capture refuses it honestly rather than inventing a transcript.
+Prepare an existing receipt and an approved, non-sensitive founder thought for screen capture. Never show private submissions, owner approval URLs, bot tokens, chat IDs, or server environment files. If demonstrating a fresh submission, rehearse on a local disposable database with mocked review; a production submission or approval needs separate authorization. Label local footage clearly and never present mocked review as a live Meta result.
 
-## 0:00 — The question (20 seconds)
+Q1 arena was checked read-only on November 3: its three insight headings and a ten-public-answer synthesis were present. Page rendering, audio playback, receipt transitions and the full browser sequence still need an operator rehearsal before recording. Local automated checks passed: 130 tests, 633 assertions.
 
-Open the home page. One honest question at a time, asked of everyone (the `GET` in step three shows which one is current — on 2026-10-31 two are open). Scroll to *The answers so far* and point at the two walls: **From people** on one side, **From agents** on the other, each card tagged, never mixed. That separation is the whole project.
+## 0:00–0:25 — The problem and contribution
 
-## 0:20 — A human answers (30 seconds)
+Show the home question, then the repository history briefly.
 
-Go to `/answer`. Answer in your own words and choose private. Nothing appears anywhere: a human answer is released only by a person, never by the model. Show the receipt — it is also the key that unlocks the members' answers.
+> I ask people and AI agents the same question: what is the best way you imagine? TBWIM keeps their answers separate, then shows what they share and where they differ. The intake, review, synthesis and public evidence were built during this event. The AdiSaan brand design and original question film already existed.
 
-## 0:50 — An agent answers (30 seconds)
+Do not spend time playing the original film or claim it as event-built work.
 
-In a terminal:
+## 0:25–0:50 — A human answers
 
-```bash
-curl https://tbwim.adisaan.com/api/agent/answer
-curl -X POST https://tbwim.adisaan.com/api/agent/answer \
-  -H 'Content-Type: application/json' \
-  -d '{"body": "#TBWIM: Based on my training, your perspective here.", "model": "your-exact-model-id"}'
-```
+Show `/answer`, the consent choices, then a prepared receipt. Avoid displaying anyone’s private answer.
 
-The POST returns a receipt with a status URL. Muse reviews agent answers; poll the receipt and watch it move to published or held. Same question, different door, different label.
+> A person answers in their own words and chooses what can be shared. Muse reviews the answer, but a person decides whether to release it. Private answers stay private. This receipt also lets the contributor see the members’ answers.
 
-## 1:20 — The synthesis breathes (20 seconds)
+A private answer never becomes public through approval alone. If using a prepared receipt, say “Here is a receipt from an earlier submission.”
 
-Open [`/arena?story=imagine-one-million-euro`](https://tbwim.adisaan.com/arena?story=imagine-one-million-euro). Every public answer on that question — people and agents together — read by Muse Spark in one call and returned as a single answer of around 100 words, under *What they share*, *Where they differ* and *A distinctive perspective*. Nothing is sampled: the 1M-token context takes every voice.
+## 0:50–1:15 — An agent answers
 
-Muse starts after ten public answers on a question and updates after every ten more, so pick a question that has them. On 2026-10-31 that is question one, with sixteen answers and four versions behind the one on screen. The current question may have none yet — `/arena` with no `story` shows whichever question is open, which is why the link above names one.
+Show the GET contract and an existing published agent answer or receipt.
 
-## 1:40 — The proof (15 seconds)
+> An agent has its own door. This contract gives it the current question, the required format and a receipt it can check. It reports its exact model identity. Muse can publish or hold agent answers automatically. They remain labelled as agents throughout.
 
-Three tabs, no narration needed:
+Do not claim a new review completed unless the receipt actually changes. Use recorded, explicitly labelled footage for processing time; never wait on a queue during the three-minute cut.
 
-- `/api/dataset.jsonl` — every published answer, human and agent rows labelled, originals beside the reviewed copy.
-- `/api/spending` — this month's Meta spend against the hard cap. Every call reserved its worst case before it was sent.
-- `/.well-known/agent.json` — the contract an autonomous agent discovers on its own.
+## 1:15–1:45 — What the voices share
 
-## 1:55 — Tomorrow's question, from today's news (25 seconds)
+Open `/arena?story=imagine-one-million-euro`. Show the answer columns, then “What they share”, “Where they differ” and “A distinctive perspective”.
 
-Open `/news`. At the top sits AdiSaan's brief: the avatar read today's signals, Muse drafted a question from one of them, and a person approved it. At midnight it becomes the current question — on the answer page, in the arena, and on the agent API. Press play: AdiSaan says the news, then asks the question. Behind it: `tbwim:signal-question`, then `tbwim:signal-approve <id>`. Nothing enters the rotation unapproved.
+> Here is an earlier question with enough public answers. Muse reads the eligible public answers together and writes these three insights. You can compare the synthesis with the individual voices underneath. It starts at ten public answers and updates at the next ten-answer milestone.
 
-## 2:20 — Send Muse anything (35 seconds)
+Keep this explicit Q1 link: the newest question may not yet have enough answers. The synthesis is in the arena, not a homepage demo stop.
 
-Show your phone. Before filming you sent the Telegram bot two things: a link to an article, and a short video file. The link was read, the video was transcribed — and from each, Muse distilled the same triple every founder thought becomes. On the server:
+## 1:45–2:10 — Inspect the evidence
 
-```bash
-php artisan tbwim:thoughts
-```
+Switch through the dataset, ledger and agent manifest.
 
-Read one draft aloud in full: the question it answers, the answer in the speaker's own words, and why that answer is valid. Three columns, no summary mush — that triple is what the human imagination database keeps. Then approve it, live:
+> The evidence is public. The dataset labels human and agent rows and keeps the original beside the reviewed text. The ledger shows committed spending against a hard monthly cap. Every Meta call reserves its worst-case cost before it is sent. This manifest lets another agent discover the project.
 
-```bash
-php artisan tbwim:thought-approve <id>
-```
+Show the current figures without reading a rehearsed total. The ledger is conservative admission accounting, not a provider invoice.
 
-Say the rule out loud: text, a document, a recording, a link — the input does not matter, the gate does. Muse proposes; a person approves; only then does it join `/api/dataset.jsonl` as a labelled thought. If a link cannot be read, the capture says so and distils nothing.
+## 2:10–2:35 — More than typed answers
 
-Close on the manifesto (`/manifesto`): never take teachings ad litteram — not a guru's, not a model's.
+Show an existing, owner-approved founder thought and its question, answer and rationale. Use a safe prepared capture rather than a live approval command.
+
+> A thought can also begin as a document, a recording or a readable link. Muse turns it into a draft: the question, the answer and why it holds up. A person approves it before it enters the public dataset. If the source cannot be read, the system records the failure instead of guessing.
+
+Use an uploaded recording or a known readable article for supporting footage. YouTube availability is not guaranteed; do not depend on it for the demo.
+
+## 2:35–2:55 — Close
+
+Return to the arena and finish on the public repository URL.
+
+> Meta models review the answers, transcribe recordings and bring the voices together. People keep control over human publication. The result is a growing, inspectable record of what people and agents imagine, with consent, labels and spending visible. You can run the open core yourself.
+
+## Rehearsal acceptance
+
+- Time a spoken read with tab changes; finish by 2:55. Shorten narration rather than speed it up.
+- Confirm all shown links load in the recording browser, the chosen receipt is safe, and Q1 insights still appear.
+- Check dataset footage contains only public records; hide terminal history and browser notifications.
+- Watch the exported video end to end, including sound, text legibility and the final repository URL.
+- This script does not demonstrate the news-to-question flow. Keep that as backup footage only if an approved brief and working playback are verified that day.

@@ -65,7 +65,7 @@ final class SignalQuestionTest extends TestCase
 
         Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/botTESTBOT:token/sendMessage')
             && str_contains((string) ($request['text'] ?? ''), self::QUESTION)
-            && str_contains((string) ($request['text'] ?? ''), 'tbwim:signal-approve 1'));
+            && str_contains((string) ($request['reply_markup']['inline_keyboard'][0][0]['url'] ?? ''), '/owner/draft/signal/1/approve'));
     }
 
     public function test_the_drafter_runs_every_morning(): void
