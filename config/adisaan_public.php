@@ -229,6 +229,7 @@ return [
             'answer_video' => '/question/answer-video/know-when-to-stop',
             'answer_why_video' => '/question/answer-video/know-when-to-stop?part=why',
             'answer_why_wait_seconds' => 10,
+            'answer_why_text' => 'When you send a prompt across the wire to a SaaS platform, the data has already left your possession—meaning you have to trust their logging practices, their legal team, and their security posture...',
             'duration_label' => '10 SEC',
             'badge' => 'QUESTION 03 · 10 SEC',
             // Rendered 2026-10-25. Transcript: "Starting is easy. Walking
