@@ -38,6 +38,13 @@ final class OwnerDraftController extends Controller
             $row = $model::query()->lockForUpdate()->findOrFail($id);
             if ($row->status !== 'draft') {
                 $message = 'Already decided: '.$row->status.'. Nothing changed.';
+            } elseif ($request->isMethod('post') && $decision === 'edit') {
+                $rules = ['question' => ['required', 'string', 'max:280', 'regex:/^What is the best way (?:I|you) imagine.+\?$/u']];
+                $rules += $kind === 'thought'
+                    ? ['answer' => ['required', 'string', 'max:6000'], 'why_valid' => ['required', 'string', 'max:6000']]
+                    : ['why' => ['required', 'string', 'max:6000'], 'brief_script' => ['required', 'string', 'max:12000']];
+                $row->fill($request->validate($rules))->save();
+                $message = 'Draft saved. It still needs your approval.';
             } elseif ($request->isMethod('post')) {
                 $args = ['id' => $id];
                 if ($decision === 'reject') {
@@ -53,7 +60,7 @@ final class OwnerDraftController extends Controller
             return $row;
         });
 
-        return response()->view('tbwim.owner-draft', compact('row', 'kind', 'decision', 'message'))
+        return response()->view('tbwim.owner-draft', compact('row', 'kind', 'decision', 'message') + ['alerts' => app(OwnerAlerts::class)])
             ->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer');
     }
 }

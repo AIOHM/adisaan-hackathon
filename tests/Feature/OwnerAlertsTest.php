@@ -246,4 +246,20 @@ final class OwnerAlertsTest extends TestCase
         $this->assertSame('approved', $row->fresh()->status);
         $this->assertSame(now('Europe/Bucharest')->addDay()->toDateString(), $row->fresh()->scheduled_for->toDateString());
     }
+
+    public function test_owner_can_edit_a_draft_without_publishing_or_changing_the_source(): void
+    {
+        $echo = $this->humanAnswer(['body' => 'Original source words.']);
+        $thought = FounderThought::create(['echo_submission_id' => $echo->id, 'source_type' => 'text', 'question' => 'What is the best way I imagine to begin?', 'answer' => 'Draft answer.', 'why_valid' => 'Draft why.', 'status' => 'draft']);
+        $alerts = app(OwnerAlerts::class);
+        $url = $alerts->draftUrl('thought', $thought->id, 'edit');
+        $this->get($url)->assertOk()->assertSee('Save draft');
+        $this->post($url, ['question' => 'What is the best way you imagine to begin?', 'answer' => 'My edited answer.', 'why_valid' => 'My edited why.'])->assertOk()->assertSee('still needs your approval');
+        $this->assertSame('draft', $thought->fresh()->status);
+        $this->assertSame('My edited answer.', $thought->fresh()->answer);
+        $this->assertSame('Original source words.', $echo->fresh()->body);
+        $this->post($alerts->draftUrl('thought', $thought->id, 'approve'))->assertOk();
+        $this->post($url, ['answer' => 'Overwrite'])->assertOk()->assertSee('Already decided');
+        $this->assertSame('My edited answer.', $thought->fresh()->answer);
+    }
 }

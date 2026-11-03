@@ -88,7 +88,8 @@ final class OwnerAlerts
     public function draftButtons(string $kind, int $id): array
     {
         return [[['text' => 'Approve', 'url' => $this->draftUrl($kind, $id, 'approve')],
-            ['text' => 'Reject', 'url' => $this->draftUrl($kind, $id, 'reject')]]];
+            ['text' => 'Reject', 'url' => $this->draftUrl($kind, $id, 'reject')]],
+            [['text' => 'Edit draft', 'url' => $this->draftUrl($kind, $id, 'edit')]]];
     }
 
     public function notifyThought(FounderThought $thought): bool

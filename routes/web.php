@@ -73,5 +73,5 @@ Route::controller(TbwimController::class)->group(function (): void {
 Route::get('/owner/pending', [OwnerDraftController::class, 'inbox'])
     ->middleware(['signed', 'throttle:30,1'])->name('tbwim.owner.inbox');
 Route::match(['get', 'post'], '/owner/draft/{kind}/{id}/{decision}', [OwnerDraftController::class, 'show'])
-    ->where('kind', 'thought|signal')->whereNumber('id')->where('decision', 'approve|reject')
+    ->where('kind', 'thought|signal')->whereNumber('id')->where('decision', 'approve|reject|edit')
     ->withoutMiddleware([ValidateCsrfToken::class])->middleware(['signed', 'throttle:30,1'])->name('tbwim.owner.draft');

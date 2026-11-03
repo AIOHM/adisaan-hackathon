@@ -25,7 +25,7 @@ button{flex:1;font-size:1rem;padding:.8rem;border:none;border-radius:.5rem;curso
 <p>This private link expires after seven days. Open a newer Telegram alert for a fresh link.</p>
 @foreach(['thought' => $thoughts, 'signal' => $signals] as $kind => $rows)
 <h2>{{ $kind === 'thought' ? 'Thoughts' : 'Future questions' }}</h2>
-@forelse($rows as $row)<p>{{ $row->question }}</p><p><a href="{{ $alerts->draftUrl($kind, $row->id, 'approve') }}">Review approval</a> · <a href="{{ $alerts->draftUrl($kind, $row->id, 'reject') }}">Review rejection</a></p>@empty<p>None waiting.</p>@endforelse
+@forelse($rows as $row)<p>{{ $row->question }}</p><p><a href="{{ $alerts->draftUrl($kind, $row->id, 'edit') }}">Edit draft</a> · <a href="{{ $alerts->draftUrl($kind, $row->id, 'approve') }}">Review approval</a> · <a href="{{ $alerts->draftUrl($kind, $row->id, 'reject') }}">Review rejection</a></p>@empty<p>None waiting.</p>@endforelse
 @endforeach
 <h2>Human answers</h2>
 @forelse($answers as $answer)<p>{{ $answer->body }}</p><p><a href="{{ $alerts->decideUrl($answer, 'approve') }}">Review release</a> · <a href="{{ $alerts->decideUrl($answer, 'reject') }}">Review rejection</a></p>@empty<p>None waiting.</p>@endforelse

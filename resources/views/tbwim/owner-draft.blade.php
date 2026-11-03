@@ -26,6 +26,16 @@ button{flex:1;font-size:1rem;padding:.8rem;border:none;border-radius:.5rem;curso
 @if($kind === 'thought')<blockquote>{{ $row->answer }}</blockquote><p>{{ $row->why_valid }}</p>
 @else<p>{{ $row->why }}</p><p>Source: {{ $row->signal_source }} · {{ $row->signal_title }}</p><blockquote>{{ $row->brief_script }}</blockquote>@endif
 @if($message)<p>{{ $message }}</p>
+@if($row->status === 'draft')<p><a href="{{ $alerts->draftUrl($kind, $row->id, 'approve') }}">Review approval</a> · <a href="{{ $alerts->draftUrl($kind, $row->id, 'edit') }}">Edit again</a></p>@endif
+@elseif($decision === 'edit')
+<p>Edit Muse's draft. Saving does not approve or publish it.</p>
+@if($errors->any())<p role="alert">{{ $errors->first() }}</p>@endif
+<form method="post" action="{{ request()->fullUrl() }}">
+@foreach(($kind === 'thought' ? ['question' => 'Question', 'answer' => 'Your proposed answer', 'why_valid' => 'Why'] : ['question' => 'Question', 'why' => 'Why this question', 'brief_script' => 'News briefing']) as $field => $label)
+<p><label for="{{ $field }}">{{ $label }}</label><br><textarea style="width:100%;min-height:7rem" id="{{ $field }}" name="{{ $field }}" required>{{ old($field, $row->$field) }}</textarea></p>
+@endforeach
+<button type="submit">Save draft</button>
+</form>
 @else
 <p>{{ $decision === 'reject' ? 'Reject this draft.' : ($kind === 'thought' ? 'Approve this thought for the public dataset.' : 'Schedule this question for tomorrow in Europe/Bucharest. The date is set when you confirm.') }}</p>
 <form method="post" action="{{ request()->fullUrl() }}"><button type="submit">{{ $decision === 'approve' ? 'Approve' : 'Reject' }}</button></form>
