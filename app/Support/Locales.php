@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
  * The site's languages.
  *
  * English is the source text and the fallback for everything. The other
- * nine are the top European/global set Adrian asked for (2026-11-03):
+ * ten are the European/global set Adrian asked for (2026-11-03):
  * Romanian first (the brand's home language), then Spanish, French,
- * German, Italian, Portuguese, Hungarian, Polish and Dutch.
+ * German, Italian, Portuguese, Hungarian, Polish, Czech and Dutch.
  *
  * Detection is browser-first, as chosen: an explicit choice always wins
  * over detection, and detection never lands on a language we do not have.
@@ -34,6 +34,7 @@ final class Locales
         'pt' => ['native' => 'Português', 'english' => 'Portuguese', 'date_format' => 'j M Y'],
         'hu' => ['native' => 'Magyar', 'english' => 'Hungarian', 'date_format' => 'Y. M j.'],
         'pl' => ['native' => 'Polski', 'english' => 'Polish', 'date_format' => 'j M Y'],
+        'cs' => ['native' => 'Čeština', 'english' => 'Czech', 'date_format' => 'j. n. Y'],
         'nl' => ['native' => 'Nederlands', 'english' => 'Dutch', 'date_format' => 'j M Y'],
     ];
 

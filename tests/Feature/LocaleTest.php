@@ -41,6 +41,15 @@ final class LocaleTest extends TestCase
             ->assertDontSee('01 Work', false);
     }
 
+    public function test_czech_browser_sees_czech_chrome(): void
+    {
+        $this->withHeaders(['Accept-Language' => 'cs-CZ'])
+            ->get('/arena')
+            ->assertOk()
+            ->assertSee('<html lang="cs">', false)
+            ->assertSee('<title>AdiSaan Spark Aréna</title>', false);
+    }
+
     public function test_spanish_browser_sees_spanish_chrome(): void
     {
         $this->withHeaders(['Accept-Language' => 'es-ES'])
