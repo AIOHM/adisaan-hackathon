@@ -619,6 +619,23 @@
       // one's src in place would show question one's film under question
       // two's title, so the frame falls back to its placeholder instead.
       const film = document.querySelector('[data-film]');
+      // The caption track belongs to the film on stage, not to the page:
+      // swap it with the picture, or question two would speak with
+      // question one's subtitles.
+      let trackEl = mainVideo.querySelector('track[data-stage-captions]');
+      if (d.epVideo && d.epCaptions) {
+        if (!trackEl) {
+          trackEl = document.createElement('track');
+          trackEl.kind = 'captions';
+          trackEl.srclang = 'en';
+          trackEl.label = 'English';
+          trackEl.dataset.stageCaptions = '';
+          mainVideo.appendChild(trackEl);
+        }
+        trackEl.src = d.epCaptions;
+      } else if (trackEl) {
+        trackEl.remove();
+      }
       if (d.epVideo) {
         film?.classList.remove('is-soon');
         if (d.epPoster) mainVideo.poster = d.epPoster;

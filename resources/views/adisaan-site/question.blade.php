@@ -49,7 +49,7 @@
                    data-episode="{{ $featuredStory['id'] ?? '' }}"
                    controls playsinline preload="metadata"
                    poster="{{ $featuredStory['poster'] ?? '/assets/adisaan/site/story-poster.jpg' }}"
-                   @if($featuredHasVideo) src="{{ $featuredStory['video'] }}" @endif>@if(!empty($featuredStory['captions']))<track kind="captions" src="{{ $featuredStory['captions'] }}" srclang="en" label="English">@endif Your browser does not support video playback.</video>
+                   @if($featuredHasVideo) src="{{ $featuredStory['video'] }}" @endif>@if(!empty($featuredStory['captions']))<track kind="captions" data-stage-captions src="{{ $featuredStory['captions'] }}" srclang="en" label="English">@endif Your browser does not support video playback.</video>
             <div class="question-film-soon__frame" data-film-soon>
                 <span class="question-film-soon__badge" data-stage-soon-badge>{{ $featuredStory['badge'] ?? 'QUESTION' }}</span>
                 @if($featuredFilmOpensAt)
@@ -84,10 +84,10 @@
              archive cards use, so there is one idea of "which question am I
              on" and not two that can disagree.
 
-             Only question one has a film and an answer today. The other nine
-             render their real state, which is that the answer is still being
-             made. The moment one is rendered, setting its story keys fills the
-             card in; nothing here needs changing. --}}
+             A card whose answer is not ready renders its real state, which
+             is that the answer is still being made. The moment one is
+             rendered, setting its story keys fills the card in; nothing
+             here needs changing. --}}
         <div class="question-page-v2__answer reveal">
             <p class="question-page-v2__label" data-stage-label>{{ $featuredHasVideo ? 'THE QUESTION' : 'YOUR TURN' }}</p>
             <div class="stage-box stage-box--quote">
@@ -112,13 +112,17 @@
                                 $slideRevealAt = !empty($story['answer_reveal_at'])
                                     ? \Illuminate\Support\Carbon::parse($story['answer_reveal_at'], 'Europe/Bucharest')
                                     : null;
-                                // Released by the schedule AND actually on disk. Either
-                                // alone would put a player in front of nothing.
+                                // Released by the schedule AND playable: a brand
+                                // stream URL, a local file, or tenant media on
+                                // disk. Anything less puts a player in front
+                                // of nothing.
                                 $slideReady = !empty($story['answer_released'])
                                     && !empty($story['answer_video'])
-                                    && (str_starts_with($story['answer_video'], '/assets/')
-                                        ? is_file(public_path(ltrim($story['answer_video'], '/')))
-                                        : \Illuminate\Support\Facades\Storage::disk('local')->exists('question-answer-media/'.config('adisaan_public.tenant').'/'.$story['id'].'.mp4'));
+                                    && (str_starts_with($story['answer_video'], 'http')
+                                        ? true
+                                        : (str_starts_with($story['answer_video'], '/assets/')
+                                            ? is_file(public_path(ltrim($story['answer_video'], '/')))
+                                            : \Illuminate\Support\Facades\Storage::disk('local')->exists('question-answer-media/'.config('adisaan_public.tenant').'/'.$story['id'].'.mp4')));
                                 $slideNo = str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT);
                             @endphp
                             <article class="qreel__slide" data-qreel-slide data-index="{{ $i }}" data-story-id="{{ $story['id'] }}"
@@ -246,6 +250,7 @@
                       data-ep-no="{{ str_pad((string) ($idx + 1), 2, '0', STR_PAD_LEFT) }}"
                       data-ep-video="{{ $ep['video'] ?? '' }}"
                       data-ep-poster="{{ $ep['poster'] ?? '' }}"
+                      data-ep-captions="{{ $ep['captions'] ?? '' }}"
                       data-ep-answer-url="{{ $ep['answer_url'] }}"></span>
             @endforeach
         </div>

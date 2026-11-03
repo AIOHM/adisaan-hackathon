@@ -201,12 +201,12 @@ return [
             'answer_video' => '/assets/adisaan/site/question-02-answer.mp4',
             'duration_label' => '10 SEC',
             'badge' => 'QUESTION 02 · 10 SEC',
-            // Rendered 2026-10-24. Captions are burned into the picture, so
-            // there is no sidecar track: a .vtt would have to be typed from
-            // the frames and would be a transcript nobody checked.
+            // Rendered 2026-10-24. Captions are burned into the picture;
+            // the sidecar track was transcribed from the film's own audio
+            // and checked, so screen readers and search get the words too.
             'video' => '/assets/adisaan/site/question-02-start-when-not-ready.mp4',
             'poster' => '/assets/adisaan/site/question-02-start-when-not-ready-poster.jpg',
-            'captions' => '',
+            'captions' => '/assets/adisaan/site/question-02-start-when-not-ready.vtt',
         ],
         [
             'id' => 'know-when-to-stop',
@@ -221,7 +221,11 @@ return [
             'question' => 'What is the best way you imagine to know when to stop?',
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
-            'question_release_at' => '2026-11-02T00:00:00+02:00',
+            'question_release_at' => '2026-11-03T00:00:00+02:00',
+            'answer_reveal_at' => '2026-11-04T00:00:00+02:00',
+            'answer_video' => '/question/answer-video/know-when-to-stop',
+            'answer_why_video' => '/question/answer-video/know-when-to-stop?part=why',
+            'answer_why_wait_seconds' => 10,
             'duration_label' => '10 SEC',
             'badge' => 'QUESTION 03 · 10 SEC',
             // Rendered 2026-10-25. Transcript: "Starting is easy. Walking
@@ -231,9 +235,9 @@ return [
             // says the answer is being made.
             'video' => '/assets/adisaan/site/question-03-know-when-to-stop.mp4',
             'poster' => '/assets/adisaan/site/question-03-know-when-to-stop-poster.jpg',
-            // No sidecar track: this clip carries no burned captions either,
-            // so a .vtt would have to be typed from the audio and checked.
-            'captions' => '',
+            // Sidecar track transcribed from the film's own audio; the
+            // words are the transcript quoted above.
+            'captions' => '/assets/adisaan/site/question-03-know-when-to-stop.vtt',
         ],
         [
             'id' => 'rest-without-guilt',

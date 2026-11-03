@@ -77,7 +77,7 @@ final class Questions
                     $q[$key] = $base.$q[$key];
                 }
             }
-            if (($local = $this->generatedPoster($q['id'])) !== null) {
+            if (empty($q['poster']) && ($local = $this->generatedPoster($q['id'])) !== null) {
                 $q['poster'] = $local;
             }
             $q['open'] = $this->schedule->questionReleased($s);
@@ -161,7 +161,7 @@ final class Questions
                     $q[$key] = $base.$q[$key];
                 }
             }
-            if (is_string($q['id'] ?? null) && ($local = $this->generatedPoster($q['id'])) !== null) {
+            if (empty($q['poster']) && is_string($q['id'] ?? null) && ($local = $this->generatedPoster($q['id'])) !== null) {
                 $q['poster'] = $local;
             }
             $at = $this->parse($q['opens_at'] ?? null);

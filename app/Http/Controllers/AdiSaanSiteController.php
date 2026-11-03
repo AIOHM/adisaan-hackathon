@@ -832,8 +832,20 @@ final class AdiSaanSiteController extends Controller
         }
 
         return array_map(function (array $story): array {
-            if (is_string($story['id'] ?? null) && ($local = $this->questions->generatedPoster($story['id'])) !== null) {
+            // A story's own poster wins; the generated one only fills a
+            // story that has none. (Question three's generated poster once
+            // hid its real brand poster behind this line.)
+            if (empty($story['poster']) && is_string($story['id'] ?? null) && ($local = $this->questions->generatedPoster($story['id'])) !== null) {
                 $story['poster'] = $local;
+            }
+            $story['answer_video'] = $this->resolveAnswerVideo($story);
+            $story['answer_why_video'] = $this->resolveAnswerVideo($story, 'answer_why_video');
+            foreach (['video', 'poster', 'captions'] as $key) {
+                $value = $story[$key] ?? null;
+                if (is_string($value) && str_starts_with($value, '/assets/')
+                    && ! is_file(public_path(ltrim((string) strtok($value, '?'), '/')))) {
+                    $story[$key] = rtrim((string) config('tbwim.media_base'), '/').$value;
+                }
             }
 
             return $story + [
@@ -845,6 +857,28 @@ final class AdiSaanSiteController extends Controller
                 'answer_opens_at' => $this->schedule->answerOpensAt($story)?->toIso8601String(),
             ];
         }, $this->schedule->visibleQuestions($configStories));
+    }
+
+    /**
+     * The answer film canonically lives on the brand host as a stream
+     * (/question/answer-video/{story}); a local file copy wins when this
+     * install carries one. Anything else is returned untouched.
+     */
+    private function resolveAnswerVideo(array $story, string $key = 'answer_video'): mixed
+    {
+        $video = $story[$key] ?? null;
+        if (! is_string($video) || $video === '') {
+            return $video;
+        }
+        $base = rtrim((string) config('tbwim.media_base'), '/');
+        if (str_starts_with($video, '/question/answer-video/')) {
+            return $base.$video;
+        }
+        if (str_starts_with($video, '/assets/') && ! is_file(public_path(ltrim($video, '/')))) {
+            return $base.'/question/answer-video/'.($story['id'] ?? '');
+        }
+
+        return $video;
     }
 
     private function currentEpisode(array $stories, ?string $ref, string $lang = 'en'): array
