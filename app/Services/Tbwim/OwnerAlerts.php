@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Tbwim;
 
 use App\Models\EchoSubmission;
+use App\Models\SignalQuestion;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
@@ -12,7 +13,8 @@ use Illuminate\Support\Str;
 
 /**
  * One-way Telegram pings to the owner: a human answer to review (with
- * signed release/reject links), or a new join-lead email. Sending only:
+ * signed release/reject links), a new join-lead email, or a signal
+ * draft waiting for its approve/reject decision. Sending only:
  * the shared platform bot's webhook belongs to the platform, so the
  * links below carry the decisions instead of callback buttons. False
  * when unconfigured or on transport failure; never throws.
@@ -56,6 +58,22 @@ final class OwnerAlerts
             [['text' => '✅ Release', 'url' => $this->decideUrl($echo, 'approve')],
                 ['text' => '⛔ Reject', 'url' => $this->decideUrl($echo, 'reject')]],
         ]);
+    }
+
+    public function notifySignalDraft(SignalQuestion $row): bool
+    {
+        return $this->send(implode("\n", [
+            'New signal draft #'.$row->id.' — a question is waiting for your decision',
+            '',
+            $row->question,
+            '',
+            'Why this one: '.Str::limit(trim((string) $row->why), 300),
+            'From: '.trim($row->signal_source.' · '.$row->signal_title),
+            $row->signal_url,
+            '',
+            'Approve: php artisan tbwim:signal-approve '.$row->id,
+            'Reject: php artisan tbwim:signal-approve '.$row->id.' --reject',
+        ]), []);
     }
 
     public function notifyLead(string $email, string $source): bool

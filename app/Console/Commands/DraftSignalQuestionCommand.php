@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\SignalQuestion;
 use App\Services\Tbwim\NewsReader;
+use App\Services\Tbwim\OwnerAlerts;
 use App\Services\Tbwim\SignalQuestionDrafter;
 use Illuminate\Console\Command;
 
@@ -15,8 +16,17 @@ final class DraftSignalQuestionCommand extends Command
 
     protected $description = "Draft tomorrow's question from today's news signals (Muse; a person still approves)";
 
-    public function handle(NewsReader $reader, SignalQuestionDrafter $drafter): int
+    public function handle(NewsReader $reader, SignalQuestionDrafter $drafter, OwnerAlerts $alerts): int
     {
+        // One undecided draft at a time: a daily run must never bury the
+        // founder under questions he has not judged yet.
+        $pending = SignalQuestion::query()->drafts()->first();
+        if ($pending) {
+            $this->info("Draft #{$pending->id} is still waiting for a decision; nothing new drafted.");
+
+            return self::SUCCESS;
+        }
+
         $signals = array_slice($reader->signals(), 0, max(1, (int) $this->option('signals')));
         if ($signals === []) {
             $this->error('No published signals right now; nothing to draft from.');
@@ -51,6 +61,9 @@ final class DraftSignalQuestionCommand extends Command
         $this->info("Draft #{$row->id} from [{$row->signal_source}] {$row->signal_title}");
         $this->line('Question: '.$row->question);
         $this->line('Approve: php artisan tbwim:signal-approve '.$row->id.' (or --reject)');
+        if ($alerts->notifySignalDraft($row)) {
+            $this->line('The owner has the draft on Telegram.');
+        }
 
         return self::SUCCESS;
     }

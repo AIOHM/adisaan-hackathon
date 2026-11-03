@@ -51,7 +51,7 @@ php artisan tbwim:battle-round           # ask the Meta models the current quest
 php artisan tbwim:transcribe-pending    # transcribe recordings that still wait for text
 php artisan tbwim:poster --all          # generate missing question posters
 php artisan tbwim:thoughts              # distilled founder drafts waiting for a person
-php artisan tbwim:signal-question       # draft tomorrow's question from today's news (Muse)
+php artisan tbwim:signal-question       # draft tomorrow's question from today's news (Muse; runs daily at 06:10 Bucharest, one waiting draft at a time, owner pinged on Telegram)
 php artisan tbwim:signal-questions      # signal-question drafts waiting for a person
 php artisan tbwim:signal-approve <id>   # approve one as tomorrow's question (or --reject)
 php artisan tbwim:thought-approve <id>  # approve one (or --reject)

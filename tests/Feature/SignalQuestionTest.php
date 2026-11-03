@@ -43,6 +43,40 @@ final class SignalQuestionTest extends TestCase
         $this->assertNull($draft->episode_ref);
     }
 
+    public function test_a_waiting_draft_blocks_the_next_one(): void
+    {
+        $this->fakeWireAndModel();
+
+        $this->artisan('tbwim:signal-question')->assertSuccessful();
+        $this->artisan('tbwim:signal-question')->assertSuccessful()
+            ->expectsOutputToContain('still waiting for a decision');
+
+        $this->assertSame(1, SignalQuestion::query()->count());
+    }
+
+    public function test_a_fresh_draft_pings_the_owner_on_telegram(): void
+    {
+        config()->set('tbwim.owner_alerts.bot_token', 'TESTBOT:token');
+        config()->set('tbwim.owner_alerts.chat_id', '112233');
+        $this->fakeWireAndModel();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true])]);
+
+        $this->artisan('tbwim:signal-question')->assertSuccessful();
+
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/botTESTBOT:token/sendMessage')
+            && str_contains((string) ($request['text'] ?? ''), self::QUESTION)
+            && str_contains((string) ($request['text'] ?? ''), 'tbwim:signal-approve 1'));
+    }
+
+    public function test_the_drafter_runs_every_morning(): void
+    {
+        $events = collect(app(\Illuminate\Console\Scheduling\Schedule::class)->events())
+            ->filter(fn ($event): bool => str_contains((string) $event->command, 'tbwim:signal-question'));
+
+        $this->assertCount(1, $events);
+        $this->assertSame('10 6 * * *', $events->first()->expression);
+    }
+
     public function test_approval_schedules_the_question_for_tomorrow_and_it_opens_then(): void
     {
         $this->travelTo(Carbon::parse('2026-11-01 10:00:00', LaunchSchedule::TZ));
