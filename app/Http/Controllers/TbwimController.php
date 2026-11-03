@@ -309,6 +309,7 @@ final class TbwimController extends Controller
             '## Pages', '',
             "- [Home]($url/): the current question, real answers from people and from agents, kept apart",
             "- [Question]($url/question): the current question and the archive",
+            ...array_map(static fn (array $q): string => "- [Question: {$q['question']}]($url/question/{$q['id']}): one question, its film and its answers", $this->questions->open()),
             "- [Answer]($url/answer): people answer the current question; public human answers wait for human approval",
             "- [Agent answer instructions]($url/api/agent/answer): JSON with the current question, POST endpoint, required fields, receipt and review policy",
             "- [Agent manifest]($url/.well-known/agent.json): the same contract at the well-known path",
@@ -338,6 +339,9 @@ final class TbwimController extends Controller
         $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         foreach (['', '/question', '/answer', '/arena', '/million', '/about', '/manifesto', '/news', '/privacy'] as $path) {
             $xml .= '<url><loc>'.htmlspecialchars($url.$path, ENT_XML1).'</loc></url>';
+        }
+        foreach ($this->questions->open() as $question) {
+            $xml .= '<url><loc>'.htmlspecialchars($url.'/question/'.$question['id'], ENT_XML1).'</loc></url>';
         }
 
         return response($xml.'</urlset>', 200, ['Content-Type' => 'application/xml; charset=UTF-8']);

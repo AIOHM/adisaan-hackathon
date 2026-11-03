@@ -23,6 +23,9 @@ Route::controller(AdiSaanSiteController::class)->group(function (): void {
     Route::get('/about', 'home')->name('adisaan.public.about');
     Route::post('/', 'lead')->middleware('throttle:30,1')->name('adisaan.public.construction.lead');
     Route::get('/question', 'question')->name('adisaan.public.question');
+    // One shareable, indexable address per question: /question/{slug}.
+    // The hub above keeps serving the featured question; a slug names one.
+    Route::get('/question/{story}', 'question')->where('story', '[a-z0-9]+(?:-[a-z0-9]+)*')->name('adisaan.public.question.story');
     Route::redirect('/questions', '/question', 301);
     Route::get('/answer', 'answer')->name('adisaan.public.answer');
     Route::post('/answer', 'storeAnswer')->middleware('throttle:20,1')->name('adisaan.public.answer.store');

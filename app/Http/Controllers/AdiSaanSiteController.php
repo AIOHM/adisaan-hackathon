@@ -120,13 +120,36 @@ final class AdiSaanSiteController extends Controller
         ]);
     }
 
-    public function question(Request $request, SpamGuard $guard): View
+    public function question(Request $request, SpamGuard $guard, ?string $story = null): View
     {
         $visitorId = $this->visitors->existing($request);
         $answered = $visitorId && $this->ledger->enabled() ? $this->ledger->answeredQuestions($visitorId) : [];
 
         $shared = $this->shared('question');
         $arena = $this->loadArena($shared['stories']);
+
+        // /question/{slug}: the named question leads the page and the reel
+        // starts on it. An unknown or unpublished slug is a 404, never a
+        // silent swap to another question — the address must mean the words.
+        $published = array_values(array_filter(
+            $shared['stories'],
+            static fn (array $item): bool => ($item['question_published'] ?? false) === true,
+        ));
+        $featured = $published[0] ?? null;
+        $featuredIndex = 0;
+        if ($story !== null) {
+            $featured = null;
+            foreach ($published as $index => $item) {
+                if (($item['id'] ?? null) === $story) {
+                    $featured = $item;
+                    $featuredIndex = $index;
+                    break;
+                }
+            }
+            if ($featured === null) {
+                abort(404);
+            }
+        }
 
         return view('adisaan-site.question', $shared + [
             'livingMap' => $this->loadLivingMap(),
@@ -135,7 +158,9 @@ final class AdiSaanSiteController extends Controller
             'questionCounts' => collect($arena['questions'] ?? [])->keyBy('ref')->all(),
             'answersTotal' => (int) ($arena['total'] ?? 0),
             'answerGoal' => (int) config('adisaan_public.answer_goal', 1000000),
-            'canonicalPath' => '/question',
+            'canonicalPath' => $story !== null ? '/question/'.$story : '/question',
+            'featuredStory' => $featured,
+            'featuredIndex' => $featuredIndex,
             'form' => $this->formData($guard, null),
         ]);
     }

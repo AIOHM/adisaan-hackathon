@@ -1,6 +1,11 @@
 @extends('adisaan-site.layout')
-@section('title', __('site.ui.question_title'))
-@section('description', __('site.ui.question_description'))
+@php
+    // Per-question SEO: a slug page names its question in the title and
+    // description; the hub keeps the generic ones.
+    $seoQuestion = $featuredStory['lead'] ?? $featuredStory['question'] ?? null;
+@endphp
+@section('title', $seoQuestion ? $seoQuestion.' — AdiSaan' : __('site.ui.question_title'))
+@section('description', $featuredStory['description'] ?? __('site.ui.question_description'))
 @push('styles')
 <link rel="stylesheet" href="/assets/adisaan/site/question-answer-countdown.css?v=20261103-why-after-video">
 @endpush
@@ -9,7 +14,7 @@
     // Only released questions belong in the public archive. Future releases
     // opt in through tenant story settings; the filler follows grid parity.
     $publishedStories = array_values(array_filter($stories, static fn (array $story): bool => ($story['question_published'] ?? false) === true));
-    $featuredStory = $publishedStories[0] ?? config('adisaan_public.story');
+    $featuredStory = $featuredStory ?? $publishedStories[0] ?? config('adisaan_public.story');
     // Released, not merely rendered. A film can be on disk for a week
     // before its morning; until then the frame counts down to it.
     $featuredHasVideo = !empty($featuredStory['film_released']);
@@ -100,7 +105,7 @@
             </div>
             <p data-stage-invite>{{ $featuredHasVideo ? __('site.ui.invite_film') : __('site.ui.invite_no_film') }}</p>
 
-            <div class="qreel" data-qreel>
+            <div class="qreel" data-qreel data-initial-index="{{ $featuredIndex ?? 0 }}">
                 <button type="button" class="qreel__nav qreel__nav--prev" data-qreel-prev aria-label="{{ __('site.ui.prev_question') }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
@@ -328,6 +333,7 @@
 
                                 <div class="qcard__actions">
                                     @if(!empty($story['video']))<button type="button" data-play-episode-id="{{ $story['id'] }}" aria-label="{{ __('site.ui.watch_aria', ['badge' => $story['badge'] ?? __('site.ui.this_question')]) }}">{{ __('site.ui.watch') }} <span aria-hidden="true">↗</span></button>@endif
+                                    <a href="{{ route('adisaan.public.question.story', ['story' => $story['id']]) }}">{{ __('site.ui.million_open') }} <span aria-hidden="true">↗</span></a>
                                     <a href="{{ $story['answer_url'] ?? route('adisaan.public.answer', ['story' => $story['id']]) }}">{{ $answeredThis ? __('site.ui.answer_again') : __('site.ui.answer') }} <span aria-hidden="true">↗</span></a>
                                 </div>
                             </div>
@@ -347,5 +353,5 @@
 </section>
 <script src="/assets/adisaan/site/question-answer-countdown.js?v=20261103-why-after-video" defer></script>
 {{-- After site.js, which publishes the stage selector the reel turns. --}}
-<script src="/assets/adisaan/site/question-reel.js?v=20261103-locales" defer></script>
+<script src="/assets/adisaan/site/question-reel.js?v=20261103-question-slugs" defer></script>
 @endsection

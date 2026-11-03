@@ -28,7 +28,22 @@
   const counter = reel.querySelector('[data-qreel-current]');
   const pad = (n) => String(n).padStart(2, '0');
 
-  let index = 0;
+  // A /question/{slug} address starts the reel on its question; the hub
+  // starts where it always did.
+  let index = Math.max(0, Math.min(slides.length - 1, parseInt(reel.dataset.initialIndex || '0', 10) || 0));
+
+  /* The address follows the question you are on, so it can be copied,
+     shared and indexed. pushState only: turning the reel never reloads. */
+  const syncUrl = () => {
+    const id = slides[index]?.dataset.storyId;
+    if (!id) return;
+    const url = new URL(window.location.href);
+    url.pathname = `/question/${id}`;
+    url.hash = '';
+    window.history.pushState({}, '', url);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', url.origin + url.pathname);
+  };
 
   /* The cards are absolutely positioned, so the track has no height of its
      own. A fixed one would clip a three-line question or leave a hole under
@@ -79,7 +94,10 @@
     // Turn the stage with the reel. autoPlay false: the film is above the
     // fold you are looking at, and a video starting on its own behind your
     // back is a jump scare, not a feature.
-    if (fromUser) window.AdiSaanStage?.select?.(index, false);
+    if (fromUser) {
+      window.AdiSaanStage?.select?.(index, false);
+      syncUrl();
+    }
   };
 
   const press = (btn) => {
@@ -133,7 +151,7 @@
   document.addEventListener('aiohm:story-selected', (event) => {
     const id = event.detail?.id;
     const found = slides.findIndex((s) => s.dataset.storyId === id);
-    if (found >= 0 && found !== index) { index = found; render(); }
+    if (found >= 0 && found !== index) { index = found; render(); syncUrl(); }
   });
 
   /* The card's height changes with the viewport and when a video's metadata
