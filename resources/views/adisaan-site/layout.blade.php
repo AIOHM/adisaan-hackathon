@@ -61,7 +61,7 @@
     <link rel="icon" href="/assets/adisaan/site/wordmark.svg" type="image/svg+xml">
     <link rel="preload" href="/assets/adisaan/site/montserrat-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/assets/adisaan/site/montserrat-700.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261031-atlas-once">
+    <link rel="stylesheet" href="/assets/adisaan/site/site.css?v=20261103-side-tools">
     @stack('styles')
     <noscript><style>.hero__plan{opacity:1;transform:rotate(-3deg) scale(1)}</style></noscript>
     @if($active === 'journey')
@@ -189,8 +189,6 @@
         <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>{{ __('site.ui.nav_about') }}</a>
         <a href="{{ route('adisaan.public.manifesto') }}" @if($active === 'manifesto') aria-current="page" @endif>{{ __('site.ui.nav_manifesto') }}</a>
         <a href="{{ route('adisaan.public.news') }}" @if($active === 'news') aria-current="page" @endif>{{ __('site.ui.nav_news') }}</a>
-        @include('adisaan-site.partials.language-switcher')
-        <button class="tabs__share" type="button" data-share aria-label="{{ __('site.ui.share_aria') }}">{{ __('site.ui.share') }} <span aria-hidden="true">↗</span></button>
     </div>
 </nav>
 @if($compactHeader)
@@ -201,6 +199,10 @@
 </header>
 </div>
 @endif
+<aside class="site-tools" aria-label="{{ __('site.ui.language') }} / {{ __('site.ui.share') }}">
+    @include('adisaan-site.partials.language-switcher', ['compactTools' => true])
+    <button class="site-tools__share" type="button" data-share aria-label="{{ __('site.ui.share_aria') }}" title="{{ __('site.ui.share') }}"><span aria-hidden="true">↗</span></button>
+</aside>
 <main id="main">@yield('content')</main>
 <footer class="footer footer--compact">
     <div class="container footer__bottom">

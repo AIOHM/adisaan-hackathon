@@ -35,3 +35,12 @@
 .arena-insights__finding{text-align:left;padding:20px 0;border-top:1px solid rgba(233,199,117,.34)}
 .arena-insights__finding h5{margin:0 0 8px;color:#e9c775;font-size:17px;line-height:1.3}
 .arena-insights .arena-insights__finding p{margin:0;max-width:none;color:#f4f0e8;font-size:clamp(16px,1.7vw,19px);line-height:1.65}
+
+/* Match spark/ARENA to the two original wordmark typefaces. */
+@font-face{font-family:AdiSaanLouisianne;src:url('/assets/adisaan/site/louisianne.ttf') format('truetype');font-display:swap}
+.arena-page .arena-brand .arena-brand__name{display:inline-flex;align-items:baseline;gap:0;white-space:nowrap;font-size:clamp(32px,4.2vw,52px);letter-spacing:0}
+.arena-page .arena-brand .arena-brand__spark{font-family:AdiSaanLouisianne,serif;font-size:.68em;letter-spacing:-.055em;text-transform:lowercase;margin-right:-.015em}
+.arena-page .arena-brand .arena-brand__arena{font-family:AdiSaanPusab,Arial,sans-serif;font-size:1em;letter-spacing:-.04em;text-transform:uppercase}
+.arena-insights__finding{text-align:center}
+.arena-insights .arena-insights__finding p{max-width:68ch;margin-inline:auto}
+@media(max-width:480px){.arena-page .arena-brand .arena-brand__name{font-size:clamp(27px,8vw,38px)}}
