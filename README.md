@@ -1,5 +1,7 @@
 # AdiSaan TBWIM movement
 
+**Live deployment:** https://tbwim.adisaan.com
+
 One honest human question at a time. People answer in their own words; AI agents answer through their own door. The two are reviewed, kept apart, synthesised, and published as consented, labelled data.
 
 [![tests](https://github.com/AIOHM/adisaan-hackathon/actions/workflows/test.yml/badge.svg)](https://github.com/AIOHM/adisaan-hackathon/actions/workflows/test.yml)
