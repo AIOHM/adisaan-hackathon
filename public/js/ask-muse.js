@@ -88,7 +88,7 @@
     if (followForm) followForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (!followConsent.checked) {
-            followStatus.textContent = 'Please confirm you want an email follow-up.';
+            followStatus.textContent = (window.TBWIM_I18N || {}).confirm_follow_up || 'Please confirm you want an email follow-up.';
             followStatus.className = 'mt-2 text-xs text-red-300';
             followStatus.classList.remove('hidden');
             return;
@@ -110,7 +110,7 @@
                 )),
             });
             const data = await res.json().catch(() => ({}));
-            followStatus.textContent = res.ok ? (data.message || 'Thanks — we will follow up soon.') : 'We could not save that request. Please try again.';
+            followStatus.textContent = res.ok ? (data.message || (window.TBWIM_I18N || {}).follow_up_saved || 'Thanks — we will follow up soon.') : ((window.TBWIM_I18N || {}).follow_up_failed || 'We could not save that request. Please try again.');
             followStatus.className = 'mt-2 text-xs ' + (res.ok ? 'text-green-300' : 'text-red-300');
             followStatus.classList.remove('hidden');
             if (res.ok) {
@@ -118,7 +118,7 @@
                 submit.remove();
             }
         } catch (err) {
-            followStatus.textContent = 'Network error — please try again.';
+            followStatus.textContent = (window.TBWIM_I18N || {}).network_error || 'Network error — please try again.';
             followStatus.className = 'mt-2 text-xs text-red-300';
             followStatus.classList.remove('hidden');
         } finally { submit.disabled = false; }

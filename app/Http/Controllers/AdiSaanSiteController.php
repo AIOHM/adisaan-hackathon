@@ -19,6 +19,7 @@ use App\Services\Tbwim\NewsReader;
 use App\Services\Tbwim\Questions;
 use App\Support\ClientIpResolver;
 use App\Support\IntakeDecision;
+use App\Support\Locales;
 use App\Support\SpamGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -97,9 +98,7 @@ final class AdiSaanSiteController extends Controller
     public function home(Request $request, SpamGuard $guard): View
     {
         $shared = $this->shared('about');
-        $home = config('adisaan_public.home', []);
-        unset($home['ro']);
-        $home['faq'] = $this->localizeFaq($home['faq'] ?? null);
+        $home = $this->localizedHome();
         $episode = $this->currentEpisode($shared['stories'], $home['episode_ref'] ?? null);
         $arena = $this->loadArena($shared['stories']);
         $questionCounts = collect($arena['questions'] ?? [])->keyBy('ref');
@@ -108,12 +107,12 @@ final class AdiSaanSiteController extends Controller
         return view('adisaan-site.home', $shared + [
             'livingMap' => $this->loadLivingMap(),
             'canonicalPath' => '/about',
-            'lang' => 'en',
+            'lang' => app()->getLocale(),
             'home' => $home,
             'homeEpisode' => $episode,
             'loop' => $this->loopState($episode, $shared['board'], $home['date_format'] ?? 'j M Y'),
             'homeAnswers' => $perspectives->take(5)->values(),
-            'lifeAreas' => (array) config('adisaan_public.life_areas', []),
+            'lifeAreas' => $this->localizedLifeAreas(),
             'questionCounts' => $questionCounts->all(),
             'answersTotal' => (int) ($arena['total'] ?? 0),
             'answerGoal' => (int) ($arena['goal'] ?? config('adisaan_public.answer_goal', 1000000)),
@@ -131,7 +130,7 @@ final class AdiSaanSiteController extends Controller
 
         return view('adisaan-site.question', $shared + [
             'livingMap' => $this->loadLivingMap(),
-            'lifeAreas' => (array) config('adisaan_public.life_areas', []),
+            'lifeAreas' => $this->localizedLifeAreas(),
             'answeredRefs' => $answered,
             'questionCounts' => collect($arena['questions'] ?? [])->keyBy('ref')->all(),
             'answersTotal' => (int) ($arena['total'] ?? 0),
@@ -154,6 +153,7 @@ final class AdiSaanSiteController extends Controller
 
         return view('adisaan-site.answer', $shared + [
             'livingMap' => $this->loadLivingMap(),
+            'home' => $this->localizedHome(),
             'selectedStory' => $selectedStory,
             'question' => $selectedStory['question'] ?? config('adisaan_public.story.question'),
             'form' => $this->formData($guard, $selectedStory),
@@ -169,7 +169,7 @@ final class AdiSaanSiteController extends Controller
         }
 
         if ($request->input('respondent_type') === 'agent') {
-            return response()->json(['ok' => false, 'error' => 'Agents answer through the machine endpoint.', 'endpoint' => route('adisaan.public.agent.answer.info')], 422);
+            return response()->json(['ok' => false, 'error' => __('site.ui.agents_endpoint'), 'endpoint' => route('adisaan.public.agent.answer.info')], 422);
         }
 
         $min = (int) config('echo_intake.body.minimum_length', 10);
@@ -191,7 +191,7 @@ final class AdiSaanSiteController extends Controller
         ]);
 
         if (($validated['share_mode'] ?? '') === 'members' && strlen((string) config('tbwim.member_bridge_secret', '')) < 32) {
-            abort(503, 'Members-only sharing is not available yet.');
+            abort(503, __('site.ui.members_unavailable'));
         }
 
         $media = $request->file('answer_media');
@@ -209,15 +209,15 @@ final class AdiSaanSiteController extends Controller
         $story = $this->questions->findOpen($episodeRef);
         if ($story === null) {
             return $request->expectsJson()
-                ? response()->json(['ok' => false, 'error' => 'That question is not open.'], 422)
-                : redirect()->route('adisaan.public.answer')->withErrors(['episode_ref' => 'That question is not open.']);
+                ? response()->json(['ok' => false, 'error' => __('site.ui.question_not_open')], 422)
+                : redirect()->route('adisaan.public.answer')->withErrors(['episode_ref' => __('site.ui.question_not_open')]);
         }
 
         $decision = $guard->inspect($request, self::FORM, $body);
         if ($decision->rejected()) {
             Log::info('Answer rejected by the form guard', ['reason' => $decision->reason, 'fingerprint' => $decision->fingerprint]);
             if ($request->expectsJson()) {
-                return response()->json(['ok' => false, 'error' => 'The form could not be verified. Reload the page and try again.'], 422);
+                return response()->json(['ok' => false, 'error' => __('site.ui.form_verify')], 422);
             }
 
             return $this->receiptRedirect($request, $isPublic, $episodeRef, '');
@@ -247,7 +247,7 @@ final class AdiSaanSiteController extends Controller
         $echo->prompt_text = (string) ($story['question'] ?? config('adisaan_public.story.question'));
         $echo->body = $body;
         $echo->signature = $this->cleanSignature($validated['signature'] ?? null);
-        $echo->language = Str::limit((string) $request->input('language', 'en'), 12, '');
+        $echo->language = Str::limit((string) $request->input('language', app()->getLocale()), 12, '');
         $echo->country_code = $place['country_code'];
         $echo->city = $place['city'];
         $echo->age_band = $place['age_band'];
@@ -382,7 +382,7 @@ final class AdiSaanSiteController extends Controller
 
         $ref = trim((string) session('shared_question', ''));
         $published = array_values(array_filter(
-            (array) config('adisaan_public.stories', []),
+            array_map(fn (array $story): array => $this->localizedStory($story), (array) config('adisaan_public.stories', [])),
             static fn (array $story): bool => ($story['question_published'] ?? false) === true
         ));
         $answered = null;
@@ -404,6 +404,7 @@ final class AdiSaanSiteController extends Controller
 
         return view('adisaan-site.received', $this->shared('answer') + [
             'livingMap' => $this->loadLivingMap(),
+            'home' => $this->localizedHome(),
             'gratitude' => [
                 'enabled' => $ledgerOn,
                 'balance' => $ledgerOn && $visitorId ? $this->ledger->balance($visitorId) : 0,
@@ -449,10 +450,10 @@ final class AdiSaanSiteController extends Controller
             $name = trim((string) $request->input('name', ''));
             $email = mb_strtolower(trim((string) $request->input('email', '')));
             if ($name === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                return redirect()->to(route('adisaan.public.received').'#claim')->with('claim_error', 'A first name and a working email, and they are yours.');
+                return redirect()->to(route('adisaan.public.received').'#claim')->with('claim_error', __('site.ui.claim_error_name'));
             }
             if ($submission === null || $visitorId === null || ! $this->ledger->enabled()) {
-                return redirect()->to(route('adisaan.public.received').'#claim')->with('claim_error', 'Answer a question first, then you can claim its tokens.');
+                return redirect()->to(route('adisaan.public.received').'#claim')->with('claim_error', __('site.ui.claim_error_first'));
             }
             $bonus = $this->ledger->claim($visitorId, $email);
 
@@ -461,10 +462,10 @@ final class AdiSaanSiteController extends Controller
 
         $why = trim((string) $request->input('why', ''));
         if (mb_strlen($why) < 10 || mb_strlen($why) > 2000) {
-            return redirect()->to(route('adisaan.public.received').'#why')->with('why_error', 'A sentence is enough — tell us why you answered that way.');
+            return redirect()->to(route('adisaan.public.received').'#why')->with('why_error', __('site.ui.why_error_short'));
         }
         if ($submission === null) {
-            return redirect()->to(route('adisaan.public.received').'#why')->with('why_error', 'That answer could not be found any more.');
+            return redirect()->to(route('adisaan.public.received').'#why')->with('why_error', __('site.ui.why_error_gone'));
         }
         $meta = (array) $submission->metadata;
         $meta['why'] = Str::limit($why, 2000, '');
@@ -488,7 +489,7 @@ final class AdiSaanSiteController extends Controller
             ?? $stories->firstWhere('id', $this->questions->current()['id'])
             ?? $stories->first();
         $ref = $episode['id'] ?? null;
-        $home = config('adisaan_public.home', []);
+        $home = $this->localizedHome();
         $counts = collect($this->loadArena($shared['stories'])['questions'] ?? [])->keyBy('ref');
         $perspectives = $ref ? $this->loadPublicPerspectives($ref, true) : collect();
 
@@ -710,7 +711,7 @@ final class AdiSaanSiteController extends Controller
             NotifyOwnerOfLead::dispatch($email);
         }
 
-        return redirect()->to(route('adisaan.public.about').'#join')->with('lead_success', 'You’re in. I’ll write when the next episode is out.');
+        return redirect()->to(route('adisaan.public.about').'#join')->with('lead_success', __('site.ui.lead_success'));
     }
 
     /** The analytics choice, logged as the privacy page says. */
@@ -756,7 +757,7 @@ final class AdiSaanSiteController extends Controller
         } catch (\Throwable $e) {
             Log::warning('ask-muse proxy failed', ['error' => $e->getMessage()]);
 
-            return response()->json(['ok' => false, 'message' => 'AdiSaan is away from the keyboard. Try again in a moment.'], 503);
+            return response()->json(['ok' => false, 'message' => __('site.ui.ask_away')], 503);
         }
 
         return response()->json($upstream->json() ?? ['ok' => false], $upstream->status());
@@ -764,7 +765,7 @@ final class AdiSaanSiteController extends Controller
 
     public function askMuseFollowUp(): JsonResponse
     {
-        return response()->json(['ok' => false, 'message' => 'Follow-up by email is on adisaan.com.'], 404);
+        return response()->json(['ok' => false, 'message' => __('site.ui.follow_up_email')], 404);
     }
 
     // --------------------------------------------------------------- shared
@@ -778,6 +779,8 @@ final class AdiSaanSiteController extends Controller
 
         return [
             'active' => $active,
+            'lang' => app()->getLocale(),
+            'home' => $this->localizedHome(),
             'board' => $board,
             'detectedChannel' => $this->resolveSourceChannel($req),
             'barometruChannels' => self::BAROMETRU_CHANNELS,
@@ -847,6 +850,8 @@ final class AdiSaanSiteController extends Controller
                     $story[$key] = rtrim((string) config('tbwim.media_base'), '/').$value;
                 }
             }
+
+            $story = $this->localizedStory($story);
 
             return $story + [
                 'share_url' => config('adisaan_public.url').'/#story-'.$story['id'],
@@ -940,7 +945,7 @@ final class AdiSaanSiteController extends Controller
             if (! isset($coords[$code])) {
                 continue;
             }
-            $answers[] = ['name' => (string) (config('adisaan_public.countries.'.$code) ?? $code), 'count' => (int) $row->n, 'x' => $coords[$code][0], 'y' => $coords[$code][1]];
+            $answers[] = ['name' => $this->countryName($code), 'count' => (int) $row->n, 'x' => $coords[$code][0], 'y' => $coords[$code][1]];
         }
 
         return ['visitors' => [], 'answers' => $answers];
@@ -1008,10 +1013,10 @@ final class AdiSaanSiteController extends Controller
                 return [
                     'id' => $echo->id,
                     'body' => $echo->displayBody(),
-                    'signature' => $echo->signature ?: ($isAgent ? ($meta['agent_model'] ?? 'AI Agent') : 'A fellow seeker'),
-                    'place' => $isAgent ? ($meta['agent_developer'] ?? 'Model Arena') : $this->formatPlace($echo->city, $echo->country_code),
+                    'signature' => $echo->signature ?: ($isAgent ? ($meta['agent_model'] ?? __('site.ui.ai_agent')) : 'A fellow seeker'),
+                    'place' => $isAgent ? ($meta['agent_developer'] ?? __('site.ui.model_arena')) : $this->formatPlace($echo->city, $echo->country_code),
                     'episode_ref' => $echo->episode_ref ?: 'who-are-you',
-                    'theme' => $echo->theme ?: ($meta['pillar'] ?? 'Living Mirror'),
+                    'theme' => $echo->theme ?: ($meta['pillar'] ?? __('site.ui.living_mirror')),
                     'votes' => max(0, (int) ($meta['votes'] ?? 0)),
                     'voted' => in_array((int) $echo->id, $votedIds, true),
                     'created_human' => $echo->created_at ? $echo->created_at->diffForHumans() : 'recently',
@@ -1055,10 +1060,10 @@ final class AdiSaanSiteController extends Controller
                 return [
                     'id' => $echo->id,
                     'body' => $echo->displayBody(),
-                    'signature' => $echo->signature ?: 'A fellow seeker',
+                    'signature' => $echo->signature ?: __('site.ui.fellow_seeker'),
                     'place' => $this->formatPlace($echo->city, $echo->country_code),
                     'episode_ref' => $echo->episode_ref ?: 'who-are-you',
-                    'theme' => $echo->theme ?: 'Living Mirror',
+                    'theme' => $echo->theme ?: __('site.ui.living_mirror'),
                     'votes' => max(0, (int) (($echo->metadata['votes'] ?? 0))),
                     'voted' => in_array((int) $echo->id, $votedIds, true),
                     'created_human' => $echo->created_at ? $echo->created_at->diffForHumans() : 'recently',
@@ -1106,7 +1111,7 @@ final class AdiSaanSiteController extends Controller
             ->get()
             ->map(static fn (EchoSubmission $echo): array => [
                 'receipt' => $echo->public_id,
-                'model' => trim((string) data_get($echo->metadata, 'agent_model')) ?: 'Unknown model',
+                'model' => trim((string) data_get($echo->metadata, 'agent_model')) ?: __('site.ui.unknown_model'),
                 'question_id' => $echo->episode_ref,
             ]);
     }
@@ -1227,6 +1232,75 @@ final class AdiSaanSiteController extends Controller
      * answers at its own host, so point agents here. The config extract
      * itself stays byte-identical to the platform's.
      */
+
+    /**
+     * The home screens in the visitor's language: the English config with
+     * the locale's overlay on top (lang/{locale}/home.php). The overlay
+     * only carries keys it translates; the rest stays English underneath.
+     */
+    private function localizedHome(): array
+    {
+        $home = (array) config('adisaan_public.home', []);
+        unset($home['ro']);
+        if (app()->getLocale() !== Locales::FALLBACK) {
+            $overlay = trans('home');
+            if (is_array($overlay)) {
+                $home = array_replace_recursive($home, $overlay);
+            }
+        }
+        $home['date_format'] = Locales::dateFormat(app()->getLocale());
+        $home['faq'] = $this->localizeFaq($home['faq'] ?? null);
+
+        return $home;
+    }
+
+    /** One story's words in the visitor's language (lang/{locale}/questions.php). */
+    private function localizedStory(array $story): array
+    {
+        if (app()->getLocale() === Locales::FALLBACK || empty($story['id'])) {
+            return $story;
+        }
+        $overlay = trans('questions.'.$story['id']);
+        if (! is_array($overlay)) {
+            return $story;
+        }
+        foreach ($overlay as $key => $value) {
+            if (is_string($value) && $value !== '') {
+                $story[$key] = $value;
+            }
+        }
+
+        return $story;
+    }
+
+    /** The four life areas in the visitor's language. */
+    private function localizedLifeAreas(): array
+    {
+        $areas = (array) config('adisaan_public.life_areas', []);
+        if (app()->getLocale() !== Locales::FALLBACK) {
+            $overlay = trans('site.life_areas');
+            if (is_array($overlay)) {
+                $areas = array_replace_recursive($areas, $overlay);
+            }
+        }
+
+        return $areas;
+    }
+
+    /** A country's name in the visitor's language; English config underneath. */
+    private function countryName(string $code): string
+    {
+        $code = strtoupper($code);
+        if (extension_loaded('intl')) {
+            $name = \Locale::getDisplayRegion('-'.$code, app()->getLocale());
+            if (is_string($name) && $name !== '' && strtoupper($name) !== $code) {
+                return $name;
+            }
+        }
+
+        return (string) (config('adisaan_public.countries.'.$code) ?? $code);
+    }
+
     private function localizeFaq(mixed $faq): mixed
     {
         if (! is_array($faq) || ! is_array($faq['items'] ?? null)) {
@@ -1373,7 +1447,7 @@ final class AdiSaanSiteController extends Controller
             return $city.', '.$code;
         }
         if ($code !== '') {
-            return (string) (config('adisaan_public.countries.'.$code) ?? $code);
+            return $this->countryName($code);
         }
 
         return $city === '' ? null : $city;

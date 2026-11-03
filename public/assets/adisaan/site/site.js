@@ -1,5 +1,8 @@
 (() => {
   'use strict';
+  const T = window.TBWIM_I18N || {};
+  const LOCALE = window.TBWIM_LOCALE || 'en';
+  const t = (key, fallback, vars = {}) => { let out = T[key] || fallback; Object.entries(vars).forEach(([k, v]) => { out = out.replace(':' + k, String(v)); }); return out; };
   document.documentElement.classList.add('js');
   // Keep the plan tucked into BACK until the visitor's first deliberate movement.
   const planBadge = document.querySelector('.hero__plan');
@@ -63,7 +66,7 @@
       if (mutedIcon) mutedIcon.hidden = audible;
       if (soundIcon) soundIcon.hidden = !audible;
       narrationToggle.setAttribute('aria-pressed', String(audible));
-      narrationToggle.setAttribute('aria-label', narration.paused ? 'Play narration' : (audible ? 'Mute narration' : 'Unmute narration'));
+      narrationToggle.setAttribute('aria-label', narration.paused ? t('play_narration', 'Play narration') : (audible ? t('mute_narration', 'Mute narration') : t('unmute_narration', 'Unmute narration')));
     };
     narrationToggle.addEventListener('click', async () => {
       if (narration.paused || narration.ended) {
@@ -128,17 +131,17 @@
       };
       try {
         if (navigator.share) await navigator.share(data);
-        else if (navigator.clipboard) { await navigator.clipboard.writeText(url); notify('Link copied. Share it with someone who might enjoy the story.'); }
-        else notify(`Share this address: ${url}`);
+        else if (navigator.clipboard) { await navigator.clipboard.writeText(url); notify(t('link_copied', 'Link copied. Share it with someone who might enjoy the story.')); }
+        else notify(t('share_address', 'Share this address: :url', { url }));
       } catch (error) {
-        if (error.name !== 'AbortError') notify(`Share this address: ${url}`);
+        if (error.name !== 'AbortError') notify(t('share_address', 'Share this address: :url', { url }));
       }
     });
   });
   document.querySelectorAll('[data-journey-play]').forEach((button) => {
     const card = button.closest('.journey-barometer');
     const speech = document.querySelector('[data-journey-speech]');
-    const lines = ['Tiny spark. Big imagination. Shall we bring a friend?', 'One thought started this. Imagine where yours could take us.', 'No shortcuts to a million. Good company helps.', 'The scenic route looks better with you here.'];
+    const lines = [t('speech_1', 'Tiny spark. Big imagination. Shall we bring a friend?'), t('speech_2', 'One thought started this. Imagine where yours could take us.'), t('speech_3', 'No shortcuts to a million. Good company helps.'), t('speech_4', 'The scenic route looks better with you here.')];
     let turn = 0;
     button.addEventListener('click', () => {
       speech.textContent = lines[turn++ % lines.length];
@@ -248,8 +251,8 @@
         chat.hidden = !visible;
         cloud.hidden = visible || hiddenThought;
         companionFace?.setAttribute('aria-expanded', String(visible));
-        label.textContent = visible ? 'Talk with me' : 'Let’s talk';
-        if (!visible) thought.textContent = 'What is the best way you imagine? Tell me when you’re ready.';
+        label.textContent = visible ? t('talk_with_me', 'Talk with me') : t('lets_talk', 'Let’s talk');
+        if (!visible) thought.textContent = t('thought_default', 'What is the best way you imagine? Tell me when you’re ready.');
         const to = companionFace.getBoundingClientRect();
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && from.width && to.width) {
           dockFlight = document.createElement('img');
@@ -287,7 +290,7 @@
       const editConsent = document.createElement('button');
       editConsent.type = 'button';
       editConsent.className = 'adisaan-consent-edit';
-      editConsent.textContent = 'Change consent';
+      editConsent.textContent = t('change_consent', 'Change consent');
       museConsentLabel.after(editConsent);
       const syncConsent = (moveFocus = false) => {
         chat.classList.toggle('is-muse-consented', museConsent.checked);
@@ -321,7 +324,7 @@
       ['.runners', 'Our travelling companions', 'Some accounts are moving. Some are taking a breath. I know the feeling.'],
       ['.quiet', 'The missing measurement', 'No number yet. I’d rather leave a space than fill it with imagination.'],
       ['.chapter-section', 'The road ahead', 'Halfway home sounds lovely. Today, I only need to take the next step.'],
-      ['.story-section', 'The story', 'When no one is looking, what do you see? I’m still curious about your answer.'],
+      ['.story-section', t('the_story', 'The story'), 'When no one is looking, what do you see? I’m still curious about your answer.'],
       ['.rhythm', 'Morning and evening', 'Imagine an answer in the morning. Leave room to change your mind by evening.'],
       ['.lab-preview, .news-section', 'Ideas and tools', 'Another tool. Another possibility. What would you actually create with it?'],
       ['.answer-section', 'Your perspective', 'Your answer doesn’t have to sound like mine. That’s why I’m asking.'],
@@ -345,8 +348,8 @@
           if (best && best.title !== section && chat.hidden) {
             section = best.title;
             label.textContent = best.title;
-            const selectedStory = best.title === 'The story' ? document.querySelector('[data-story-panel]:not([hidden]) [data-story-share]') : null;
-            thought.textContent = selectedStory ? `${selectedStory.dataset.storyQuestion} Take your time. I’m curious about your answer.` : best.text;
+            const selectedStory = best.title === t('the_story', 'The story') ? document.querySelector('[data-story-panel]:not([hidden]) [data-story-share]') : null;
+            thought.textContent = selectedStory ? `${selectedStory.dataset.storyQuestion}${t('take_time', ' Take your time. I’m curious about your answer.')}` : best.text;
           }
         }, 650);
       }, {rootMargin:'-20% 0px -20% 0px', threshold:[0, 0.25, 0.5, 0.75, 1]});
@@ -362,8 +365,8 @@
       if (typeof event.detail?.question !== 'string' || !chat.hidden) return;
       const museForm = document.querySelector('#muse-public-form');
       if (museForm) museForm.dataset.storyRef = event.detail.id || '';
-      label.textContent = event.detail.title || 'The story';
-      thought.textContent = `${event.detail.question} Take your time. I’m curious about your answer.`;
+      label.textContent = event.detail.title || t('the_story', 'The story');
+      thought.textContent = `${event.detail.question}${t('take_time', ' Take your time. I’m curious about your answer.')}`;
     });
     const initialStory = document.querySelector('[data-story-panel]:not([hidden])');
     const museForm = document.querySelector('#muse-public-form');
@@ -399,7 +402,7 @@
     const button = form.querySelector('[type="submit"]');
     const minimum = Math.max(0, Number(form.dataset.minimumSeconds) || 3) * 1000;
     const loadedAt = Date.now();
-    const count = () => { if (counter && text) counter.textContent = `${text.value.length.toLocaleString()} characters`; };
+    const count = () => { if (counter && text) counter.textContent = t('characters', ':n characters', { n: text.value.length.toLocaleString(LOCALE) }); };
     text?.addEventListener('input', count);
     count();
     const modeCards = form.querySelectorAll('[data-share-mode-card]');
@@ -412,16 +415,16 @@
         const isPublic = radio.value === 'public';
         modeCards.forEach((c) => c.classList.toggle('is-selected', c === card));
         if (consentInput) consentInput.value = isPublic ? '1' : '';
-        if (modeIndicator) modeIndicator.textContent = isPublic ? 'Everyone can read this' : 'Only AdiSaan’s creator reads this';
-        if (submitLabel) submitLabel.textContent = isPublic ? 'Send' : 'Send privately';
+        if (modeIndicator) modeIndicator.textContent = isPublic ? t('everyone_read', 'Everyone can read this') : t('only_creator', 'Only AdiSaan’s creator reads this');
+        if (submitLabel) submitLabel.textContent = isPublic ? t('send', 'Send') : t('send_privately', 'Send privately');
       });
     });
     form.addEventListener('submit', (event) => {
-      if (Date.now() - loadedAt < minimum) { event.preventDefault(); notify('Take a breath, then send your perspective.'); return; }
-      if (button) { button.disabled = true; button.textContent = 'Sending…'; }
+      if (Date.now() - loadedAt < minimum) { event.preventDefault(); notify(t('take_breath', 'Take a breath, then send your perspective.')); return; }
+      if (button) { button.disabled = true; button.textContent = t('sending', 'Sending…'); }
     });
   }
-  const format = (number) => new Intl.NumberFormat('en').format(number);
+  const format = (number) => new Intl.NumberFormat(LOCALE).format(number);
   document.querySelector('[data-watch-story]')?.addEventListener('click', () => {
     document.querySelector('[data-story-tab="0"]')?.click();
     const player = document.querySelector('#story-film [data-story-panel]:not([hidden]) video') || document.querySelector('#story-film video');
@@ -432,7 +435,7 @@
       const stamp = node.dataset.measuredAt || node.dataset.iso;
       if (!stamp) return;
       const date = new Date(stamp);
-      if (!Number.isNaN(date.valueOf())) node.textContent = `Measured ${date.toLocaleDateString('en', {day:'numeric', month:'short'})}, ${date.toLocaleTimeString('en', {hour:'2-digit', minute:'2-digit'})}`;
+      if (!Number.isNaN(date.valueOf())) node.textContent = t('measured', 'Measured :date, :time', { date: date.toLocaleDateString(LOCALE, {day:'numeric', month:'short'}), time: date.toLocaleTimeString(LOCALE, {hour:'2-digit', minute:'2-digit'}) });
     });
   };
   updateTime();
@@ -465,8 +468,8 @@
       follow.href = profile;
       follow.target = '_blank';
       follow.rel = 'noopener noreferrer';
-      follow.textContent = 'Follow me ↗';
-      follow.setAttribute('aria-label', `Follow ${item.dataset.profileHandle} on ${item.dataset.profilePlatform}`);
+      follow.textContent = t('follow_me', 'Follow me ↗');
+      follow.setAttribute('aria-label', t('follow_aria', 'Follow :handle on :platform', { handle: item.dataset.profileHandle, platform: item.dataset.profilePlatform }));
       item.append(follow);
     });
   };
@@ -474,7 +477,7 @@
   document.addEventListener('adisaan:board-refreshed', addRaceFollowLinks);
   const socialUnavailable = () => {
     if (socialGrid && !socialGrid.querySelector('[data-social-list]').children.length) {
-      socialGrid.querySelector('[data-social-coverage]').textContent = 'Measurements unavailable right now';
+      socialGrid.querySelector('[data-social-coverage]').textContent = t('measurements_unavailable', 'Measurements unavailable right now');
     }
   };
   const updateSocialGrid = (board) => {
@@ -489,9 +492,9 @@
       const identity = document.createElement('span');
       identity.className = 'build-social__identity';
       const platform = document.createElement('small');
-      platform.textContent = account.platform_label || account.platform || 'Social';
+      platform.textContent = account.platform_label || account.platform || t('social', 'Social');
       const handle = document.createElement('b');
-      handle.textContent = account.handle ? (account.handle.startsWith('@') ? account.handle : `@${account.handle}`) : (account.name || 'Connected account');
+      handle.textContent = account.handle ? (account.handle.startsWith('@') ? account.handle : `@${account.handle}`) : (account.name || t('connected_account', 'Connected account'));
       identity.append(platform, handle);
       const count = document.createElement('span');
       count.className = 'build-social__count';
@@ -499,10 +502,10 @@
         const value = document.createElement('strong');
         value.textContent = format(account.followers);
         const unit = document.createElement('small');
-        unit.textContent = 'followers';
+        unit.textContent = t('followers', 'followers');
         count.append(value, unit);
       } else {
-        count.textContent = 'Not reporting';
+        count.textContent = t('not_reporting', 'Not reporting');
         count.classList.add('build-social__count--missing');
       }
       item.append(identity, count);
@@ -513,17 +516,17 @@
         follow.href = profile;
         follow.target = '_blank';
         follow.rel = 'noopener noreferrer';
-        follow.textContent = 'Follow me ↗';
-        follow.setAttribute('aria-label', `Follow ${account.handle} on ${account.platform_label || account.platform}`);
+        follow.textContent = t('follow_me', 'Follow me ↗');
+        follow.setAttribute('aria-label', t('follow_aria', 'Follow :handle on :platform', { handle: account.handle, platform: account.platform_label || account.platform }));
         item.append(follow);
       }
       list.append(item);
     });
-    coverage.textContent = `${board.measured_count} of ${board.accounts.length} reporting${board.total_followers === null ? '' : ` · ${format(board.total_followers)} measured follows`}`;
+    coverage.textContent = t('reporting_of', ':measured of :total reporting', { measured: board.measured_count, total: board.accounts.length }) + (board.total_followers === null ? '' : t('measured_follows', ' · :n measured follows', { n: format(board.total_followers) }));
     const measuredAt = board.last_synced_at ? new Date(board.last_synced_at) : null;
     note.textContent = measuredAt && !Number.isNaN(measuredAt.valueOf())
-      ? `Measured ${measuredAt.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' })} by AIOHM Social. Combined follows can include the same person on more than one account.`
-      : 'Counts come from AIOHM Social. Accounts without a measurement are shown without a number.';
+      ? t('counts_note_measured', 'Measured :date by AIOHM Social. Combined follows can include the same person on more than one account.', { date: measuredAt.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short', year: 'numeric' }) })
+      : t('counts_note_plain', 'Counts come from AIOHM Social. Accounts without a measurement are shown without a number.');
   };
   // The existing Social feed contains periodic totals, not individual follow events.
   // Compare only the same reporting accounts; coverage changes are not new fans.
@@ -537,7 +540,7 @@
     if (Number.isFinite(total) && Number.isFinite(lastFanTotal) && coverage === lastFanCoverage && total > lastFanTotal) {
       const gained = total - lastFanTotal;
       const status = document.querySelector('[data-fan-update]');
-      if (status) status.textContent = `${format(gained)} new ${gained === 1 ? 'fan' : 'fans'} reported in the latest update.${gained > 40 ? ' Shown as a grouped shower.' : ''}`;
+      if (status) status.textContent = t('fans_reported', ':n new :fan reported in the latest update.', { n: format(gained), fan: gained === 1 ? t('fan', 'fan') : t('fans', 'fans') }) + (gained > 40 ? t('grouped_shower', ' Shown as a grouped shower.') : '');
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
         for (let i = 0; i < Math.min(gained, 40); i++) {
           const drop = document.createElement('i');
@@ -564,11 +567,11 @@
       updateFanDrops(board);
       document.querySelectorAll('[data-fan-marker]').forEach(node => node.style.setProperty('--fan-fraction', Math.max(0, Math.min(1, (board.total_followers ?? 0) / 1000000))));
       document.querySelectorAll('[data-followers]').forEach((node) => { node.textContent = board.total_followers === null ? '—' : format(board.total_followers); });
-      document.querySelectorAll('[data-follow-percentage]').forEach((node) => { node.textContent = board.total_followers === null ? 'awaiting measurements' : `${(board.total_followers / 10000).toFixed(2)}%`; });
+      document.querySelectorAll('[data-follow-percentage]').forEach((node) => { node.textContent = board.total_followers === null ? t('awaiting', 'awaiting measurements') : `${(board.total_followers / 10000).toFixed(2)}%`; });
       document.querySelectorAll('[data-barometer-fill]').forEach((node) => { node.style.transform = `scaleY(${Math.max(0, Math.min(1, (board.total_followers ?? 0) / 1000000))})`; });
-      document.querySelectorAll('[data-barometer]').forEach((node) => { node.setAttribute('aria-label', board.total_followers === null ? 'Awaiting follower measurements' : `${format(board.total_followers)} of 1,000,000 fans`); });
+      document.querySelectorAll('[data-barometer]').forEach((node) => { node.setAttribute('aria-label', board.total_followers === null ? t('awaiting_aria', 'Awaiting follower measurements') : t('of_fans', ':n of 1,000,000 fans', { n: format(board.total_followers) })); });
       document.querySelectorAll('[data-total-preview] progress').forEach((node) => { node.value = board.total_followers ?? 0; });
-      document.querySelectorAll('[data-coverage]').forEach((node) => { node.textContent = `${board.measured_count} of ${board.accounts.length} accounts reporting`; });
+      document.querySelectorAll('[data-coverage]').forEach((node) => { node.textContent = t('reporting_accounts', ':measured of :total accounts reporting', { measured: board.measured_count, total: board.accounts.length }); });
       document.querySelectorAll('[data-measured-at]').forEach((node) => { node.dataset.measuredAt = board.last_synced_at || ''; });
       const race = document.querySelector('[data-race-fragment]');
       if (race) {

@@ -22,7 +22,7 @@
     ];
     $uid = substr(md5(uniqid('', true)), 0, 6);
 @endphp
-<svg class="qcard__pillars {{ !empty($compact) ? 'qcard__pillars--compact' : '' }}" viewBox="0 0 180 174" role="img" aria-label="{{ number_format($people) }} answers from people and {{ number_format($machines) }} from machines" focusable="false">
+<svg class="qcard__pillars {{ !empty($compact) ? 'qcard__pillars--compact' : '' }}" viewBox="0 0 180 174" role="img" aria-label="{{ __('site.ui.pillars_aria', ['people' => number_format($people), 'machines' => number_format($machines)]) }}" focusable="false">
     <defs>
         <linearGradient id="pp-{{ $uid }}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#2d6a3b"/><stop offset=".45" stop-color="#5fae72"/><stop offset="1" stop-color="#245a31"/></linearGradient>
         <linearGradient id="pm-{{ $uid }}" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#9c7a2b"/><stop offset=".45" stop-color="#ecd08a"/><stop offset="1" stop-color="#8a6a22"/></linearGradient>

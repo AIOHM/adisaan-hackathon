@@ -20,7 +20,7 @@
     <h3 id="loop-heading" class="qloop__title">{{ $w['released_title'] }}</h3>
     <p class="qloop__question">{{ $loop['question'] }}</p>
     @if(!empty($loop['answer_video']))
-    <video class="qloop__video" controls playsinline preload="metadata" src="{{ $loop['answer_video'] }}">Your browser does not support video playback.</video>
+    <video class="qloop__video" controls playsinline preload="metadata" src="{{ $loop['answer_video'] }}">{{ __('site.ui.audio_unsupported') }}</video>
     @endif
     <p class="qloop__meta">{{ $loop['unlock_reason'] === 'followers' ? $t('released_followers', ['date' => $loop['released_at'], 'target' => number_format((int) $loop['target'])]) : $t('released_time', ['date' => $loop['released_at']]) }}</p>
     @if($hash)

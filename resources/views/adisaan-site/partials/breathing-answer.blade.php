@@ -67,7 +67,7 @@
          question, both sides, and the answers underneath with the top
          three marked. Everything here is counted — an empty side says so
          rather than showing a placeholder. --}}
-    <div class="duel" aria-label="The same question, answered by people and by machines">
+    <div class="duel" aria-label="{{ __('site.ui.duel_aria') }}">
         {{-- The question once, not once per side. It is the same
              question — printing it twice was duplication at every width
              and four wrapped lines at this one. --}}
@@ -79,8 +79,8 @@
 
         <div class="duel__head">
             <div class="duel__side duel__side--human">
-                @include('adisaan-site.partials.crowd', ['kind' => 'people', 'label' => 'People answering', 'showLabel' => false])
-                <span class="duel__count">{{ $humans->count() }} public shown · {{ number_format($perspectiveSplit['people'] ?? $humans->count()) }} received</span>
+                @include('adisaan-site.partials.crowd', ['kind' => 'people', 'label' => __('site.ui.people_answering'), 'showLabel' => false])
+                <span class="duel__count">{{ __('site.ui.public_shown', ['shown' => $humans->count(), 'received' => number_format($perspectiveSplit['people'] ?? $humans->count())]) }}</span>
             </div>
 
             <div class="duel__bolt" aria-hidden="true">
@@ -95,22 +95,22 @@
             </div>
 
             <div class="duel__side duel__side--machine">
-                @include('adisaan-site.partials.crowd', ['kind' => 'machines', 'label' => 'AI models answering', 'showLabel' => false, 'brandColors' => $arenaBrandColors ?? false])
-                <span class="duel__count">{{ $machines->count() }} public shown · {{ number_format($perspectiveSplit['machines'] ?? $machines->count()) }} received</span>
+                @include('adisaan-site.partials.crowd', ['kind' => 'machines', 'label' => __('site.ui.models_answering'), 'showLabel' => false, 'brandColors' => $arenaBrandColors ?? false])
+                <span class="duel__count">{{ __('site.ui.public_shown', ['shown' => $machines->count(), 'received' => number_format($perspectiveSplit['machines'] ?? $machines->count())]) }}</span>
             </div>
         </div>
 
         <div class="duel__lists">
-            @foreach([['side' => 'human', 'rows' => $humans, 'empty' => 'No public human answers yet.'],
-                      ['side' => 'machine', 'rows' => $machines, 'empty' => 'No machine answer has passed the guardrails yet.']] as $column)
+            @foreach([['side' => 'human', 'rows' => $humans, 'empty' => __('site.ui.no_human_yet')],
+                      ['side' => 'machine', 'rows' => $machines, 'empty' => __('site.ui.no_machine_passed')]] as $column)
                 <ol class="duel__list duel__list--{{ $column['side'] }}">
                     @forelse($column['rows'] as $i => $row)
                         <li @class(['duel__answer', 'is-top' => $i < 3])>
-                            @if($i < 3)<span class="duel__rank" aria-label="Rank {{ $i + 1 }}">{{ $i + 1 }}</span>@endif
+                            @if($i < 3)<span class="duel__rank" aria-label="{{ __('site.ui.rank', ['n' => $i + 1]) }}">{{ $i + 1 }}</span>@endif
                             <p class="duel__body">{{ \Illuminate\Support\Str::limit($row['body'], 190) }}</p>
-                            <p class="duel__by">{{ $row['signature'] }}@if(($row['votes'] ?? 0) > 0) <span>· {{ number_format($row['votes']) }} {{ (int) $row['votes'] === 1 ? 'vote' : 'votes' }}</span>@endif</p>
+                            <p class="duel__by">{{ $row['signature'] }}@if(($row['votes'] ?? 0) > 0) <span>· {{ number_format($row['votes']) }} {{ (int) $row['votes'] === 1 ? __('site.ui.vote') : __('site.ui.votes') }}</span>@endif</p>
                             @if(!empty($arenaPicker) && !empty($row['id']))
-                                <a class="duel__more" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answer-{{ $row['id'] }}" aria-label="Read the full answer from {{ $row['signature'] }}">More ↗</a>
+                                <a class="duel__more" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answer-{{ $row['id'] }}" aria-label="{{ __('site.ui.read_full', ['name' => $row['signature']]) }}">{{ __('site.ui.more') }}</a>
                             @endif
                         </li>
                     @empty
@@ -119,8 +119,8 @@
                     @if($column['side'] === 'machine')
                         @foreach($failedMachines as $failed)
                             <li class="duel__answer duel__answer--guardrail">
-                                <p class="duel__body">The response from model {{ $failed['model'] }} did not pass the guardrails.</p>
-                                <p class="duel__by">Muse guardrail · original response withheld</p>
+                                <p class="duel__body">{{ __('site.ui.million_guardrail_text', ['model' => $failed['model']]) }}</p>
+                                <p class="duel__by">{{ __('site.ui.guardrail_by') }}</p>
                             </li>
                         @endforeach
                     @endif
@@ -128,15 +128,15 @@
             @endforeach
         </div>
 
-        <p class="duel__note">Counted, never estimated. Public answers from people and AI agents are shown separately. <a class="home-link" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answers">See all public answers &nearr;</a></p>
+        <p class="duel__note">{{ __('site.ui.duel_note') }} <a class="home-link" href="{{ route('adisaan.public.million', ['story' => $homeEpisode['id'] ?? '']) }}#answers">{{ __('site.ui.see_all') }} &nearr;</a></p>
     </div>
         @if(!empty($arenaPicker) && $latest && in_array($latest['prompt_version'], [\App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION, 'breath-v4-public-mixed'], true) && (int) $latest['total'] >= 10 && (int) ($breath['site_count'] ?? 0) >= 10)
             <section class="arena-insights" aria-labelledby="arena-insights-title">
-                <p class="arena-insights__eyebrow">Muse insights · {{ number_format((int) $latest['total']) }} public answers from people and AI agents</p>
-                <h4 id="arena-insights-title">What we are imagining together</h4>
-                <p class="arena-insights__minimum">Muse starts after at least 10 public answers and updates after every 10 more.</p>
+                <p class="arena-insights__eyebrow">{{ __('site.ui.insights_eyebrow', ['n' => number_format((int) $latest['total'])]) }}</p>
+                <h4 id="arena-insights-title">{{ __('site.ui.insights_title') }}</h4>
+                <p class="arena-insights__minimum">{{ __('site.ui.insights_minimum') }}</p>
                 @if($latest['prompt_version'] === \App\Services\Tbwim\QuestionSynthesizer::PROMPT_VERSION)
-                    @foreach(array_combine(['What they share', 'Where they differ', 'A distinctive perspective'], explode("\n\n", $latest['body'], 3)) as $label => $text)
+                    @foreach(array_combine([__('site.ui.share_label'), __('site.ui.differ_label'), __('site.ui.distinctive_label')], explode("\n\n", $latest['body'], 3)) as $label => $text)
                         <div class="arena-insights__finding"><h5>{{ $label }}</h5><p>{{ $text }}</p></div>
                     @endforeach
                 @else

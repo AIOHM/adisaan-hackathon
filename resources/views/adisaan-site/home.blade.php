@@ -58,12 +58,12 @@
     <div class="container reveal">
         @include('adisaan-site.partials.living-map-key')
         <p class="home-episode__tag">{{ $home['episode']['hashtag'] ?? '#TBWIM' }}</p>
-        <p class="home-episode__eyebrow">{{ $home['episode']['eyebrow'] ?? '· THE QUESTION BEHIND EVERY QUESTION ·' }}</p>
+        <p class="home-episode__eyebrow">{{ $home['episode']['eyebrow'] ?? __('site.ui.episode_eyebrow') }}</p>
         <h2 id="episode-heading">{{ $home['episode']['title'] ?? 'Watch first. Then answer.' }}</h2>
         <figure class="home-episode__preview">
-            <img class="home-episode__poster" src="{{ $home['episode']['intro_poster'] }}" alt="AdiSaan points toward the question: What is the best way you imagine?" width="1920" height="1080" fetchpriority="high" decoding="async">
-            <audio class="home-episode__audio" data-home-narration preload="none" src="{{ $home['episode']['narration_audio'] }}">Your browser does not support audio playback.</audio>
-            <button class="home-episode__sound" type="button" data-home-narration-toggle aria-label="Play narration" aria-pressed="false">
+            <img class="home-episode__poster" src="{{ $home['episode']['intro_poster'] }}" alt="{{ __('site.ui.home_poster_alt') }}" width="1920" height="1080" fetchpriority="high" decoding="async">
+            <audio class="home-episode__audio" data-home-narration preload="none" src="{{ $home['episode']['narration_audio'] }}">{{ __('site.ui.audio_unsupported') }}</audio>
+            <button class="home-episode__sound" type="button" data-home-narration-toggle aria-label="{{ __('site.ui.play_narration') }}" aria-pressed="false">
                 <svg data-icon-muted viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m16 9 5 6m0-6-5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
                 <svg data-icon-sound viewBox="0 0 24 24" aria-hidden="true" focusable="false" hidden><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
             </button>
@@ -94,9 +94,9 @@
         @include('adisaan-site.partials.question-loop', ['loop' => $loop ?? null])
         {{-- 2026-10-31: the duel and the living synthesis live in the arena now. --}}
         <div class="qloop" aria-labelledby="arena-pointer-heading">
-            <h3 id="arena-pointer-heading" class="qloop__title">The arena holds the synthesis</h3>
-            <p class="qloop__meta">The duel and what every voice adds up to, version by version.</p>
-            <p><a class="home-link" href="{{ route('adisaan.public.arena') }}">Enter the arena</a></p>
+            <h3 id="arena-pointer-heading" class="qloop__title">{{ __('site.ui.arena_pointer_title') }}</h3>
+            <p class="qloop__meta">{{ __('site.ui.arena_pointer_text') }}</p>
+            <p><a class="home-link" href="{{ route('adisaan.public.arena') }}">{{ __('site.ui.arena_pointer_link') }}</a></p>
         </div>
     </div>
 </section>
@@ -152,7 +152,7 @@
                 @foreach($column as $item)
                 <li class="reveal">
                     <span class="home-journey__who"><span class="home-journey__platform">{{ $item['platform_label'] ?? $item['platform'] }}</span><span class="home-journey__handle">{{ stripos((string) ($item['handle'] ?? ''), 'adrian') !== false ? 'AdiSaan' : ($item['handle'] !== '' ? '@'.ltrim((string) $item['handle'], '@') : ($item['name'] ?? 'Channel')) }}</span></span>
-                    <span class="home-journey__n">@if(!empty($item['measured'])){{ number_format((int) $item['followers']) }} follow @else not reporting @endif</span>
+                    <span class="home-journey__n">@if(!empty($item['measured'])){{ number_format((int) $item['followers']) }} {{ __('site.ui.follow') }} @else {{ __('site.ui.not_reporting') }} @endif</span>
                     <a class="home-journey__follow" href="{{ $item['profile_url'] }}" target="_blank" rel="noopener noreferrer" data-follow-channel="{{ $item['platform'] }}:{{ $item['handle'] }}">{{ $journey['follow_label'] ?? 'Follow' }}</a>
                 </li>
                 @endforeach
@@ -175,8 +175,8 @@
 @if($partnerSeats !== [])
 <section class="home-section home-section--paper home-who home-partners" id="partners" aria-labelledby="partners-heading">
     <div class="container reveal">
-        <h2 id="partners-heading">Partners</h2>
-        <p class="home-who__text">Two organisations took a seat before there was anything to show them. The study is built with their help, and the record should say so.</p>
+        <h2 id="partners-heading">{{ __('site.ui.partners_title') }}</h2>
+        <p class="home-who__text">{{ __('site.ui.partners_text') }}</p>
         <ul class="partner-row">
             @foreach($partnerSeats as $partner)
                 <li class="partner">
@@ -191,12 +191,12 @@
                         </a>
                     @elseif(!empty($partner['logo']))
                         <img class="partner__logo" src="{{ $partner['logo'] }}" alt="{{ $partner['logo_alt'] ?? $partner['name'] }}" loading="lazy" decoding="async">
-                        <span class="partner__role">{{ $partner['status'] ?? 'Partner' }}</span>
+                        <span class="partner__role">{{ $partner['status'] ?? __('site.ui.partner_default') }}</span>
                     @else
                         {{-- No logo file for this one yet; the name in our own
                              type is better than an invented mark. --}}
                         <span class="partner__wordmark">{{ $partner['name'] }}</span>
-                        <span class="partner__role">{{ $partner['status'] ?? 'Partner' }}</span>
+                        <span class="partner__role">{{ $partner['status'] ?? __('site.ui.partner_default') }}</span>
                     @endif
                 </li>
             @endforeach

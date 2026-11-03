@@ -18,16 +18,16 @@
 <div class="wall" id="{{ $wallId }}">
     <div class="wall__bar">
         @if($membersOnly > 0)
-            <p class="wall__count">Showing {{ number_format($answers->count()) }} answers <span aria-hidden="true">·</span> {{ number_format($people->count()) }} from people ({{ number_format($membersOnly) }} members-only), {{ number_format($machines->count()) }} from agents</p>
+            <p class="wall__count">{{ __('site.ui.showing_answers', ['total' => number_format($answers->count()), 'people' => number_format($people->count()), 'members' => number_format($membersOnly), 'machines' => number_format($machines->count())]) }}</p>
         @else
-            <p class="wall__count">Showing {{ number_format($answers->count()) }} public answers <span aria-hidden="true">·</span> {{ number_format($people->count()) }} from people, {{ number_format($machines->count()) }} from agents</p>
+            <p class="wall__count">{{ __('site.ui.showing_public', ['total' => number_format($answers->count()), 'people' => number_format($people->count()), 'machines' => number_format($machines->count())]) }}</p>
         @endif
     </div>
     @if($answers->isEmpty())
-        <div class="wall__card wall__empty"><p class="wall__full">No public answers yet. Be the first to share your perspective.</p>@if(!empty($answerUrl))<a href="{{ $answerUrl }}">Add your answer ↗</a>@endif</div>
+        <div class="wall__card wall__empty"><p class="wall__full">{{ __('site.ui.wall_empty') }}</p>@if(!empty($answerUrl))<a href="{{ $answerUrl }}">{{ __('site.ui.wall_add') }}</a>@endif</div>
     @else
         <div class="wall__duel">
-            @foreach([['key' => 'people', 'title' => 'From people', 'rows' => $people, 'empty' => 'No public answers from people yet.'], ['key' => 'agents', 'title' => 'From agents', 'rows' => $machines, 'empty' => 'No agent answers yet.']] as $column)
+            @foreach([['key' => 'people', 'title' => __('site.ui.from_people'), 'rows' => $people, 'empty' => __('site.ui.no_people')], ['key' => 'agents', 'title' => __('site.ui.from_agents'), 'rows' => $machines, 'empty' => __('site.ui.no_agents')]] as $column)
                 <section class="wall__column wall__column--{{ $column['key'] }}" aria-label="{{ $column['title'] }}">
                     <h3 class="wall__column-title">{{ $column['title'] }} <span>{{ number_format($column['rows']->count()) }}</span></h3>
                     <ol class="wall__grid">
@@ -44,7 +44,7 @@
         @php($hiddenTotal = $people->count() > 5 ? $people->count() - 5 : 0)
         @php($hiddenTotal += $machines->count() > 5 ? $machines->count() - 5 : 0)
         @if($hiddenTotal > 0)
-            <button type="button" class="wall__more-btn" data-wall-more aria-expanded="false" data-more="Show {{ $hiddenTotal }} more" data-less="Show less">Show {{ $hiddenTotal }} more <span aria-hidden="true">↓</span></button>
+            <button type="button" class="wall__more-btn" data-wall-more aria-expanded="false" data-more="{{ __('site.ui.show_more', ['n' => $hiddenTotal]) }}" data-less="{{ __('site.ui.show_less') }}">{{ __('site.ui.show_more', ['n' => $hiddenTotal]) }} <span aria-hidden="true">↓</span></button>
         @endif
     @endif
 </div>

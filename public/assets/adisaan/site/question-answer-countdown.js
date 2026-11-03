@@ -30,7 +30,7 @@
         wait.hidden = true;
         video.hidden = false;
         const eyebrow = clock.querySelector('[data-answer-eyebrow]');
-        if (eyebrow) eyebrow.textContent = 'ADISAAN’S ANSWER';
+        if (eyebrow) eyebrow.textContent = (window.TBWIM_I18N || {}).adisaan_answer || 'ADISAAN’S ANSWER';
         window.dispatchEvent(new Event('resize'));
         video.play().catch(() => {});
       }, 200);
@@ -80,7 +80,7 @@
       window.clearInterval(timer);
       card.hidden = true;
       why.hidden = false;
-      if (eyebrow) eyebrow.textContent = 'AND WHY THAT WAY';
+      if (eyebrow) eyebrow.textContent = (window.TBWIM_I18N || {}).and_why || 'AND WHY THAT WAY';
       // Autoplay can still be refused after a gesture. The controls are
       // already there, so a refusal just means the viewer presses play.
       why.play().catch(() => {});

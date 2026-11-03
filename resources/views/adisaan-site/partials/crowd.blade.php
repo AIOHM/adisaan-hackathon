@@ -47,7 +47,7 @@
 @endphp
 
 <div class="crowd crowd--{{ $isPeople ? 'people' : 'machines' }}">
-    <ul class="crowd__ring" role="img" aria-label="{{ $label ?? ($isPeople ? 'People answering' : 'Models answering') }}">
+    <ul class="crowd__ring" role="img" aria-label="{{ $label ?? ($isPeople ? __('site.ui.people_answering') : __('site.ui.models_answering')) }}">
         @foreach($members as $i => $member)
             <li class="crowd__token{{ $isPeople ? ' crowd__token--portrait' : ' crowd__token--logo' }}" style="--i:{{ $i }}" title="{{ $member['name'] }}">
                 <img src="/assets/adisaan/site/{{ $isPeople ? 'people/' : 'ai-logos/' }}{{ !$isPeople && !empty($brandColors) ? ($member['colorImage'] ?? $member['image']) : $member['image'] }}" alt="" aria-hidden="true" loading="lazy" decoding="async">
@@ -56,6 +56,6 @@
         <li class="crowd__token crowd__token--more" style="--i:5" aria-hidden="true"><span>+</span></li>
     </ul>
     @if($showLabel ?? true)
-        <p class="crowd__label">{{ $label ?? ($isPeople ? 'People imagining answers' : 'AI agent services') }}</p>
+        <p class="crowd__label">{{ $label ?? ($isPeople ? __('site.ui.people_imagining') : __('site.ui.agent_services')) }}</p>
     @endif
 </div>

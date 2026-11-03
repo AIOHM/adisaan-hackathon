@@ -7,7 +7,7 @@
     $countWords = ($home['count_words'] ?? null) ?: ['none' => 'No measured count yet', 'follow' => 'follow so far', 'counted' => 'counted'];
 @endphp
 <!doctype html>
-<html lang="{{ $lang ?? 'en' }}">
+<html lang="{{ $locale ?? $lang ?? 'en' }}">
 <head>
     <!-- GA4 consent defaults stay denied. Returning visitors who opted in can be
          measured from the first page view; everyone else remains cookieless. -->
@@ -41,13 +41,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'AdiSaan — Your online partner')</title>
-    <meta name="description" content="@yield('description', 'A morning question. An evening perspective. Join AdiSaan on a real journey toward one million follows.')">
+    <title>@yield('title', __('site.ui.title_default'))</title>
+    <meta name="description" content="@yield('description', __('site.ui.description_default'))">
     <meta name="theme-color" content="#073209">
     <link rel="canonical" href="{{ $publicUrl }}{{ $canonicalPath }}">
+    @foreach(($locales ?? []) as $code => $meta)<link rel="alternate" hreflang="{{ $code }}" href="{{ $publicUrl }}{{ $canonicalPath }}?lang={{ $code }}">
+    @endforeach<link rel="alternate" hreflang="x-default" href="{{ $publicUrl }}{{ $canonicalPath }}">
+    <script>window.TBWIM_LOCALE = @json($locale ?? 'en'); window.TBWIM_I18N = @json(trans('site.js'));</script>
     <meta property="og:type" content="website">
-    <meta property="og:title" content="@yield('title', 'AdiSaan — Your online partner')">
-    <meta property="og:description" content="A real story. A question for your imagination. A journey we shape together.">
+    <meta property="og:title" content="@yield('title', __('site.ui.title_default'))">
+    <meta property="og:description" content="{{ __('site.ui.og_description') }}">
     <meta property="og:url" content="{{ $publicUrl }}{{ $canonicalPath }}">
     <meta property="og:image" content="{{ $publicUrl }}/assets/adisaan/site/header-art-v1-share.jpg">
     <meta property="og:image:type" content="image/jpeg">
@@ -86,7 +89,7 @@
             'name' => 'AdiSaan',
             'alternateName' => 'AdiSaan is BACK',
             'url' => $publicUrl.'/',
-            'inLanguage' => $lang ?? 'en',
+            'inLanguage' => $locale ?? $lang ?? 'en',
             'author' => ['@id' => $publicUrl.'/#adisaan'],
         ];
         // The graph is assembled here, inside @php, on purpose (2026-10-26).
@@ -112,11 +115,11 @@
         <link rel="stylesheet" href="/css/public-story-carousel.css?v=20261014-2">
         <script src="/js/public-story-carousel.js?v=20261014-2" defer></script>
     @endif
-    <script src="/assets/adisaan/site/site.js?v=20261026-chart-windows" defer></script>
+    <script src="/assets/adisaan/site/site.js?v=20261103-locales" defer></script>
     <script src="/assets/adisaan/site/analytics-consent.js?v=20261024-1" defer></script>
 </head>
 <body class="@if(in_array($active ?? '', ['about', 'manifesto'], true)) manifesto-page @endif @if(($active ?? '') === 'journey') journey-page @endif @if(($active ?? '') === 'question') question-template @endif @if(($active ?? '') === 'answer') answer-template @endif @if(isset($livingMap)) home-living-map @endif" data-public-url="{{ $publicUrl }}" data-public-path="{{ $canonicalPath }}" data-board-url="{{ route('adisaan.public.board') }}">
-<a class="skip-link" href="#main">Skip to the story</a>
+<a class="skip-link" href="#main">{{ __('site.ui.skip') }}</a>
 @if(isset($livingMap))
 <div class="living-map" aria-hidden="true">
     <div class="living-map__atlas">
@@ -133,8 +136,8 @@
 <div class="public-header--compact">
 <header class="brand-header brand-header--slim">
     <div class="container brand-header__slim-row">
-        <a href="{{ route('adisaan.public.home') }}" class="brand-header__wordmark" aria-label="AdiSaan home">
-            <img src="/assets/adisaan/site/logo-en.svg" width="5107" height="1509" alt="AdiSaan — Your online partner">
+        <a href="{{ route('adisaan.public.home') }}" class="brand-header__wordmark" aria-label="{{ __('site.ui.home_aria') }}">
+            <img src="/assets/adisaan/site/logo-en.svg" width="5107" height="1509" alt="{{ __('site.ui.logo_alt') }}">
         </a>
 @else
 <header class="brand-header brand-header--building">
@@ -144,20 +147,20 @@
                 <path d="M-80 506 C 180 493, 338 673, 638 625 S 1030 482, 1290 568 S 1540 600, 1680 523" />
                 <path d="M-80 560 C 220 526, 430 683, 716 633 S 1090 528, 1360 596 S 1540 630, 1680 565" />
             </svg>
-            <img class="hero__avatar" src="/assets/adisaan/site/avatar-cutout-800.webp" srcset="/assets/adisaan/site/avatar-cutout-600.webp 600w, /assets/adisaan/site/avatar-cutout-800.webp 800w, /assets/adisaan/site/avatar-cutout-1084.webp 1084w" sizes="(max-width: 700px) 100vw, 46vw" width="1084" height="1451" alt="AdiSaan, the animated avatar" fetchpriority="high" decoding="async">
+            <img class="hero__avatar" src="/assets/adisaan/site/avatar-cutout-800.webp" srcset="/assets/adisaan/site/avatar-cutout-600.webp 600w, /assets/adisaan/site/avatar-cutout-800.webp 800w, /assets/adisaan/site/avatar-cutout-1084.webp 1084w" sizes="(max-width: 700px) 100vw, 46vw" width="1084" height="1451" alt="{{ __('site.ui.avatar_alt') }}" fetchpriority="high" decoding="async">
         </div>
     <div class="utility container">
-        <span>{{ $home['tagline'] ?? 'A. Adrian’s avatar. His almost real story.' }}</span>
-        <a class="utility__count" href="{{ route('adisaan.public.home') }}" title="See the progress so far">@if($followersTotal === null){{ $countWords['none'] }}@else<span>{{ $followersTotal }} {{ $countWords['follow'] }}</span>@if($countedOn)<small>{{ $countWords['counted'] }} {{ $countedOn }}</small>@endif @endif</a>
+        <span>{{ $home['tagline'] ?? __('site.ui.tagline_default') }}</span>
+        <a class="utility__count" href="{{ route('adisaan.public.home') }}" title="{{ __('site.ui.see_progress') }}">@if($followersTotal === null){{ $countWords['none'] }}@else<span>{{ $followersTotal }} {{ $countWords['follow'] }}</span>@if($countedOn)<small>{{ $countWords['counted'] }} {{ $countedOn }}</small>@endif @endif</a>
     </div>
     <div class="hero">
         <div class="container hero__inner">
             <div class="hero__copy">
-                    <h1 class="hero__brandline" aria-label="AdiSaan is BACK with a plan">
-                        <a href="{{ route('adisaan.public.home') }}" class="hero__logo" aria-label="AdiSaan home">
-                            <img src="/assets/adisaan/site/logo-en.svg" width="5107" height="1509" alt="AdiSaan — Your online partner">
+                    <h1 class="hero__brandline" aria-label="{{ __('site.ui.brandline_aria') }}">
+                        <a href="{{ route('adisaan.public.home') }}" class="hero__logo" aria-label="{{ __('site.ui.home_aria') }}">
+                            <img src="/assets/adisaan/site/logo-en.svg" width="5107" height="1509" alt="{{ __('site.ui.logo_alt') }}">
                         </a>
-                        <span class="hero__return-line"><span class="hero__is">is</span><span class="hero__back">BACK<a href="{{ route('adisaan.public.manifesto') }}" class="hero__plan" aria-label="with a plan — read the manifesto">with a plan...</a></span></span>
+                        <span class="hero__return-line"><span class="hero__is">is</span><span class="hero__back">BACK<a href="{{ route('adisaan.public.manifesto') }}" class="hero__plan" aria-label="{{ __('site.ui.plan_aria') }}">with a plan...</a></span></span>
                     </h1>
                 <div class="hero__support">
                     {{-- 2026-10-20 (Adrian): one intro line, then the question of the day in a thought bubble, then the two actions.
@@ -178,15 +181,16 @@
     </div>
 </header>
 @endif
-<nav class="tabs" aria-label="The AdiSaan journey">
+<nav class="tabs" aria-label="{{ __('site.ui.nav_aria') }}">
     <div class="@unless($compactHeader)container @endunless tabs__inner">
-        <a href="{{ route('adisaan.public.question') }}" @if($active === 'question') aria-current="page" @endif>Question</a>
-        <a href="{{ route('adisaan.public.answer') }}" @if($active === 'answer') aria-current="page" @endif>Answer</a>
-        <a href="{{ route('adisaan.public.arena') }}" @if($active === 'arena') aria-current="page" @endif>Arena</a>
-        <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>About</a>
-        <a href="{{ route('adisaan.public.manifesto') }}" @if($active === 'manifesto') aria-current="page" @endif>Manifesto</a>
-        <a href="{{ route('adisaan.public.news') }}" @if($active === 'news') aria-current="page" @endif>News</a>
-        <button class="tabs__share" type="button" data-share aria-label="Share the AdiSaan journey">Share <span aria-hidden="true">↗</span></button>
+        <a href="{{ route('adisaan.public.question') }}" @if($active === 'question') aria-current="page" @endif>{{ __('site.ui.nav_question') }}</a>
+        <a href="{{ route('adisaan.public.answer') }}" @if($active === 'answer') aria-current="page" @endif>{{ __('site.ui.nav_answer') }}</a>
+        <a href="{{ route('adisaan.public.arena') }}" @if($active === 'arena') aria-current="page" @endif>{{ __('site.ui.nav_arena') }}</a>
+        <a href="{{ route('adisaan.public.about') }}" @if($active === 'about') aria-current="page" @endif>{{ __('site.ui.nav_about') }}</a>
+        <a href="{{ route('adisaan.public.manifesto') }}" @if($active === 'manifesto') aria-current="page" @endif>{{ __('site.ui.nav_manifesto') }}</a>
+        <a href="{{ route('adisaan.public.news') }}" @if($active === 'news') aria-current="page" @endif>{{ __('site.ui.nav_news') }}</a>
+        @include('adisaan-site.partials.language-switcher')
+        <button class="tabs__share" type="button" data-share aria-label="{{ __('site.ui.share_aria') }}">{{ __('site.ui.share') }} <span aria-hidden="true">↗</span></button>
     </div>
 </nav>
 @if($compactHeader)
@@ -201,20 +205,20 @@
 <footer class="footer footer--compact">
     <div class="container footer__bottom">
         <span>© {{ now()->year }} AdiSaan</span>
-        <span>Supported by <a href="https://ohm.events/">OHM Events</a> · Built with <a href="https://aiohm.org/">AIOHM</a></span>
-        <span><a href="{{ route('adisaan.public.manifesto') }}">Manifesto</a> · <a href="{{ route('adisaan.public.million') }}#answers">Members&rsquo; answers</a> · <a href="{{ route('adisaan.public.privacy') }}">Privacy</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>Analytics choice</button> · <a href="{{ $adminUrl }}">My home ↗</a></span>
+        <span>{{ __('site.ui.supported_by') }} <a href="https://ohm.events/">OHM Events</a> · {{ __('site.ui.built_with') }} <a href="https://aiohm.org/">AIOHM</a></span>
+        <span><a href="{{ route('adisaan.public.manifesto') }}">{{ __('site.ui.nav_manifesto') }}</a> · <a href="{{ route('adisaan.public.million') }}#answers">{{ __('site.ui.members_answers') }}</a> · <a href="{{ route('adisaan.public.privacy') }}">{{ __('site.ui.privacy') }}</a> · <button type="button" class="footer__consent-link" data-analytics-preferences>{{ __('site.ui.analytics_choice') }}</button> · <a href="{{ $adminUrl }}">{{ __('site.ui.my_home') }}</a></span>
     </div>
 </footer>
 <div class="toast" role="status" aria-live="polite" hidden></div>
 @include('adisaan-site.partials.analytics-consent')
 @include('adisaan-site.partials.ambassador-companion')
 <dialog class="manifesto-exit" aria-labelledby="manifesto-exit-title" aria-describedby="manifesto-exit-description">
-    <button class="manifesto-exit__close" type="button" aria-label="Close">×</button>
-    <p class="manifesto-exit__label">A thought before you go</p>
-    <h2 id="manifesto-exit-title">Every question opens a new way forward.</h2>
-    <p id="manifesto-exit-description">Discover the idea behind AdiSaan and the journey we are building together.</p>
-    <a href="{{ route('adisaan.public.manifesto') }}">Read the manifesto <span aria-hidden="true">↗</span></a>
-    <button type="button" class="manifesto-exit__later">Maybe later</button>
+    <button class="manifesto-exit__close" type="button" aria-label="{{ __('site.ui.close') }}">×</button>
+    <p class="manifesto-exit__label">{{ __('site.ui.exit_label') }}</p>
+    <h2 id="manifesto-exit-title">{{ __('site.ui.exit_title') }}</h2>
+    <p id="manifesto-exit-description">{{ __('site.ui.exit_text') }}</p>
+    <a href="{{ route('adisaan.public.manifesto') }}">{{ __('site.ui.exit_read') }} <span aria-hidden="true">↗</span></a>
+    <button type="button" class="manifesto-exit__later">{{ __('site.ui.exit_later') }}</button>
 </dialog>
 <script src="/assets/adisaan/site/manifesto-exit.js?v=20261030" defer></script>
 </body>

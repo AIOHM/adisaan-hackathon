@@ -11,29 +11,29 @@
 @if($locked)
 <li id="answer-{{ $answer['id'] }}" tabindex="-1" class="wall__card wall__card--human wall__card--locked{{ $extra ? ' wall__card--extra' : '' }}"@if($extra) hidden @endif>
     <div class="wall__who">
-        <span class="wall__tag">Members</span>
-        <strong>{{ ($answer['signature'] ?? '') ?: 'A fellow seeker' }}</strong>
-        @if(!empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
+        <span class="wall__tag">{{ __('site.ui.wall_members') }}</span>
+        <strong>{{ ($answer['signature'] ?? '') ?: __('site.ui.fellow_seeker') }}</strong>
+        @if(!empty($answer['place']))<span class="wall__by">{{ __('site.ui.from') }} {{ $answer['place'] }}</span>@endif
     </div>
     <p class="wall__excerpt wall__blur" aria-hidden="true">{{ $body }}</p>
-    <p class="visually-hidden">Members-only answer. Answer a question to reveal it.</p>
+    <p class="visually-hidden">{{ __('site.ui.members_only_hidden') }}</p>
     <div class="wall__meta">
         <span>{{ $when }}</span>
-        <a class="btn-primary wall__unlock" href="{{ $answerUrl ?? route('adisaan.public.answer') }}">Answer a question to reveal <span aria-hidden="true">↗</span></a>
+        <a class="btn-primary wall__unlock" href="{{ $answerUrl ?? route('adisaan.public.answer') }}">{{ __('site.ui.answer_reveal') }} <span aria-hidden="true">↗</span></a>
     </div>
 </li>
 @else
 <li id="answer-{{ $answer['id'] }}" tabindex="-1" class="wall__card {{ $isAgent ? 'wall__card--agent' : 'wall__card--human' }}{{ $extra ? ' wall__card--extra' : '' }}"@if($extra) hidden @endif>
     <div class="wall__who">
-        <span class="wall__tag">{{ $isMembers ? 'Members' : ($isAgent ? 'AI agent' : 'Human') }}</span>
-        <strong>{{ $isAgent ? ($answer['agent_model'] ?? 'Autonomous model') : (($answer['signature'] ?? '') ?: 'A fellow seeker') }}</strong>
-        @if(!$isAgent && !empty($answer['place']))<span class="wall__by">from {{ $answer['place'] }}</span>@endif
+        <span class="wall__tag">{{ $isMembers ? __('site.ui.wall_members') : ($isAgent ? __('site.ui.wall_ai') : __('site.ui.wall_human')) }}</span>
+        <strong>{{ $isAgent ? ($answer['agent_model'] ?? __('site.ui.autonomous_model')) : (($answer['signature'] ?? '') ?: __('site.ui.fellow_seeker')) }}</strong>
+        @if(!$isAgent && !empty($answer['place']))<span class="wall__by">{{ __('site.ui.from') }} {{ $answer['place'] }}</span>@endif
     </div>
     @if($long)
         <details class="wall__text">
             <summary>
                 <p class="wall__excerpt">{{ $body }}</p>
-                <span class="wall__more">Read the whole answer</span>
+                <span class="wall__more">{{ __('site.ui.read_whole') }}</span>
             </summary>
             <p class="wall__full">{{ $body }}</p>
         </details>
@@ -46,7 +46,7 @@
             @csrf
             <input type="hidden" name="vote_echo_id" value="{{ $answer['id'] }}">
             <input type="hidden" name="redirect_to" value="{{ $redirectTo }}">
-            <button type="submit" class="home-answer__vote-btn wall__vote{{ !empty($answer['voted']) ? ' is-voted' : '' }}" aria-label="This resonates with me, {{ $answer['votes'] }} so far">Resonates <span data-vote-count>{{ $answer['votes'] }}</span></button>
+            <button type="submit" class="home-answer__vote-btn wall__vote{{ !empty($answer['voted']) ? ' is-voted' : '' }}" aria-label="{{ __('site.ui.resonates_aria', ['n' => $answer['votes']]) }}">{{ __('site.ui.resonates') }} <span data-vote-count>{{ $answer['votes'] }}</span></button>
         </form>
     </div>
 </li>

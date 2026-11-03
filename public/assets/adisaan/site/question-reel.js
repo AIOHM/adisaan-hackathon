@@ -64,8 +64,8 @@
 
     dots.forEach((dot, i) => dot.setAttribute('aria-selected', String(i === index)));
     if (counter) counter.textContent = pad(index + 1);
-    if (prevBtn) prevBtn.setAttribute('aria-label', `Question ${pad(((index - 1 + slides.length) % slides.length) + 1)}`);
-    if (nextBtn) nextBtn.setAttribute('aria-label', `Question ${pad(((index + 1) % slides.length) + 1)}`);
+    if (prevBtn) prevBtn.setAttribute('aria-label', `${(window.TBWIM_I18N || {}).question_word || 'Question'} ${pad(((index - 1 + slides.length) % slides.length) + 1)}`);
+    if (nextBtn) nextBtn.setAttribute('aria-label', `${(window.TBWIM_I18N || {}).question_word || 'Question'} ${pad(((index + 1) % slides.length) + 1)}`);
 
     pauseOthers();
     sizeTrack();

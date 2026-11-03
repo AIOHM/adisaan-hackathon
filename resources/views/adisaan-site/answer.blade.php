@@ -3,11 +3,11 @@
     $activeEp = $selectedStory ?? ($stories[0] ?? config('adisaan_public.story'));
     $lead = $activeEp['lead'] ?? $question;
     $displayLead = $lead;
-    $ap = config('adisaan_public.home.answer_page', []);
+    $ap = $home['answer_page'] ?? config('adisaan_public.home.answer_page', []);
     $initialMode = old('share_mode', 'public');
 @endphp
-@section('title', 'Answer: ' . $lead)
-@section('description', 'Answer AdiSaan’s question. Human perspectives and AI-agent submissions are kept separate.')
+@section('title', __('site.ui.answer_title_prefix') . $lead)
+@section('description', __('site.ui.answer_description'))
 @push('styles')
 <link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261030-analysis">
 @endpush
@@ -18,9 +18,9 @@
             <h1 id="answer-heading" class="reveal" style="--i:1">{{ $displayLead }}</h1>
             @include('adisaan-site.partials.arena-question-picker', ['pickerRoute' => 'adisaan.public.answer', 'pickerId' => 'answer-question', 'pickerSelectedId' => $activeEp['id'] ?? null])
             <p class="answer-page__episode reveal" style="--i:2">
-                <a class="home-link" href="{{ route('adisaan.public.question') }}">← See the question and context</a>
+                <a class="home-link" href="{{ route('adisaan.public.question') }}">{{ __('site.ui.see_question') }}</a>
             </p>
-            <p class="home-lead reveal" style="--i:2">Two ways to answer. Share your own words, voice, or video. Autonomous agents can respond through the separate machine endpoint.</p>
+            <p class="home-lead reveal" style="--i:2">{{ __('site.ui.answer_two_ways') }}</p>
         </div>
 
         <!-- DUAL ARENA GRID -->
@@ -29,8 +29,8 @@
             <!-- PERSPECTIVE I: HUMAN SANCTUARY -->
             <div class="arena-card arena-card--human" id="human-perspective">
                 <div class="arena-card__header">
-                    @include('adisaan-site.partials.crowd', ['kind' => 'people', 'label' => '01 / People'])
-                    <h2 class="arena-card__title">Your perspective, your way</h2>
+                    @include('adisaan-site.partials.crowd', ['kind' => 'people', 'label' => __('site.ui.people_label')])
+                    <h2 class="arena-card__title">{{ __('site.ui.your_perspective') }}</h2>
                 </div>
 
                 <div class="human-answer-layout">
@@ -47,11 +47,11 @@
                      labels, the prompt itself folded away, and the form beside it. --}}
                 <div class="human-answer-tools">
                 <div class="companion-helper" id="silent-mirror">
-                    <p class="companion-helper__title">Not sure what you think yet?</p>
-                    <p class="companion-helper__desc">Copy this prompt into the AI you already use. Four short questions later, it gives you your answer in your own words.</p>
+                    <p class="companion-helper__title">{{ __('site.ui.mirror_title') }}</p>
+                    <p class="companion-helper__desc">{{ __('site.ui.mirror_desc') }}</p>
                     <div class="companion-helper__actions">
-                        <button type="button" class="btn-companion-copy" id="btn-copy-mirror"><span id="copy-mirror-icon" aria-hidden="true">⎘</span> <span id="copy-mirror-label">Copy the prompt</span></button>
-                        <button type="button" class="companion-helper__toggle" id="btn-show-mirror" aria-expanded="false" aria-controls="silent-mirror-prompt">Show prompt</button>
+                        <button type="button" class="btn-companion-copy" id="btn-copy-mirror"><span id="copy-mirror-icon" aria-hidden="true">⎘</span> <span id="copy-mirror-label">{{ __('site.ui.copy_prompt') }}</span></button>
+                        <button type="button" class="companion-helper__toggle" id="btn-show-mirror" aria-expanded="false" aria-controls="silent-mirror-prompt">{{ __('site.ui.show_prompt') }}</button>
                     </div>
                     <pre class="companion-helper__prompt-box" id="silent-mirror-prompt" hidden>Act as a calm, incisive listener helping me find my own answer to this question:
 "What is the best way you imagine to {{ $goalPhrase }}?"
@@ -70,13 +70,13 @@ Do not give advice, frameworks, or generic coaching. Instead, analyze my exact w
 4. THE ONE CONDITION: 1 clear sentence stating the single non-negotiable reality my idea hinges on to actually work.
 
 Keep the tone understated, perceptive, and free of hype.</pre>
-                    <p class="companion-helper__subhint">When it answers, paste it in the answer box.</p>
+                    <p class="companion-helper__subhint">{{ __('site.ui.mirror_subhint') }}</p>
                 </div>
 
-                    <div class="answer-format" role="group" aria-label="Choose how to answer">
-                        <button type="button" class="answer-format__choice is-active" data-answer-kind="text" aria-pressed="true">Write</button>
-                        <button type="button" class="answer-format__choice" data-answer-kind="audio" aria-pressed="false">Audio</button>
-                        <button type="button" class="answer-format__choice" data-answer-kind="video" aria-pressed="false">Video</button>
+                    <div class="answer-format" role="group" aria-label="{{ __('site.ui.choose_how') }}">
+                        <button type="button" class="answer-format__choice is-active" data-answer-kind="text" aria-pressed="true">{{ __('site.ui.write') }}</button>
+                        <button type="button" class="answer-format__choice" data-answer-kind="audio" aria-pressed="false">{{ __('site.ui.audio') }}</button>
+                        <button type="button" class="answer-format__choice" data-answer-kind="video" aria-pressed="false">{{ __('site.ui.video') }}</button>
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                     <input type="hidden" name="respondent_type" value="human">
 
                     <div class="honeypot" aria-hidden="true">
-                        <label for="extra-website">Leave this blank</label>
+                        <label for="extra-website">{{ __('site.ui.leave_blank') }}</label>
                         <input id="extra-website" name="{{ $form['honeypotField'] }}" type="text" tabindex="-1" autocomplete="off">
                     </div>
 
@@ -111,7 +111,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                               aria-describedby="answer-help">{{ old('body') }}</textarea>
                     <p class="one-form__hint" id="answer-help">
                         <span>{{ $form['minimumLength'] }}–{{ number_format($form['maximumLength']) }} characters</span>
-                        <span data-character-count aria-live="off">0 characters</span>
+                        <span data-character-count aria-live="off">{{ __('site.js.characters', ['n' => 0]) }}</span>
                     </p>
                     </div>
                     <div class="answer-upload" data-answer-upload hidden>
@@ -122,29 +122,29 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                                 <button type="button" class="answer-capture__orb" data-record-start>
                                     <span class="answer-capture__orb-ring" aria-hidden="true"></span>
                                     <span class="answer-capture__orb-core" aria-hidden="true"></span>
-                                    <span class="answer-capture__orb-label visually-hidden" data-record-label>Record</span>
+                                    <span class="answer-capture__orb-label visually-hidden" data-record-label>{{ __('site.ui.record') }}</span>
                                 </button>
                                 <button type="button" class="answer-capture__orb answer-capture__orb--stop" data-record-stop hidden>
                                     <span class="answer-capture__orb-ring" aria-hidden="true"></span>
                                     <span class="answer-capture__orb-core" aria-hidden="true"></span>
-                                    <span class="answer-capture__orb-label visually-hidden">Finish recording</span>
+                                    <span class="answer-capture__orb-label visually-hidden">{{ __('site.ui.finish_recording') }}</span>
                                 </button>
-                                <button type="button" class="answer-capture__reset" data-record-retake hidden>Record again</button>
+                                <button type="button" class="answer-capture__reset" data-record-retake hidden>{{ __('site.ui.record_again') }}</button>
                             </div>
-                            <p class="answer-capture__status" data-record-status role="status" aria-live="polite">Tap the orb to record your answer.</p>
+                            <p class="answer-capture__status" data-record-status role="status" aria-live="polite">{{ __('site.ui.tap_orb') }}</p>
                             <video class="answer-capture__live" data-record-live autoplay muted playsinline hidden></video>
                             <audio class="answer-capture__preview" data-record-audio-preview controls hidden></audio>
                             <video class="answer-capture__preview" data-record-video-preview controls playsinline hidden></video>
                         </div>
                         <input id="answer-media" type="file" name="answer_media" accept="audio/*" class="visually-hidden" tabindex="-1" aria-hidden="true" disabled>
-                        <p class="answer-upload__hint" data-answer-upload-hint hidden>Audio up to 40 MB.</p>
-                        <label for="answer-caption" class="one-form__label">A short note (optional)</label>
-                        <textarea id="answer-caption" name="body" rows="3" maxlength="{{ $form['maximumLength'] }}" disabled placeholder="Anything you want AdiSaan to know about your recording?">{{ old('body') }}</textarea>
-                        <p class="answer-upload__hint">Your recording is transcribed, then deleted. Only the text stays, private, until AdiSaan reads it.</p>
+                        <p class="answer-upload__hint" data-answer-upload-hint hidden>{{ __('site.js.audio_hint') }}</p>
+                        <label for="answer-caption" class="one-form__label">{{ __('site.ui.short_note') }}</label>
+                        <textarea id="answer-caption" name="body" rows="3" maxlength="{{ $form['maximumLength'] }}" disabled placeholder="{{ __('site.ui.caption_placeholder') }}">{{ old('body') }}</textarea>
+                        <p class="answer-upload__hint">{{ __('site.ui.recording_note') }}</p>
                     </div>
 
                     <fieldset class="one-form__switch" data-answer-privacy>
-                        <legend class="visually-hidden">Who can read this answer</legend>
+                        <legend class="visually-hidden">{{ __('site.ui.who_reads') }}</legend>
                         <label class="one-form__option{{ $initialMode === 'public' ? ' is-selected' : '' }}" data-share-mode-card="public">
                             <input type="radio" name="share_mode" value="public" @checked($initialMode === 'public')>
                             <span><strong>{{ $ap['public_label'] ?? 'Everyone can read this' }}</strong><small>{{ $ap['public_hint'] ?? 'It can appear on adisaan.com and be read in an episode.' }}</small></span>
@@ -152,7 +152,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                         @if(strlen((string) config('tbwim.member_bridge_secret', '')) >= 32)
                         <label class="one-form__option{{ $initialMode === 'members' ? ' is-selected' : '' }}" data-share-mode-card="members">
                             <input type="radio" name="share_mode" value="members" @checked($initialMode === 'members')>
-                            <span><strong>AdiSaan members</strong><small>People who answered can read it after human review.</small></span>
+                            <span><strong>{{ __('site.ui.members_label') }}</strong><small>{{ __('site.ui.members_hint') }}</small></span>
                         </label>
                         @else
                         <label class="one-form__option{{ $initialMode === 'private' ? ' is-selected' : '' }}" data-share-mode-card="private">
@@ -182,26 +182,26 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                     @endfor
                 </div>
                 <div class="arena-card__header">
-                    @include('adisaan-site.partials.crowd', ['kind' => 'machines', 'label' => '02 / Agents'])
-                    <h2 class="arena-card__title">LLM perspective</h2>
-                    <p class="arena-card__desc">For autonomous agents. Read the question, send a JSON answer, and receive a receipt while Muse checks it against the question and unsupported claims.</p>
+                    @include('adisaan-site.partials.crowd', ['kind' => 'machines', 'label' => __('site.ui.agents_label')])
+                    <h2 class="arena-card__title">{{ __('site.ui.llm_perspective') }}</h2>
+                    <p class="arena-card__desc">{{ __('site.ui.agent_desc') }}</p>
                 </div>
                 <div class="agent-protocol">
-                    <span class="agent-protocol__label">PUBLIC ENDPOINT · POST</span>
+                    <span class="agent-protocol__label">{{ __('site.ui.public_endpoint') }}</span>
                     {{-- This app's own agent endpoint, not the brand site's (2026-10-30). --}}
                     <code>{{ $form['agentEndpoint'] }}</code>
-                    <a href="{{ route('adisaan.public.agent.answer.info', ['story' => $activeEp['id'] ?? null]) }}" class="agent-protocol__docs">Read machine instructions ↗</a>
-                    <button type="button" class="agent-protocol__copy" data-agent-copy>Copy instructions ↗</button>
+                    <a href="{{ route('adisaan.public.agent.answer.info', ['story' => $activeEp['id'] ?? null]) }}" class="agent-protocol__docs">{{ __('site.ui.machine_instructions') }}</a>
+                    <button type="button" class="agent-protocol__copy" data-agent-copy>{{ __('site.ui.copy_instructions') }}</button>
                     <span class="agent-protocol__status" data-agent-copy-status role="status"></span>
                 </div>
                 <ol class="agent-steps">
-                    <li><span>01</span> Read today’s question.</li>
-                    <li><span>02</span> Send your perspective as JSON, opening with #TBWIM: Based on my training,</li>
-                    <li><span>03</span> Receive a receipt with a status URL you can check later.</li>
+                    <li><span>01</span> {{ __('site.ui.agent_step_1') }}</li>
+                    <li><span>02</span> {{ __('site.ui.agent_step_2') }}</li>
+                    <li><span>03</span> {{ __('site.ui.agent_step_3') }}</li>
                 </ol>
                 <details class="agent-api-box" open>
-                    <summary>Request example</summary>
-                    <p>Identity is self-reported. Muse checks model responses; public human answers wait for human approval.</p>
+                    <summary>{{ __('site.ui.request_example') }}</summary>
+                    <p>{{ __('site.ui.agent_identity_note') }}</p>
                     <pre><code id="agent-api-example">curl -X POST {{ $form['agentEndpoint'] }} \
   -H "Content-Type: application/json" \
   -d '{
@@ -220,6 +220,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
 
 <script>
 (() => {
+    const T = window.TBWIM_I18N || {};
     const form = document.querySelector('[data-answer-form]');
     const textPanel = form?.querySelector('[data-answer-text]');
     const uploadPanel = form?.querySelector('[data-answer-upload]');
@@ -273,7 +274,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         startButton.hidden = false;
         stopButton.hidden = true;
         retakeButton.hidden = true;
-        status.textContent = 'Tap the orb to record your answer.';
+        status.textContent = (T.tap_orb || @json(__('site.ui.tap_orb')));
     };
     const showPreview = (file) => {
         clearPreview();
@@ -284,7 +285,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         element.hidden = false;
         startButton.hidden = true;
         retakeButton.hidden = false;
-        status.textContent = `${file.name} is ready. Review it, then tap Send.`;
+        status.textContent = (T.ready_review || ':name is ready. Review it, then tap Send.').replace(':name', file.name);
     };
     const mimeFor = (kind) => {
         const choices = kind === 'video'
@@ -298,17 +299,17 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         window.clearInterval(timer);
         timer = null;
         stopButton.hidden = true;
-        status.textContent = 'Preparing your recording…';
+        status.textContent = T.preparing_recording || 'Preparing your recording…';
     };
     startButton?.addEventListener('click', async () => {
         if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-            status.textContent = 'In-page recording is unavailable here. Choose a file or use your phone camera below.';
+            status.textContent = T.recording_unavailable || 'In-page recording is unavailable here. Choose a file or use your phone camera below.';
             return;
         }
         resetCapture();
         const version = captureVersion;
         startButton.disabled = true;
-        status.textContent = `Opening your ${activeKind === 'video' ? 'camera and microphone' : 'microphone'}…`;
+        status.textContent = activeKind === 'video' ? (T.opening_camera || 'Opening your camera and microphone…') : (T.opening_mic || 'Opening your microphone…');
         try {
             const openedStream = await navigator.mediaDevices.getUserMedia(activeKind === 'video'
                 ? {audio: true, video: {facingMode: 'user'}}
@@ -337,12 +338,12 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                 const type = (activeRecorder.mimeType || preferredMime || '').split(';')[0];
                 const blob = new Blob(chunks, {type});
                 if (tooLarge || blob.size > maxBytes) {
-                    status.textContent = 'That recording is over 40 MB. Record a shorter one or choose a smaller file.';
+                    status.textContent = T.over_limit_recording || 'That recording is over 40 MB. Record a shorter one or choose a smaller file.';
                     startButton.hidden = false;
                     return;
                 }
                 if (!blob.size || !['audio/mp4', 'audio/webm', 'audio/ogg', 'video/mp4', 'video/webm'].includes(type)) {
-                    status.textContent = 'This browser could not save the recording. Choose a file instead.';
+                    status.textContent = T.cannot_save || 'This browser could not save the recording. Choose a file instead.';
                     startButton.hidden = false;
                     return;
                 }
@@ -354,14 +355,14 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                     media.files = transfer.files;
                     showPreview(file);
                 } catch (_) {
-                    status.textContent = 'This browser cannot attach the recording. Choose a file instead.';
+                    status.textContent = T.cannot_attach || 'This browser cannot attach the recording. Choose a file instead.';
                     startButton.hidden = false;
                 }
                 chunks = [];
             }, {once: true});
             recorder.addEventListener('error', () => {
                 stopTracks();
-                status.textContent = 'Recording was interrupted. Please try again.';
+                status.textContent = T.recording_interrupted || 'Recording was interrupted. Please try again.';
                 startButton.hidden = false;
                 stopButton.hidden = true;
             }, {once: true});
@@ -379,8 +380,8 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         } catch (error) {
             stopTracks();
             status.textContent = error?.name === 'NotAllowedError'
-                ? 'Allow camera or microphone access, or choose a file below.'
-                : 'Could not start recording. Choose a file below.';
+                ? (T.allow_access || 'Allow camera or microphone access, or choose a file below.')
+                : (T.could_not_start || 'Could not start recording. Choose a file below.');
         } finally {
             startButton.disabled = false;
         }
@@ -392,7 +393,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         if (!file) return;
         if (file.size > maxBytes) {
             media.value = '';
-            status.textContent = 'That file is over 40 MB. Choose a smaller recording.';
+            status.textContent = T.over_limit_file || 'That file is over 40 MB. Choose a smaller recording.';
             return;
         }
         showPreview(file);
@@ -400,7 +401,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
     form?.addEventListener('submit', (event) => {
         if (recorder?.state === 'recording') {
             event.preventDefault();
-            status.textContent = 'Finish your recording before sending it.';
+            status.textContent = T.finish_first || 'Finish your recording before sending it.';
         }
     });
     window.addEventListener('pagehide', stopTracks);
@@ -422,10 +423,10 @@ Keep the tone understated, perceptive, and free of hype.</pre>
             // Set the label span, not the button text: replacing the text would
             // delete the ring and core the orb is drawn from.
             const label = startButton?.querySelector('[data-record-label]');
-            if (label) label.textContent = kind === 'video' ? 'Record video' : 'Record audio';
+            if (label) label.textContent = kind === 'video' ? @json(__('site.ui.record_video')) : @json(__('site.ui.record_audio'));
             uploadPanel.querySelector('[data-answer-upload-hint]').textContent = kind === 'audio'
-                ? 'Audio up to 40 MB. On mobile, you can also use your phone recorder.'
-                : 'Video up to 40 MB. On mobile, you can also use your phone camera.';
+                ? (T.audio_hint || 'Audio up to 40 MB.')
+                : (T.video_hint || 'Video up to 40 MB.');
         } else {
             consent.value = form.querySelector('input[name="share_mode"]:checked')?.value === 'public' ? '1' : '';
         }
@@ -443,9 +444,9 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         const example = document.getElementById('agent-api-example')?.textContent || '';
         try {
             await navigator.clipboard.writeText(example);
-            document.querySelector('[data-agent-copy-status]').textContent = 'Copied';
+            document.querySelector('[data-agent-copy-status]').textContent = @json(__('site.ui.copied'));
         } catch (_) {
-            document.querySelector('[data-agent-copy-status]').textContent = 'Select and copy the request below';
+            document.querySelector('[data-agent-copy-status]').textContent = @json(__('site.ui.select_copy'));
         }
     });
 
@@ -455,7 +456,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
         if (!pre) return;
         pre.hidden = !pre.hidden;
         mirrorToggle.setAttribute('aria-expanded', String(!pre.hidden));
-        mirrorToggle.textContent = pre.hidden ? 'Show prompt' : 'Hide prompt';
+        mirrorToggle.textContent = pre.hidden ? @json(__('site.ui.show_prompt')) : @json(__('site.ui.hide_prompt'));
     });
     const mirrorBtn = document.getElementById('btn-copy-mirror');
     mirrorBtn?.addEventListener('click', async () => {
@@ -466,7 +467,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
             const icon = document.getElementById('copy-mirror-icon');
             if (label) {
                 const prev = label.textContent;
-                label.textContent = 'Copied';
+                label.textContent = @json(__('site.ui.copied'));
                 if (icon) icon.textContent = '✓';
                 setTimeout(() => {
                     label.textContent = prev;
@@ -482,7 +483,7 @@ Keep the tone understated, perceptive, and free of hype.</pre>
                 selection?.removeAllRanges();
                 selection?.addRange(range);
                 const label = document.getElementById('copy-mirror-label');
-                if (label) label.textContent = 'Selected — press Ctrl+C to copy';
+                if (label) label.textContent = @json(__('site.ui.selected_copy'));
             }
         }
     });

@@ -1,5 +1,5 @@
 <form class="arena-picker" action="{{ route($pickerRoute ?? 'adisaan.public.arena') }}" method="get">
-    <label for="{{ $pickerId ?? 'arena-question' }}">What is the best way you imagine to...</label>
+    <label for="{{ $pickerId ?? 'arena-question' }}">{{ __('site.ui.picker_label') }}</label>
     <div class="arena-picker__controls">
         <div class="arena-picker__select-wrap">
             <select id="{{ $pickerId ?? 'arena-question' }}" name="story">
@@ -9,6 +9,6 @@
                 @endforeach
             </select>
         </div>
-        <button type="submit">Choose</button>
+        <button type="submit">{{ __('site.ui.choose') }}</button>
     </div>
 </form>

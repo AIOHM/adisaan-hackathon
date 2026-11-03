@@ -29,7 +29,7 @@
         <div
             id="muse-public-messages"
             class="hidden mb-4 max-h-64 overflow-y-auto rounded-2xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm p-4 text-left space-y-3 scroll-smooth"
-            role="log" aria-live="polite" aria-label="Chat messages"
+            role="log" aria-live="polite" aria-label="{{ __('site.ui.chat_messages') }}"
         ></div>
 
         {{-- Input pill --}}
@@ -44,7 +44,7 @@
                 placeholder="{{ $askMuseInputPlaceholder }}" autocomplete="off"
                 class="flex-1 bg-transparent border-none text-white placeholder-white/30 text-sm md:text-base px-6 py-4 focus:outline-none focus:ring-0"
             >
-            <button id="muse-public-send" type="submit" aria-label="Send message"
+            <button id="muse-public-send" type="submit" aria-label="{{ __('site.ui.send_message') }}"
                 class="flex-shrink-0 mr-2 w-10 h-10 rounded-full flex items-center justify-center transition-all"
                 style="background-color: var(--ohm-attention);"
             >
@@ -54,8 +54,8 @@
             </button>
         </form>
         <label for="muse-public-consent" class="mt-3 flex items-start gap-2 text-[11px] text-white/75 cursor-pointer">
-            <input id="muse-public-consent" type="checkbox" required form="muse-public-form" class="mt-0.5 accent-[#D97706]" aria-label="Consent to processing message data according to Privacy Policy">
-            <span>I agree that {{ $askMuseProcessor }} may process my message and technical request data to answer it, as described in the <a href="{{ $askMusePrivacyUrl }}" class="underline text-white hover:text-[#D97706]">Privacy Policy</a>. Do not include sensitive personal data.</span>
+            <input id="muse-public-consent" type="checkbox" required form="muse-public-form" class="mt-0.5 accent-[#D97706]" aria-label="{{ __('site.ui.consent_agree', ['processor' => $askMuseProcessor, 'policy' => __('site.ui.privacy_policy')]) }}">
+            <span>{{ __('site.ui.consent_agree', ['processor' => $askMuseProcessor, 'policy' => __('site.ui.privacy_policy')]) }}</span>
         </label>
 
 
@@ -104,4 +104,4 @@
 </div>
 
 {{-- Ask Muse JS --}}
-<script src="{{ asset('js/ask-muse.js') }}?v=20261014-2" defer></script>
+<script src="{{ asset('js/ask-muse.js') }}?v=20261103-locales" defer></script>

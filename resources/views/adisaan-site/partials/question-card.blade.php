@@ -38,7 +38,7 @@
         <div class="qcard__face qcard__face--front">
             <span class="qcard__numeral" aria-hidden="true">{{ $numeral }}</span>
             <h3 class="qcard__question">{{ $story['lead'] ?? $story['question'] ?? '' }}</h3>
-            <span class="qcard__turn">{{ $area['label'] ?? 'Any area' }} · turn the card</span>
+            <span class="qcard__turn">{{ $area['label'] ?? __('site.ui.any_area') }} · {{ __('site.ui.turn_card') }}</span>
             <img class="qcard__seal" src="/assets/adisaan/site/ohm-mark.svg" alt="" width="38" height="40" loading="lazy" aria-hidden="true">
         </div>
 
@@ -48,21 +48,21 @@
             <div class="qcard__back-main">
                 <div class="qcard__back-copy">
                     <div class="qcard__score">
-                        <span class="qcard__score-side"><strong>{{ number_format($count['people']) }}</strong><small>people</small></span>
+                        <span class="qcard__score-side"><strong>{{ number_format($count['people']) }}</strong><small>{{ __('site.ui.people') }}</small></span>
                         <span class="qcard__score-vs" aria-hidden="true">vs</span>
-                        <span class="qcard__score-side qcard__score-side--machine"><strong>{{ number_format($count['machines']) }}</strong><small>machines</small></span>
+                        <span class="qcard__score-side qcard__score-side--machine"><strong>{{ number_format($count['machines']) }}</strong><small>{{ __('site.ui.machines') }}</small></span>
                     </div>
 
                     <div class="qcard__climb">
-                        <span class="qcard__climb-bar" role="img" aria-label="{{ number_format($siteTotal) }} of {{ number_format($goal) }} answers across every question"><i style="width:{{ $drawn }}%"></i></span>
-                        <span class="qcard__climb-meta">{{ number_format($count['total']) }} received for this question &middot; {{ number_format($siteTotal) }} of {{ number_format($goal) }} together</span>
+                        <span class="qcard__climb-bar" role="img" aria-label="{{ __('site.ui.climb_aria', ['site' => number_format($siteTotal), 'goal' => number_format($goal)]) }}"><i style="width:{{ $drawn }}%"></i></span>
+                        <span class="qcard__climb-meta">{{ __('site.ui.received_for', ['total' => number_format($count['total']), 'site' => number_format($siteTotal), 'goal' => number_format($goal)]) }}</span>
                     </div>
                 </div>
                 @include('adisaan-site.partials.answer-pillars', ['count' => $count])
             </div>
 
             <div class="qcard__actions">
-                <a href="{{ $story['answer_url'] ?? route('adisaan.public.answer', ['story' => $story['id'] ?? null]) }}">Answer <span aria-hidden="true">↗</span></a>
+                <a href="{{ $story['answer_url'] ?? route('adisaan.public.answer', ['story' => $story['id'] ?? null]) }}">{{ __('site.ui.answer') }} <span aria-hidden="true">↗</span></a>
             </div>
         </div>
     </div>

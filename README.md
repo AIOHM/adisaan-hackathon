@@ -99,8 +99,12 @@ AGPL-3.0. Run it, change it, host it; if you host a changed version, publish you
 
 ## Owner decisions from Telegram
 
-New human-answer alerts retain their Release/Reject links. Distilled thought drafts and news-question drafts now carry Approve/Reject links too. Each link opens a private confirmation page; only pressing its confirmation button changes data. Approving a thought makes it eligible for the public dataset. Approving a news question schedules it for tomorrow in Europe/Bucharest, calculated at confirmation time.
+New human-answer alerts retain their Release/Reject links. Distilled thought drafts and news-question drafts now carry Approve/Reject and Edit draft links too. Editing saves proposed copy without approving or publishing it; original source text stays unchanged. Each link opens a private confirmation page; only pressing its confirmation button changes data. Approving a thought makes it eligible for the public dataset. Approving a news question schedules it for tomorrow in Europe/Bucharest, calculated at confirmation time.
 
 Every new owner alert includes **Review pending items**, a private list of human answers, thought drafts and future-question drafts. Agent answers are excluded and continue through automatic model review. This is a link opened from Telegram, not a new bot slash command; the shared platform webhook is unchanged. Signed links expire after seven days: use a newer alert for a fresh inbox link. Treat these links as private owner credentials.
 
 These controls require deployment before they appear in production. No database migration or new secret is required.
+
+## Languages
+
+The public site speaks ten languages: English (source), Romanian, Spanish, French, German, Italian, Portuguese, Hungarian, Polish and Dutch. The browser decides first (`Accept-Language`), an explicit `?lang=xx` choice is remembered in the `tbwim_locale` cookie for a year, and the switcher in the menu and footer overrides both. Every template string lives in `lang/{locale}/site.php` and `lang/{locale}/pages.php`; the home screens and the ten questions overlay `config/adisaan_public.php` from `lang/{locale}/home.php` and `lang/{locale}/questions.php`, so a missing translation falls back to English and never breaks a page. Answers stay in the language they were written in. The agent API, `llms.txt` and the dataset stay English — that is the machine contract. Videos and their caption tracks stay English until new films are made. No database migration or new secret is required; deployment is the usual `ops/deploy.sh`.

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 return [
@@ -682,8 +683,8 @@ return [
     /*
      * Phase 1 (2026-10-19): the five-screen homepage. One config edit changes the
      * first screen: set `episode_ref` to the id of a story above and the question,
-     * video and poster follow. The words are Adrian's (EN).
-     * TODO: Romanian mirror of the five screens under `ro` (same episode), for /ro.
+     * video and poster follow. The words are Adrian's (EN); other languages overlay
+     * this array from `lang/{locale}/home.php` (see app/Support/Locales.php).
      * Rules: no price, no booking, no invented numbers, no levels or XP on the home.
      */
     'home' => [
@@ -869,13 +870,13 @@ return [
             'faq' => [
                 'title' => 'Întrebări frecvente.',
                 'items' => [
-                ['q' => 'Ce este AdiSaan?', 'a' => 'AdiSaan este un avatar animat: aceeași față și voce, cu o întrebare sinceră pe zi. Răspunsurile oamenilor pot forma, cu acordul lor, un studiu al modurilor în care ne imaginăm viitorul.'],
-                ['q' => 'Ce câștig dacă răspund?', 'a' => 'Îți pui ideea în cuvinte, o compari cu alte răspunsuri publice la aceeași întrebare și poți reveni pe măsură ce conversația crește. Tu alegi dacă răspunsul tău este public sau privat.'],
-                ['q' => 'Îmi cereți bani?', 'a' => 'Nu. Este o întrebare despre ce îți imaginezi, nu o cerere de donații sau o promisiune de câștig. Nu colectăm bani aici.'],
-                ['q' => 'Ce este harta?', 'a' => 'Punctele verzi arată activitatea recentă pe site, grupată pe țări. Punctele aurii numără răspunsurile celor care au ales să își ofere țara. Sunt măsuri separate; harta nu localizează oameni și nu le deduce credințele din locul în care trăiesc.'],
-                ['q' => 'Cine este în spatele AdiSaan?', 'a' => 'Un fondator din România care călătorește acum prin Europa cu rulota în timp ce construiește AIOHM și Muse. AdiSaan este experimentul său public: poate un gând sincer să adune un milion de urmăritori și apoi să susțină o campanie transparentă pentru proiecte reale?'],
-                ['q' => 'Ce se întâmplă cu răspunsul meu?', 'a' => 'Răspunsul este păstrat pentru revizuirea AdiSaan. Alegi pe formular dacă este public sau privat. Doar cele publice pot apărea pe site. Formularul actual nu cere acord pentru antrenarea lui Muse.'],
-                ['q' => 'Site-ul mă urmărește?', 'a' => 'Cookie-urile esențiale protejează formularele și împiedică voturile duplicate. Măsurarea agregată a paginilor poate funcționa fără cookie-uri opționale. Pagina de confidențialitate explică ce se stochează când răspunzi.'],
+                    ['q' => 'Ce este AdiSaan?', 'a' => 'AdiSaan este un avatar animat: aceeași față și voce, cu o întrebare sinceră pe zi. Răspunsurile oamenilor pot forma, cu acordul lor, un studiu al modurilor în care ne imaginăm viitorul.'],
+                    ['q' => 'Ce câștig dacă răspund?', 'a' => 'Îți pui ideea în cuvinte, o compari cu alte răspunsuri publice la aceeași întrebare și poți reveni pe măsură ce conversația crește. Tu alegi dacă răspunsul tău este public sau privat.'],
+                    ['q' => 'Îmi cereți bani?', 'a' => 'Nu. Este o întrebare despre ce îți imaginezi, nu o cerere de donații sau o promisiune de câștig. Nu colectăm bani aici.'],
+                    ['q' => 'Ce este harta?', 'a' => 'Punctele verzi arată activitatea recentă pe site, grupată pe țări. Punctele aurii numără răspunsurile celor care au ales să își ofere țara. Sunt măsuri separate; harta nu localizează oameni și nu le deduce credințele din locul în care trăiesc.'],
+                    ['q' => 'Cine este în spatele AdiSaan?', 'a' => 'Un fondator din România care călătorește acum prin Europa cu rulota în timp ce construiește AIOHM și Muse. AdiSaan este experimentul său public: poate un gând sincer să adune un milion de urmăritori și apoi să susțină o campanie transparentă pentru proiecte reale?'],
+                    ['q' => 'Ce se întâmplă cu răspunsul meu?', 'a' => 'Răspunsul este păstrat pentru revizuirea AdiSaan. Alegi pe formular dacă este public sau privat. Doar cele publice pot apărea pe site. Formularul actual nu cere acord pentru antrenarea lui Muse.'],
+                    ['q' => 'Site-ul mă urmărește?', 'a' => 'Cookie-urile esențiale protejează formularele și împiedică voturile duplicate. Măsurarea agregată a paginilor poate funcționa fără cookie-uri opționale. Pagina de confidențialitate explică ce se stochează când răspunzi.'],
                 ],
             ],
             'breath_words' => [
@@ -1337,9 +1338,9 @@ return [
      * answer will be counted when it comes.
      */
     'life_areas' => [
-        'work'    => ['label' => 'Work',    'note' => 'What you make, and what it earns.'],
-        'rest'    => ['label' => 'Rest',    'note' => 'Stopping, and recovering well.'],
-        'people'  => ['label' => 'People',  'note' => 'Who you are with, and how.'],
+        'work' => ['label' => 'Work',    'note' => 'What you make, and what it earns.'],
+        'rest' => ['label' => 'Rest',    'note' => 'Stopping, and recovering well.'],
+        'people' => ['label' => 'People',  'note' => 'Who you are with, and how.'],
         'meaning' => ['label' => 'Meaning', 'note' => 'Why any of it is worth doing.'],
     ],
 

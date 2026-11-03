@@ -1,6 +1,6 @@
 @extends('adisaan-site.layout')
-@section('title', 'The Avatar Lab Dispatch — AdiSaan')
-@section('description', 'Live intelligence on AI digital avatars, expressive voice synthesis, video models, and the AdiSaan journey to 1,000,000 followers.')
+@section('title', __('site.ui.news_title'))
+@section('description', __('site.ui.news_description'))
 @push('styles')
 <link rel="stylesheet" href="/assets/adisaan/site/news-dispatch.css?v=20261031-news">
 @endpush
@@ -10,24 +10,24 @@
     <header class="news-masthead">
         <div class="container">
             <div class="news-masthead__meta">
-                <span class="news-live-tag">Live Intelligence Desk</span>
-                <span>{{ now()->format('l, d F Y') }}</span>
-                <span>{{ number_format($counts['total']) }} Signals Tracked</span>
+                <span class="news-live-tag">{{ __('site.ui.live_desk') }}</span>
+                <span>{{ now()->translatedFormat('l, d F Y') }}</span>
+                <span>{{ number_format($counts['total']) }} {{ __('site.ui.signals_tracked') }}</span>
             </div>
 
             <div class="news-masthead__hero">
                 <div class="news-masthead__title-group">
-                    <h1>The Avatar Lab Dispatch</h1>
-                    <p>Live intelligence on AI digital avatars, expressive voice synthesis, video models, and the AdiSaan journey to 1,000,000 followers.</p>
+                    <h1>{{ __('site.ui.dispatch_name') }}</h1>
+                    <p>{{ __('site.ui.news_description') }}</p>
                 </div>
 
                 <form class="news-search-form" method="GET" action="{{ route('adisaan.public.news') }}">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" name="q" value="{{ $searchQuery }}" placeholder="Search avatar &amp; video news..." aria-label="Search news">
+                    <input type="text" name="q" value="{{ $searchQuery }}" placeholder="{{ __('site.ui.news_search_placeholder') }}" aria-label="{{ __('site.ui.search_news') }}">
                     @if($searchQuery !== '')
-                        <a class="news-search-clear" href="{{ route('adisaan.public.news', $activeCategory !== '' ? ['category' => $activeCategory] : []) }}" aria-label="Clear search">×</a>
+                        <a class="news-search-clear" href="{{ route('adisaan.public.news', $activeCategory !== '' ? ['category' => $activeCategory] : []) }}" aria-label="{{ __('site.ui.clear_search') }}">×</a>
                     @endif
-                    <button type="submit" aria-label="Submit search">
+                    <button type="submit" aria-label="{{ __('site.ui.submit_search') }}">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </button>
                 </form>
@@ -36,11 +36,11 @@
     </header>
 
     <!-- 2. CATEGORY FILTER RIBBON -->
-    <nav class="news-categories-nav" aria-label="Filter news by topic">
+    <nav class="news-categories-nav" aria-label="{{ __('site.ui.filter_aria') }}">
         <div class="container">
             <div class="news-categories-scroll">
                 <a href="{{ route('adisaan.public.news') }}" class="news-pill {{ $activeCategory === '' ? 'is-active' : '' }}">
-                   All Signals <span class="news-pill__count">{{ number_format($counts['total']) }}</span>
+                   {{ __('site.ui.all_signals') }} <span class="news-pill__count">{{ number_format($counts['total']) }}</span>
                 </a>
                 @foreach($categories as $slug => $category)
                 <a href="{{ route('adisaan.public.news', ['category' => $slug]) }}" class="news-pill {{ $activeCategory === $slug ? 'is-active' : '' }}">
@@ -59,25 +59,25 @@
                 <img class="signal-brief__avatar" data-brief-avatar src="/assets/adisaan/site/avatar-cutout-800.webp" srcset="/assets/adisaan/site/avatar-cutout-600.webp 600w, /assets/adisaan/site/avatar-cutout-800.webp 800w, /assets/adisaan/site/avatar-cutout-1084.webp 1084w" sizes="(max-width: 700px) 40vw, 220px" width="1084" height="1451" alt="AdiSaan, the animated avatar" loading="lazy" decoding="async">
             </div>
             <div class="signal-brief__body">
-                <p class="signal-brief__eyebrow">AdiSaan&rsquo;s brief · from today&rsquo;s news</p>
+                <p class="signal-brief__eyebrow">{!! __('site.ui.brief_eyebrow') !!}</p>
                 <h2 id="signal-brief-title">{{ $signalBrief->question }}</h2>
                 <p class="signal-brief__meta">
-                    Suggested by <a href="{{ $signalBrief->signal_url }}" rel="noopener">{{ $signalBrief->signal_title }}</a>
+                    {{ __('site.ui.suggested_by') }} <a href="{{ $signalBrief->signal_url }}" rel="noopener">{{ $signalBrief->signal_title }}</a>
                     @if($signalBrief->signal_source) · {{ $signalBrief->signal_source }} @endif
-                    · {{ $signalBrief->scheduled_for?->isTomorrow() ? 'Opens tomorrow' : ($signalBrief->scheduled_for?->isToday() ? 'Open now — today’s question' : 'Opens '.$signalBrief->scheduled_for?->format('j F')) }}
+                    · {{ $signalBrief->scheduled_for?->isTomorrow() ? __('site.ui.opens_tomorrow') : ($signalBrief->scheduled_for?->isToday() ? __('site.ui.open_now') : __('site.ui.opens_on', ['date' => $signalBrief->scheduled_for?->translatedFormat('j F')])) }}
                 </p>
-                <p class="signal-brief__caption" data-brief-caption aria-live="polite">AdiSaan read today&rsquo;s signals and picked tomorrow&rsquo;s question. Press play and hear why.</p>
+                <p class="signal-brief__caption" data-brief-caption aria-live="polite">{{ __('site.ui.brief_caption') }}</p>
                 <p class="signal-brief__script" data-brief-script>{{ $signalBrief->brief_script }}</p>
                 @if($signalBrief->brief_audio_path)
                 <audio data-brief-audio src="{{ $signalBrief->brief_audio_path }}" preload="metadata"></audio>
                 @endif
                 <div class="signal-brief__controls">
-                    <button type="button" class="signal-brief__play" data-brief-play>{{ $signalBrief->brief_audio_path ? '▶ Play the brief' : '▶ Read the brief' }}</button>
-                    <button type="button" class="signal-brief__stop" data-brief-stop hidden>■ Stop</button>
+                    <button type="button" class="signal-brief__play" data-brief-play>{{ $signalBrief->brief_audio_path ? __('site.ui.play_brief') : __('site.ui.read_brief') }}</button>
+                    <button type="button" class="signal-brief__stop" data-brief-stop hidden>{{ __('site.ui.stop') }}</button>
                     <span class="signal-brief__progress" data-brief-progress aria-hidden="true"></span>
                 </div>
                 @unless($signalBrief->brief_audio_path)
-                <p class="signal-brief__meta">AdiSaan&rsquo;s voice recording arrives with the brief; until then, read it here.</p>
+                <p class="signal-brief__meta">{{ __('site.ui.brief_voice_note') }}</p>
                 @endunless
             </div>
         </section>
@@ -133,8 +133,8 @@
                 avatar.classList.remove('is-speaking');
                 play.hidden = false; stop.hidden = true; progress.textContent = '';
                 caption.textContent = audio
-                    ? 'That is tomorrow’s question, in AdiSaan’s voice. Press play to hear it again.'
-                    : 'That is tomorrow’s question. AdiSaan read today’s signals and picked it.';
+                    ? @json(__('site.ui.brief_done_audio'))
+                    : @json(__('site.ui.brief_done_text'));
             }
             function next() {
                 idx++;
@@ -184,7 +184,7 @@
                             <span class="news-fallback-meta">{{ $lead['category_label'] }}</span>
                         </div>
                         @endif
-                        <span class="news-badge">Lead Story</span>
+                        <span class="news-badge">{{ __('site.ui.lead_story') }}</span>
                     </div>
 
                     <div class="news-lead-card__content">
@@ -202,10 +202,10 @@
 
                         <div class="news-lead-card__actions">
                             <a href="{{ $lead['link'] }}" target="_blank" rel="noopener noreferrer" class="btn-primary-news">
-                                Read Full Story ↗
+                                {{ __('site.ui.read_full_story') }}
                             </a>
                             <button type="button" class="news-page-btn" data-share data-share-title="{{ $lead['title'] }}" data-share-url="{{ $lead['link'] }}">
-                                Share Signal
+                                {{ __('site.ui.share_signal') }}
                             </button>
                         </div>
                     </div>
@@ -218,11 +218,11 @@
             <section class="news-video-strip">
                 <div class="news-video-strip__header">
                     <div>
-                        <h2>🎬 AdiSaan Video Chronicles</h2>
-                        <p>The authentic AdiSaan journey, building in public toward 1,000,000 followers.</p>
+                        <h2>{{ __('site.ui.video_chronicles') }}</h2>
+                        <p>{{ __('site.ui.video_chronicles_text') }}</p>
                     </div>
                     <a href="https://www.youtube.com/channel/{{ config('tbwim_news.youtube_channel_id') }}" target="_blank" rel="noopener noreferrer" class="btn-primary-news" style="background: rgba(255,255,255,0.15); border: 1px solid var(--news-gold); font-size: 11px;">
-                        Subscribe on YouTube ↗
+                        {{ __('site.ui.subscribe_yt') }}
                     </a>
                 </div>
 
@@ -235,7 +235,7 @@
                             </div>
                             <div class="news-video-card__body">
                                 <div class="news-video-card__meta">
-                                    <span>YouTube Episode</span>
+                                    <span>{{ __('site.ui.youtube_episode') }}</span>
                                     @if($video['published'])<span>{{ $video['published']->format('d M') }}</span>@endif
                                 </div>
                                 <h3 class="news-video-card__title">{{ $video['title'] }}</h3>
@@ -253,14 +253,14 @@
                 <div class="news-section-title">
                     <span>
                         @if($searchQuery !== '')
-                            Results for “{{ $searchQuery }}”
+                            {{ __('site.ui.results_for', ['q' => $searchQuery]) }}
                         @elseif($activeCategory !== '' && isset($categories[$activeCategory]))
                             {{ $categories[$activeCategory]['label'] }}
                         @else
-                            Latest Intelligence Dispatches
+                            {{ __('site.ui.latest_dispatches') }}
                         @endif
                     </span>
-                    <span>Showing {{ $totalItems === 0 ? '0-0' : (($page - 1) * config('tbwim_news.per_page') + 1).'-'.(($page - 1) * config('tbwim_news.per_page') + count($grid)) }} of {{ $totalItems }}</span>
+                    <span>{{ __('site.ui.showing_of', ['range' => $totalItems === 0 ? '0-0' : (($page - 1) * config('tbwim_news.per_page') + 1).'-'.(($page - 1) * config('tbwim_news.per_page') + count($grid)), 'total' => $totalItems]) }}</span>
                 </div>
 
                 @if($grid !== [])
@@ -293,7 +293,7 @@
 
                                     <div class="news-article-card__footer">
                                         <a href="{{ $item['link'] }}" target="_blank" rel="noopener noreferrer" class="news-article-card__link">
-                                            Read Source ↗
+                                            {{ __('site.ui.read_source') }}
                                         </a>
                                         <span class="news-article-card__cat">{{ $item['category_label'] }}</span>
                                     </div>
@@ -304,30 +304,30 @@
 
                     <!-- Editorial Pagination -->
                     @if($totalPages > 1)
-                    <nav class="news-pagination-bar" aria-label="Pagination">
+                    <nav class="news-pagination-bar" aria-label="{{ __('site.ui.pagination') }}">
                         @if($prevUrl !== null)
-                            <a href="{{ $prevUrl }}" class="news-page-btn">← Previous</a>
+                            <a href="{{ $prevUrl }}" class="news-page-btn">{{ __('site.ui.previous') }}</a>
                         @else
-                            <span class="news-page-btn" style="opacity: 0.4; cursor: not-allowed;">← Previous</span>
+                            <span class="news-page-btn" style="opacity: 0.4; cursor: not-allowed;">{{ __('site.ui.previous') }}</span>
                         @endif
 
                         <span class="news-page-info">
-                            Page {{ $page }} of {{ $totalPages }}
+                            {{ __('site.ui.page_of', ['page' => $page, 'pages' => $totalPages]) }}
                         </span>
 
                         @if($nextUrl !== null)
-                            <a href="{{ $nextUrl }}" class="news-page-btn">Next Page →</a>
+                            <a href="{{ $nextUrl }}" class="news-page-btn">{{ __('site.ui.next_page') }}</a>
                         @else
-                            <span class="news-page-btn" style="opacity: 0.4; cursor: not-allowed;">Next Page →</span>
+                            <span class="news-page-btn" style="opacity: 0.4; cursor: not-allowed;">{{ __('site.ui.next_page') }}</span>
                         @endif
                     </nav>
                     @endif
                 @else
                     <div class="news-empty-state">
-                        <h3>No signals on this wire right now</h3>
+                        <h3>{{ __('site.ui.no_signals') }}</h3>
                         <p>{{ $searchQuery !== '' ? 'Nothing matches that search. Try fewer words, or clear it to see the full dispatch.' : 'The feeds are refreshing. The latest stories land here as soon as the next fetch completes.' }}</p>
                         @if($searchQuery !== '')
-                            <a href="{{ route('adisaan.public.news', $activeCategory !== '' ? ['category' => $activeCategory] : []) }}" class="btn-primary-news">Clear the search</a>
+                            <a href="{{ route('adisaan.public.news', $activeCategory !== '' ? ['category' => $activeCategory] : []) }}" class="btn-primary-news">{{ __('site.ui.clear_search_btn') }}</a>
                         @endif
                     </div>
                 @endif
@@ -339,7 +339,7 @@
                 @if($fastSignals !== [])
                     <div class="news-widget">
                         <h3 class="news-widget__title">
-                            <span>📡 Fast Signals</span>
+                            <span>{{ __('site.ui.fast_signals') }}</span>
                         </h3>
                         <ol class="news-ranked-list">
                             @foreach($fastSignals as $rank => $signal)
@@ -358,33 +358,31 @@
                 <!-- Widget 2: The Curator's Lens -->
                 <div class="news-widget news-curator-card">
                     <div class="news-curator-head">
-                        <img src="/assets/adisaan/site/avatar-cutout.webp" alt="AdiSaan avatar" class="news-curator-avatar">
+                        <img src="/assets/adisaan/site/avatar-cutout.webp" alt="{{ __('site.ui.avatar_alt') }}" class="news-curator-avatar">
                         <div class="news-curator-name">
-                            <h4>The Curator’s Lens</h4>
-                            <span>AdiSaan — Your Online Partner</span>
+                            <h4>{{ __('site.ui.curator_lens') }}</h4>
+                            <span>{{ __('site.ui.curator_role') }}</span>
                         </div>
                     </div>
-                    <p class="news-curator-quote">
-                        “Every video, avatar prompt, and voice clone is an experiment in public. We curate the signals we test in our lab as we build the AdiSaan personal brand to 1,000,000 followers.”
-                    </p>
+                    <p class="news-curator-quote">{{ __('site.ui.curator_quote') }}</p>
                     <a href="{{ route('adisaan.public.million') }}" class="btn-primary-news" style="width: 100%; justify-content: center; font-size: 11px;">
-                        Explore The 1M Follower Race →
+                        {{ __('site.ui.explore_race') }}
                     </a>
                 </div>
 
                 <!-- Widget 3: Newsletter / Follow The Build -->
                 <div class="news-widget news-subscribe-widget">
-                    <h3>Follow The Build</h3>
-                    <p>Receive occasional updates as AdiSaan produces new episodes, tests creative tools, and shares lessons in public.</p>
+                    <h3>{{ __('site.ui.follow_build') }}</h3>
+                    <p>{{ __('site.ui.follow_build_text') }}</p>
 
                     <form class="news-subscribe-form" method="POST" action="{{ route('adisaan.public.construction.lead') }}">
                         @csrf
-                        <input type="email" name="email" placeholder="Your email address" required aria-label="Email address">
+                        <input type="email" name="email" placeholder="{{ __('site.ui.your_email_address') }}" required aria-label="{{ __('site.ui.email_address') }}">
                         <label class="news-subscribe-consent">
                             <input type="checkbox" name="consent_updates" value="1" checked required>
-                            <span>I agree to receive occasional AdiSaan journey updates. Unsubscribe anytime.</span>
+                            <span>{{ __('site.ui.consent_updates') }}</span>
                         </label>
-                        <button type="submit">Get Weekly Dispatches ↘</button>
+                        <button type="submit">{{ __('site.ui.get_dispatches') }}</button>
                     </form>
                 </div>
 
@@ -392,7 +390,7 @@
                 @if($streams !== [])
                 <div class="news-widget">
                     <h3 class="news-widget__title">
-                        <span>⚡ Intelligence Streams</span>
+                        <span>{{ __('site.ui.streams') }}</span>
                     </h3>
                     <div class="news-feed-status-list">
                         @foreach($streams as $stream)
@@ -401,7 +399,7 @@
                                     <span class="news-feed-status-dot"@if(!$stream['ok']) style="background: #b33927;"@endif></span>
                                     {{ $stream['label'] }}
                                 </span>
-                                <span class="news-feed-status-badge">{{ $stream['ok'] ? number_format($stream['items']).' items' : 'retrying' }}</span>
+                                <span class="news-feed-status-badge">{{ $stream['ok'] ? number_format($stream['items']).' '.__('site.ui.items') : __('site.ui.retrying') }}</span>
                             </div>
                         @endforeach
                     </div>
