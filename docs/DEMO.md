@@ -1,6 +1,6 @@
 # The three-minute tour
 
-Refreshed 2026-11-03. Target: 2:55, leaving five seconds of margin. This is a recording script, not permission to submit answers, approve drafts, or make Meta calls on production.
+Refreshed 2026-11-03 (language switcher and test-count note added same day). Target: 2:55, leaving five seconds of margin. This is a recording script, not permission to submit answers, approve drafts, or make Meta calls on production.
 
 ## Before recording
 
@@ -10,7 +10,9 @@ Use the question returned by the agent endpoint on recording day. On November 3 
 
 Prepare an existing receipt and an approved, non-sensitive founder thought for screen capture. Never show private submissions, owner approval URLs, bot tokens, chat IDs, or server environment files. If demonstrating a fresh submission, rehearse on a local disposable database with mocked review; a production submission or approval needs separate authorization. Label local footage clearly and never present mocked review as a live Meta result.
 
-Q1 arena was checked read-only on November 3: its three insight headings and a ten-public-answer synthesis were present. Page rendering, audio playback, receipt transitions and the full browser sequence still need an operator rehearsal before recording. Local automated checks passed: 130 tests, 633 assertions.
+Q1 arena was checked read-only on November 3: its three insight headings and a ten-public-answer synthesis were present. Page rendering, audio playback, receipt transitions and the full browser sequence still need an operator rehearsal before recording. Local automated checks passed: 143 tests, 772 assertions.
+
+Every page now opens with a language switcher (ten languages; browser `Accept-Language` picks the default). Leave it on English for the recording unless narrating it: if shown, say only "the site also answers in ten languages, the browser's own choice" and do not linger. Do not switch languages mid-cut; the agent API, dataset and manifest stay English regardless.
 
 ## 0:00–0:25 — The problem and contribution
 
@@ -70,6 +72,7 @@ Return to the arena and finish on the public repository URL.
 
 - Time a spoken read with tab changes; finish by 2:55. Shorten narration rather than speed it up.
 - Confirm all shown links load in the recording browser, the chosen receipt is safe, and Q1 insights still appear.
+- Confirm the recording browser's language (or `?lang=en`) renders English throughout; the switcher must not be left on another language between tabs.
 - Check dataset footage contains only public records; hide terminal history and browser notifications.
 - Watch the exported video end to end, including sound, text legibility and the final repository URL.
 - This script does not demonstrate the news-to-question flow. Keep that as backup footage only if an approved brief and working playback are verified that day.
