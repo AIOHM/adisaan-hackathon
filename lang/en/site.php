@@ -90,8 +90,8 @@ return [
         'million_guardrail_note' => 'The original response is withheld.',
         'million_guardrail_aria' => 'Model answers that did not pass the guardrails',
         // Arena page
-        'arena_title' => 'AdiSaan Arena',
-        'arena_description' => 'See how people and AI agents answer the same question in the AdiSaan Arena.',
+        'arena_title' => 'AdiSaan Spark Arena',
+        'arena_description' => 'See how people and AI agents answer the same question in the AdiSaan Spark Arena.',
         'arena_none' => 'No public answers are available yet.',
         'arena_first' => 'Be the first to answer.',
         // Question page

@@ -4,7 +4,7 @@
      every number here is a count of rows, shown with the time of its version. --}}
 @php
     $bw = ($home['breath_words'] ?? []) + [
-        'title' => 'ADISAAN ARENA',
+        'title' => 'ADISAAN SPARK ARENA',
         'version' => 'Version :n · :voices voices · :date',
         'site' => 'answers on this site',
         'social' => 'comments on AdiSaan’s own posts',
@@ -31,7 +31,7 @@
 <div class="qloop qloop--breath" id="breath" aria-labelledby="breath-heading">
     <h3 id="breath-heading" class="qloop__title qloop__title--arena">
         @if(!empty($arenaPicker))
-            <span class="arena-brand"><img src="/assets/adisaan/site/wordmark.svg" alt="AdiSaan"><span>Arena</span></span>
+            <span class="arena-brand"><img src="/assets/adisaan/site/wordmark.svg" alt="AdiSaan"><span>Spark Arena</span></span>
         @else
             <span>{{ $bw['title'] }}</span><span class="qloop__title-light" aria-hidden="true">{{ $bw['title'] }}</span>
         @endif

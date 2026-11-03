@@ -11,7 +11,7 @@
 .arena-picker button{border:0;border-radius:10px;padding:12px 22px;background:#e9c775;color:#073209;font:inherit;font-weight:700;cursor:pointer}
 .arena-picker select:focus-visible,.arena-picker button:focus-visible{outline:3px solid #e9c775;outline-offset:3px}
 @media(max-width:600px){.arena-picker__controls{flex-direction:column}.arena-picker button{align-self:center;min-width:120px}}
-.arena-page .arena-brand{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2vw,20px);padding-block:8px}
+.arena-page .arena-brand{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(12px,2vw,20px);padding-block:8px;text-align:center}
 .arena-page .arena-brand img{display:block;width:clamp(170px,23vw,280px);height:auto}
 .arena-page .arena-brand span{font-family:AdiSaanPusab,Arial,sans-serif;font-size:clamp(32px,4.2vw,52px);font-weight:400;letter-spacing:-.04em;color:#f4f0e8;line-height:1}
 .arena-page .duel__more{display:inline-block;margin-top:10px;color:#e9c775;font-size:13px;font-weight:700;text-decoration:underline;text-underline-offset:4px}

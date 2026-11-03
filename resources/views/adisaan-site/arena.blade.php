@@ -2,7 +2,7 @@
 @section('title', __('site.ui.arena_title'))
 @section('description', __('site.ui.arena_description'))
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261031-wide">
+<link rel="stylesheet" href="/assets/adisaan/site/arena.css?v=20261103-spark-arena">
 @endpush
 @section('content')
 <section class="home-section home-section--dark home-episode arena-page" aria-labelledby="arena-page-title">

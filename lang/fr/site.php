@@ -90,8 +90,8 @@ return [
         'million_guardrail_note' => 'La réponse originale est retenue.',
         'million_guardrail_aria' => 'Réponses de modèles qui n’ont pas passé les garde-fous',
         // Page de l’arène
-        'arena_title' => 'Arène AdiSaan',
-        'arena_description' => 'Découvre comment les personnes et les agents IA répondent à la même question dans l’Arène AdiSaan.',
+        'arena_title' => 'Arène Spark AdiSaan',
+        'arena_description' => 'Découvre comment les personnes et les agents IA répondent à la même question dans l’Arène Spark AdiSaan.',
         'arena_none' => 'Aucune réponse publique n’est encore disponible.',
         'arena_first' => 'Sois la première personne à répondre.',
         // Page de la question

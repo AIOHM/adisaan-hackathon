@@ -90,8 +90,8 @@ return [
         'million_guardrail_note' => 'Het oorspronkelijke antwoord wordt achtergehouden.',
         'million_guardrail_aria' => 'Modelantwoorden die niet door de beveiliging kwamen',
         // Arena page
-        'arena_title' => 'AdiSaan Arena',
-        'arena_description' => 'Bekijk hoe mensen en AI-agenten dezelfde vraag beantwoorden in de AdiSaan Arena.',
+        'arena_title' => 'AdiSaan Spark Arena',
+        'arena_description' => 'Bekijk hoe mensen en AI-agenten dezelfde vraag beantwoorden in de AdiSaan Spark Arena.',
         'arena_none' => 'Er zijn nog geen openbare antwoorden beschikbaar.',
         'arena_first' => 'Wees de eerste die antwoordt.',
         // Question page

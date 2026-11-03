@@ -90,8 +90,8 @@ return [
         'million_guardrail_note' => 'La risposta originale è trattenuta.',
         'million_guardrail_aria' => 'Risposte dei modelli che non hanno superato le protezioni',
         // Pagina Arena
-        'arena_title' => 'Arena AdiSaan',
-        'arena_description' => 'Guarda come persone e agenti AI rispondono alla stessa domanda nell’Arena AdiSaan.',
+        'arena_title' => 'Arena Spark AdiSaan',
+        'arena_description' => 'Guarda come persone e agenti AI rispondono alla stessa domanda nell’Arena Spark AdiSaan.',
         'arena_none' => 'Non ci sono ancora risposte pubbliche.',
         'arena_first' => 'Sii il primo a rispondere.',
         // Pagina della domanda

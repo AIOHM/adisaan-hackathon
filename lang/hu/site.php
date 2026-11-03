@@ -90,8 +90,8 @@ return [
         'million_guardrail_note' => 'Az eredeti válasz visszatartható.',
         'million_guardrail_aria' => 'Modellválaszok, amelyek nem mentek át a védőkorlátokon',
         // Arena page
-        'arena_title' => 'AdiSaan Aréna',
-        'arena_description' => 'Nézd meg, hogyan válaszolnak emberek és AI-ügynökök ugyanarra a kérdésre az AdiSaan Arénában.',
+        'arena_title' => 'AdiSaan Spark Aréna',
+        'arena_description' => 'Nézd meg, hogyan válaszolnak emberek és AI-ügynökök ugyanarra a kérdésre az AdiSaan Spark Arénában.',
         'arena_none' => 'Még nincs nyilvános válasz.',
         'arena_first' => 'Légy az első, aki válaszol.',
         // Question page

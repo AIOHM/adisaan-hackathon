@@ -25,7 +25,7 @@ return [
         ],
     ],
     'breath_words' => [
-        'title' => 'ARENA ADISAAN',
+        'title' => 'ARENA SPARK ADISAAN',
         'version' => 'Versão :n · :voices vozes · :date',
         'site' => 'respostas neste site',
         'social' => 'comentários nas publicações do AdiSaan',

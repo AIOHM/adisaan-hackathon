@@ -25,7 +25,7 @@ return [
         ],
     ],
     'breath_words' => [
-        'title' => 'ADISAAN ARÉNA',
+        'title' => 'ADISAAN SPARK ARÉNA',
         'version' => ':n. verzió · :voices hang · :date',
         'site' => 'válaszok ezen az oldalon',
         'social' => 'kommentek AdiSaan bejegyzéseihez',

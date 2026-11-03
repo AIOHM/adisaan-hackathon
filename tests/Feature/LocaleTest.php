@@ -114,6 +114,17 @@ final class LocaleTest extends TestCase
             ->assertSee('Auf dieser Seite', false);
     }
 
+    public function test_the_arena_is_the_spark_arena(): void
+    {
+        $this->get('/arena')->assertOk()
+            ->assertSee('<title>AdiSaan Spark Arena</title>', false)
+            ->assertSee('>AdiSaan Spark Arena</h2>', false);
+        $this->withHeaders(['Accept-Language' => 'ro-RO'])
+            ->get('/arena')
+            ->assertOk()
+            ->assertSee('<title>Arena Spark AdiSaan</title>', false);
+    }
+
     public function test_language_switcher_lists_every_language(): void
     {
         $response = $this->get('/')->assertOk();

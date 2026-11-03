@@ -81,7 +81,7 @@ return [
         'million_guardrail_text' => 'Odpowiedź modelu :model nie przeszła barier ochronnych.',
         'million_guardrail_note' => 'Oryginalna odpowiedź jest wstrzymana.',
         'million_guardrail_aria' => 'Odpowiedzi modeli, które nie przeszły barier ochronnych',
-        'arena_title' => 'Arena AdiSaan',
+        'arena_title' => 'Arena Spark AdiSaan',
         'arena_description' => 'Zobacz, jak ludzie i agenci AI odpowiadają na to samo pytanie na Arenie AdiSaan.',
         'arena_none' => 'Nie ma jeszcze żadnych publicznych odpowiedzi.',
         'arena_first' => 'Bądź pierwszą osobą, która odpowie.',

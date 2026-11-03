@@ -724,7 +724,7 @@ return [
         // is a row count stored with its version. The minimum is Adrian's open decision; 5 until he says otherwise.
         'breath_min_voices' => 5,
         'breath_words' => [
-            'title' => 'ADISAAN ARENA',
+            'title' => 'ADISAAN SPARK ARENA',
             'version' => 'Version :n · :voices voices · :date',
             'site' => 'answers on this site',
             'social' => 'comments on AdiSaan’s own posts',
