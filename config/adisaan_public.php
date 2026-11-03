@@ -39,6 +39,7 @@ return [
             'film_release_at' => '2026-10-01T00:00:00+03:00',
             'answer_reveal_at' => '2026-10-30T00:00:00+02:00',
             'answer_video' => '/assets/adisaan/site/question-01-answer.mp4',
+            'answer_why_text' => 'The outcome isn\'t in your hands, but your energy is. If you truly enjoy the journey and move with genuine passion, the destination takes care of itself.',
         ],
         [
             'id' => 'premiere-how-you-deal-with-ai',
@@ -199,6 +200,7 @@ return [
             'question_release_at' => '2026-10-30T00:00:00+02:00',
             'answer_reveal_at' => '2026-10-30T00:00:00+02:00',
             'answer_video' => '/assets/adisaan/site/question-02-answer.mp4',
+            'answer_why_text' => 'Why wait for the current? Action without passion is just friction. Doing bare minimum preserves fire for ideas that matter. Patience isn\'t stopping. It\'s waiting for momentum.',
             'duration_label' => '10 SEC',
             'badge' => 'QUESTION 02 · 10 SEC',
             // Rendered 2026-10-24. Captions are burned into the picture;
@@ -253,6 +255,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-05T00:00:00+02:00',
             'badge' => 'QUESTION 04',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing
@@ -275,6 +278,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-06T00:00:00+02:00',
             'badge' => 'QUESTION 05',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing
@@ -297,6 +301,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-07T00:00:00+02:00',
             'badge' => 'QUESTION 06',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing
@@ -319,6 +324,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-08T00:00:00+02:00',
             'badge' => 'QUESTION 07',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing
@@ -341,6 +347,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-09T00:00:00+02:00',
             'badge' => 'QUESTION 08',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing
@@ -363,6 +370,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-10T00:00:00+02:00',
             'badge' => 'QUESTION 09',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing
@@ -384,6 +392,7 @@ return [
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
             'duration_label' => '',
+            'question_release_at' => '2026-11-11T00:00:00+02:00',
             'badge' => 'QUESTION 10',
             // No film yet. The question page shows the film-coming frame
             // until this is set; setting it swaps the player in and nothing

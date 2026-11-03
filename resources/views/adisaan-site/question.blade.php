@@ -171,6 +171,10 @@
                                                 <video class="question-answer-clock__video" data-answer-why controls playsinline preload="none" hidden
                                                        src="{{ $story['answer_why_video'] }}">Your browser does not support video playback.</video>
                                             @endif
+                                            @if(!empty($story['answer_why_text']))
+                                                <p class="question-answer-clock__eyebrow">WHY THIS ANSWER</p>
+                                                <p class="question-answer-clock__note">{{ $story['answer_why_text'] }}</p>
+                                            @endif
                                         </div>
                                     </div>
                                 @elseif(!empty($story['film_released']))

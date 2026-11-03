@@ -33,6 +33,37 @@ final class AnswerCountdownTest extends TestCase
             ->assertDontSee('Running an AI agent?');
     }
 
+    public function test_the_season_opens_one_question_per_day(): void
+    {
+        $questions = app(Questions::class);
+        $expect = [
+            '2026-11-04 12:00:00' => 'know-when-to-stop',
+            '2026-11-05 00:00:01' => 'rest-without-guilt',
+            '2026-11-06 12:00:00' => 'tell-someone-hard-truth',
+            '2026-11-07 12:00:00' => 'decide-between-two-goods',
+            '2026-11-08 12:00:00' => 'learn-something-hard-fast',
+            '2026-11-09 12:00:00' => 'keep-an-idea-alive',
+            '2026-11-10 12:00:00' => 'earn-a-strangers-trust',
+            '2026-11-11 12:00:00' => 'best-way-to-anything',
+        ];
+        foreach ($expect as $at => $id) {
+            $this->travelTo(Carbon::parse($at, 'Europe/Bucharest'));
+            $this->assertSame($id, $questions->current()['id'], "At {$at} the current question should be {$id}");
+        }
+    }
+
+    public function test_the_why_line_renders_under_adisaans_answer(): void
+    {
+        if (! is_file(public_path('assets/adisaan/site/question-01-answer.mp4'))) {
+            $this->markTestSkipped('Answer video question-01-answer.mp4 is not present in this checkout.');
+        }
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
+        $this->get('/question')->assertOk()
+            ->assertSee('WHY THIS ANSWER')
+            ->assertSee('in your hands, but your energy is')
+            ->assertSee('Action without passion is just friction');
+    }
+
     public function test_q3_answer_streams_from_the_brand_and_its_brand_poster_wins(): void
     {
         // A generated poster exists for question three on purpose: the
