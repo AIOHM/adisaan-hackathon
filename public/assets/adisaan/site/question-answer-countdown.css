@@ -17,6 +17,11 @@
 
 /* Stand-by between the answer and the bonus answer. Deliberately plain: it
    holds the frame for a minute and says what is coming, nothing else. */
+/* The why, held back until the answer video ends. Clear space above the
+   section and above its title, so the reveal never sits hard on the player. */
+.answer-why{margin-top:26px}
+.answer-why[hidden]{display:none}
+.answer-why__title{margin-top:12px}
 .answer-standby{display:grid;place-items:center;gap:10px;aspect-ratio:16/9;padding:24px;border-radius:12px;border:1px solid rgba(233,199,117,.34);background:radial-gradient(120% 90% at 50% 0%,rgba(233,199,117,.09),transparent 62%),#0b3811;text-align:center}
 .answer-standby[hidden]{display:none}
 /* One line now, so it carries the message and gets room to wrap. */

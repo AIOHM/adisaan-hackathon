@@ -62,22 +62,34 @@
 
   clocks.forEach((clock) => {
     const main = clock.querySelector('[data-answer-main]');
+    const section = clock.querySelector('[data-answer-why-section]');
+    if (!main || !section) return;
+
     const why = clock.querySelector('[data-answer-why]');
     const card = clock.querySelector('[data-answer-standby]');
-    if (!main || !why || !card) return;
-
     const eyebrow = clock.querySelector('[data-answer-eyebrow]');
-    const digits = card.querySelector('[data-standby-seconds]');
-    const skip = card.querySelector('[data-standby-skip]');
-    const wait = Math.max(1, parseInt(card.dataset.wait || '10', 10));
+    const digits = card ? card.querySelector('[data-standby-seconds]') : null;
+    const skip = card ? card.querySelector('[data-standby-skip]') : null;
+    const wait = card ? Math.max(1, parseInt(card.dataset.wait || '10', 10)) : 0;
     let timer = null;
     let revealed = false;
     let counting = false;
+    let shown = false;
+
+    // The whole why — stand-by, bonus video and the written why — stays
+    // hidden until the answer video has actually finished.
+    const showSection = () => {
+      if (shown) return;
+      shown = true;
+      section.hidden = false;
+      window.dispatchEvent(new Event('resize'));
+    };
 
     const reveal = () => {
-      if (revealed) return;
+      if (revealed || !why || !card) return;
       revealed = true;
       window.clearInterval(timer);
+      showSection();
       card.hidden = true;
       why.hidden = false;
       if (eyebrow) eyebrow.textContent = (window.TBWIM_I18N || {}).and_why || 'AND WHY THAT WAY';
@@ -87,7 +99,8 @@
     };
 
     main.addEventListener('ended', () => {
-      if (revealed || counting) return;
+      showSection();
+      if (!why || !card || revealed || counting) return;
       counting = true;
       main.hidden = true;
       card.hidden = false;

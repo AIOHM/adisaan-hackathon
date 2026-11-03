@@ -816,12 +816,21 @@ final class AdiSaanSiteController extends Controller
                 if ($signal->episode_ref === null || $signal->scheduled_for === null) {
                     continue;
                 }
+                // AdiSaan's own answer film for a signal question, when this
+                // install carries one: /assets/adisaan/site/answer-{ref}.mp4.
+                // Absent, the card keeps saying the answer is being made.
+                $answerFile = '/assets/adisaan/site/answer-'.$signal->episode_ref.'.mp4';
+                $hasAnswer = is_file(public_path(ltrim($answerFile, '/')));
                 $configStories[] = [
                     'id' => $signal->episode_ref,
                     'question_published' => true,
                     'lead' => $signal->question,
                     'question' => $signal->question,
                     'question_release_at' => $signal->scheduled_for->toDateString(),
+                    'answer_video' => $hasAnswer ? $answerFile : null,
+                    // The film is the answer the moment it exists; a signal
+                    // question carries no separate reveal date of its own.
+                    'answer_reveal_at' => $hasAnswer ? $signal->scheduled_for->toDateString() : null,
                     'signal' => [
                         'title' => $signal->signal_title,
                         'url' => $signal->signal_url,

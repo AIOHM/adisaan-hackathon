@@ -59,9 +59,22 @@ final class AnswerCountdownTest extends TestCase
         }
         $this->travelTo(Carbon::parse('2026-10-30 12:00:00', 'Europe/Bucharest'));
         $this->get('/question')->assertOk()
+            ->assertSee('data-answer-why-section hidden', false)
             ->assertSee('WHY THIS ANSWER')
             ->assertSee('in your hands, but your energy is')
             ->assertSee('Action without passion is just friction');
+    }
+
+    public function test_the_why_video_waits_inside_the_hidden_why_section(): void
+    {
+        // Question three streams its answer, so no local file is needed:
+        // the why video and its stand-by ship hidden inside the why
+        // section, and only the answer script opens it at `ended`.
+        $this->travelTo(Carbon::parse('2026-11-05 12:00:00', 'Europe/Bucharest'));
+        $this->get('/question')->assertOk()
+            ->assertSee('data-answer-why-section hidden', false)
+            ->assertSee('data-answer-standby hidden', false)
+            ->assertSee('data-answer-why controls playsinline preload="none" hidden', false);
     }
 
     public function test_q3_answer_streams_from_the_brand_and_its_brand_poster_wins(): void

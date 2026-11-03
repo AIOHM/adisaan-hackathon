@@ -146,6 +146,28 @@ final class SignalQuestionTest extends TestCase
         $this->assertSame(0, SignalQuestion::query()->count());
     }
 
+    public function test_an_answer_film_on_disk_turns_the_being_made_card_into_a_player(): void
+    {
+        $this->fakeWireOnly();
+        $this->travelTo(Carbon::parse('2026-11-01 10:00:00', LaunchSchedule::TZ));
+        $draft = $this->makeApprovedDraft();
+        $this->travelTo(Carbon::parse('2026-11-02 09:00:00', LaunchSchedule::TZ));
+
+        // Without a film the card keeps saying the answer is being made.
+        $this->get('/question')->assertOk()->assertSee('ADISAAN’S ANSWER IS BEING MADE', false);
+
+        $film = public_path('assets/adisaan/site/answer-'.$draft->episode_ref.'.mp4');
+        @mkdir(dirname($film), 0o775, true);
+        file_put_contents($film, 'fake-video');
+
+        try {
+            $this->get('/question')->assertOk()
+                ->assertSee('/assets/adisaan/site/answer-'.$draft->episode_ref.'.mp4', false);
+        } finally {
+            unlink($film);
+        }
+    }
+
     private function makeApprovedDraft(): SignalQuestion
     {
         $this->fakeWireAndModel();

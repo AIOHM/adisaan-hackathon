@@ -2,7 +2,7 @@
 @section('title', __('site.ui.question_title'))
 @section('description', __('site.ui.question_description'))
 @push('styles')
-<link rel="stylesheet" href="/assets/adisaan/site/question-answer-countdown.css?v=20261103-locales">
+<link rel="stylesheet" href="/assets/adisaan/site/question-answer-countdown.css?v=20261103-why-after-video">
 @endpush
 @section('content')
 @php
@@ -139,7 +139,9 @@
                                                 <p class="answer-seconds"><strong data-countdown-seconds>10</strong> <span>{{ __('site.ui.seconds') }}</span></p>
                                             </div>
                                             <video class="question-answer-clock__video" data-answer-main controls playsinline preload="metadata" hidden src="{{ $story['answer_video'] }}">{{ __('site.ui.audio_unsupported') }}</video>
-                                            <noscript><style>[data-answer-wait]{display:none}[data-answer-main][hidden]{display:block!important}</style></noscript>
+                                            <noscript><style>[data-answer-wait]{display:none}[data-answer-main][hidden]{display:block!important}[data-answer-why-section][hidden]{display:block!important}</style></noscript>
+                                            @if(!empty($story['answer_why_video']) || !empty($story['answer_why_text']))
+                                            <div class="answer-why" data-answer-why-section hidden>
                                             @if(!empty($story['answer_why_video']))
                                                 {{-- The bonus answer takes the same frame once the first
                                                      one ends: a short stand-by, then why. Hidden until
@@ -172,8 +174,10 @@
                                                        src="{{ $story['answer_why_video'] }}">{{ __('site.ui.audio_unsupported') }}</video>
                                             @endif
                                             @if(!empty($story['answer_why_text']))
-                                                <p class="question-answer-clock__eyebrow">{{ __('site.ui.why_eyebrow') }}</p>
+                                                <p class="question-answer-clock__eyebrow answer-why__title">{{ __('site.ui.why_eyebrow') }}</p>
                                                 <p class="question-answer-clock__note">{{ $story['answer_why_text'] }}</p>
+                                            @endif
+                                            </div>
                                             @endif
                                         </div>
                                     </div>
@@ -341,7 +345,7 @@
         </section>
     </div>
 </section>
-<script src="/assets/adisaan/site/question-answer-countdown.js?v=20261103-locales" defer></script>
+<script src="/assets/adisaan/site/question-answer-countdown.js?v=20261103-why-after-video" defer></script>
 {{-- After site.js, which publishes the stage selector the reel turns. --}}
 <script src="/assets/adisaan/site/question-reel.js?v=20261103-locales" defer></script>
 @endsection
