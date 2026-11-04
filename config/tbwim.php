@@ -78,6 +78,17 @@ return [
             'video' => '/assets/adisaan/site/question-04-rest-without-guilt.mp4',
             'poster' => '/assets/adisaan/site/question-04-rest-without-guilt-poster.jpg',
         ],
+        [
+            'id' => 'tell-someone-hard-truth',
+            'number' => 5,
+            'question' => 'What is the best way you imagine to tell someone something they don\'t want to hear?',
+            'lead' => 'What is the best way you imagine to tell someone something they don\'t want to hear?',
+            'life_area' => 'people',
+            'tag' => '#AdiSaanQ05',
+            'opens_at' => null,
+            'video' => '/assets/adisaan/site/question-05-tell-someone-hard-truth.mp4',
+            'poster' => '/assets/adisaan/site/question-05-tell-someone-hard-truth-poster.jpg',
+        ],
     ],
 
     'answer_goal' => 1000000,
