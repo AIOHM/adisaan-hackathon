@@ -67,6 +67,17 @@ return [
             'video' => '/assets/adisaan/site/question-03-know-when-to-stop.mp4',
             'poster' => null,
         ],
+        [
+            'id' => 'rest-without-guilt',
+            'number' => 4,
+            'question' => 'What is the best way you imagine to rest without feeling guilty?',
+            'lead' => 'What is the best way you imagine to rest without feeling guilty?',
+            'life_area' => 'rest',
+            'tag' => '#AdiSaanQ04',
+            'opens_at' => null,
+            'video' => '/assets/adisaan/site/question-04-rest-without-guilt.mp4',
+            'poster' => '/assets/adisaan/site/question-04-rest-without-guilt-poster.jpg',
+        ],
     ],
 
     'answer_goal' => 1000000,
