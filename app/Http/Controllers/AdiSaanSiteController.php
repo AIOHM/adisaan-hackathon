@@ -592,12 +592,18 @@ final class AdiSaanSiteController extends Controller
         };
 
         // The avatar's brief: the next approved signal question, announced
-        // here before it enters tomorrow's rotation.
+        // here before it enters tomorrow's rotation. The brief only lives
+        // on the day before and the day of its question: it says "from
+        // today's news" and "tomorrow I ask", so showing a past question's
+        // brief (or one scheduled days ahead) would present old news as
+        // today's. There is deliberately no fallback to the latest brief.
         $signalBrief = null;
         if (Schema::hasTable('signal_questions')) {
-            $today = Carbon::now(LaunchSchedule::TZ)->toDateString();
-            $signalBrief = SignalQuestion::approved()->whereDate('scheduled_for', '>=', $today)->orderBy('scheduled_for')->first()
-                ?? SignalQuestion::approved()->orderByDesc('scheduled_for')->first();
+            $today = Carbon::now(LaunchSchedule::TZ);
+            $signalBrief = SignalQuestion::approved()
+                ->whereDate('scheduled_for', '>=', $today->toDateString())
+                ->whereDate('scheduled_for', '<=', $today->copy()->addDay()->toDateString())
+                ->orderBy('scheduled_for')->first();
         }
 
         return view('adisaan-site.news', $this->shared('news') + [

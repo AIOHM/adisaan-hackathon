@@ -27,9 +27,27 @@ final class DraftSignalQuestionCommand extends Command
             return self::SUCCESS;
         }
 
-        $signals = array_slice($reader->signals(), 0, max(1, (int) $this->option('signals')));
+        // Only today's news may become tomorrow's question. The wires are
+        // sorted newest first, but a slow feed's days-old story can still
+        // sit in the top slice; offer the model only signals published
+        // within 48 hours of the newest one, so the brief's "in today's
+        // news" is true of the signal it picks.
+        $all = $reader->signals();
+        $newest = null;
+        foreach ($all as $signal) {
+            $stamp = $signal['published_at']?->timestamp;
+            if ($stamp !== null && ($newest === null || $stamp > $newest)) {
+                $newest = $stamp;
+            }
+        }
+        $fresh = $newest === null ? [] : array_values(array_filter(
+            $all,
+            static fn (array $signal): bool => $signal['published_at'] !== null
+                && $signal['published_at']->timestamp >= $newest - 48 * 3600,
+        ));
+        $signals = array_slice($fresh, 0, max(1, (int) $this->option('signals')));
         if ($signals === []) {
-            $this->error('No published signals right now; nothing to draft from.');
+            $this->error('No fresh signals from the last two days; nothing to draft from.');
 
             return self::FAILURE;
         }

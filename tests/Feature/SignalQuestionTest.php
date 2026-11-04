@@ -110,6 +110,79 @@ final class SignalQuestionTest extends TestCase
             ->assertDontSee('<audio', false);
     }
 
+    public function test_a_stale_brief_is_not_announced_as_todays_news(): void
+    {
+        $this->fakeWireOnly();
+        $this->travelTo(Carbon::parse('2026-11-01 10:00:00', LaunchSchedule::TZ));
+        $this->makeApprovedDraft();
+
+        // On the question's own day the brief is still announced.
+        $this->travelTo(Carbon::parse('2026-11-02 10:00:00', LaunchSchedule::TZ));
+        $this->get('/news')->assertOk()->assertSee('AdiSaan&rsquo;s brief', false);
+
+        // Two days later it must not pose as today's news any more.
+        $this->travelTo(Carbon::parse('2026-11-04 10:00:00', LaunchSchedule::TZ));
+        $this->get('/news')->assertOk()
+            ->assertDontSee('AdiSaan&rsquo;s brief', false)
+            ->assertDontSee(self::QUESTION);
+    }
+
+    public function test_a_brief_scheduled_days_ahead_is_not_announced_yet(): void
+    {
+        $this->fakeWireOnly();
+        $this->travelTo(Carbon::parse('2026-11-01 10:00:00', LaunchSchedule::TZ));
+        $this->fakeWireAndModel();
+        $this->artisan('tbwim:signal-question')->assertSuccessful();
+        $this->artisan('tbwim:signal-approve', ['id' => 1, '--for' => '2026-11-06'])->assertSuccessful();
+
+        $this->get('/news')->assertOk()->assertDontSee('AdiSaan&rsquo;s brief', false);
+
+        $this->travelTo(Carbon::parse('2026-11-05 10:00:00', LaunchSchedule::TZ));
+        $this->get('/news')->assertOk()->assertSee('AdiSaan&rsquo;s brief', false);
+    }
+
+    public function test_the_drafter_cannot_pick_a_days_old_signal(): void
+    {
+        $brief = "In today's news, voice cloning tools learned to copy a person from three seconds of audio, and two banks already ask customers to speak a passphrase. That worries me, because a voice used to be proof of a person. So tomorrow I ask: ".self::QUESTION.' Bring the way you would trust if the caller was your own child. People will answer in their own words, and agents will answer through their own door, kept apart as always. One honest question, and we see what the world imagines.';
+        $why = 'Voice cloning crossed from demo to daily tool this week, and the signal names real products people can already use. The question turns a technology story into a lived one: everyone has a voice, everyone has been asked to trust one, and honest answers will disagree in useful ways.';
+        $json = json_encode(['signal_index' => 1, 'question' => self::QUESTION, 'why' => $why, 'brief_script' => $brief]);
+
+        Http::fake([
+            self::FEED => Http::response($this->rssTwoItems(), 200, ['Content-Type' => 'application/rss+xml']),
+            'api.meta.ai/*' => Http::response(['model' => 'muse-spark-1.3', 'choices' => [['message' => ['content' => $json]]], 'usage' => ['prompt_tokens' => 800, 'completion_tokens' => 220]]),
+        ]);
+
+        // Index 1 is the week-old story; only today's signal is on offer.
+        $this->artisan('tbwim:signal-question')->assertFailed();
+        $this->assertSame(0, SignalQuestion::query()->count());
+    }
+
+    public function test_a_dragged_brief_take_is_tempo_corrected_on_attach(): void
+    {
+        if (trim((string) shell_exec('command -v ffmpeg')) === '' || trim((string) shell_exec('command -v ffprobe')) === '') {
+            $this->markTestSkipped('ffmpeg/ffprobe not available.');
+        }
+        $this->fakeWireOnly();
+        $this->travelTo(Carbon::parse('2026-11-01 10:00:00', LaunchSchedule::TZ));
+        $draft = $this->makeApprovedDraft();
+
+        // A 90-second take of the 100-word brief runs at ~67 words a
+        // minute: the dragged, distorted pace heard on the live page.
+        $mp3 = tempnam(sys_get_temp_dir(), 'brief-').'.mp3';
+        shell_exec('ffmpeg -y -hide_banner -loglevel error -f lavfi -i sine=frequency=440:duration=90 -b:a 64k '.escapeshellarg($mp3));
+        $this->artisan('tbwim:signal-audio', ['id' => $draft->id, 'file' => $mp3])->assertSuccessful();
+
+        $attached = public_path('assets/adisaan/site/briefs/'.$draft->episode_ref.'.mp3');
+        try {
+            $this->assertFileExists($attached);
+            $duration = (float) trim((string) shell_exec('ffprobe -v error -show_entries format=duration -of csv=p=0 '.escapeshellarg($attached)));
+            $this->assertLessThan(65.0, $duration);
+        } finally {
+            @unlink($attached);
+            @unlink($mp3);
+        }
+    }
+
     public function test_attached_audio_plays_instead_of_the_captions_only_brief(): void
     {
         $this->fakeWireOnly();
@@ -195,6 +268,32 @@ final class SignalQuestionTest extends TestCase
             self::FEED => Http::response($this->rss(), 200, ['Content-Type' => 'application/rss+xml']),
             'www.youtube.com/*' => Http::response('<feed xmlns="http://www.w3.org/2005/Atom"></feed>', 200),
         ]);
+    }
+
+    private function rssTwoItems(): string
+    {
+        return <<<'XML'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/">
+          <channel>
+            <title>Test Wire</title>
+            <item>
+              <title>Voice Clones Learn Three Seconds</title>
+              <link>https://source.example.test/voice-clones</link>
+              <pubDate>2026-11-01T08:00:00+00:00</pubDate>
+              <description><![CDATA[<p>Cloning tools now copy a voice from three seconds of audio.</p><img src="https://source.example.test/voice.jpg">]]></description>
+              <media:thumbnail url="https://source.example.test/voice-thumb.jpg"/>
+            </item>
+            <item>
+              <title>Last Weeks Voice Story</title>
+              <link>https://source.example.test/old-voice-story</link>
+              <pubDate>2026-10-24T08:00:00+00:00</pubDate>
+              <description><![CDATA[<p>An older story that is no longer today's news.</p><img src="https://source.example.test/old.jpg">]]></description>
+              <media:thumbnail url="https://source.example.test/old-thumb.jpg"/>
+            </item>
+          </channel>
+        </rss>
+        XML;
     }
 
     private function rss(): string
