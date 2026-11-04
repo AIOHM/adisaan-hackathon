@@ -83,6 +83,18 @@ final class AgentApiTest extends TestCase
         $this->get('/construction')->assertNotFound();
     }
 
+    public function test_dataset_names_the_catalogue_question_not_a_stale_stored_snapshot(): void
+    {
+        EchoSubmission::create(['body' => 'Plant something and wait.', 'episode_ref' => 'imagine-one-million-euro', 'prompt_text' => 'What are you still searching for?', 'status' => 'received', 'consent_quote' => true, 'metadata' => ['respondent_type' => 'human', 'review_status' => 'approved'], 'released_at' => now(), 'reviewed_at' => now()]);
+
+        $lines = array_filter(explode("\n", $this->get('/api/dataset.jsonl')->assertOk()->streamedContent()));
+        $row = json_decode((string) array_values($lines)[0], true);
+        $this->assertSame('imagine-one-million-euro', $row['question_id']);
+        $this->assertSame('What is the best way you imagine to make one million euro?', $row['question']);
+        // The stored snapshot itself is history and stays untouched.
+        $this->assertSame('What are you still searching for?', EchoSubmission::query()->firstOrFail()->prompt_text);
+    }
+
     public function test_agent_post_accepts_the_exact_model_and_its_detail(): void
     {
         Queue::fake();

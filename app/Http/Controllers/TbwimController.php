@@ -249,19 +249,24 @@ final class TbwimController extends Controller
     public function dataset(Request $request): StreamedResponse
     {
         $reference = $request->query('story');
+        // The catalogue owns the question wording, as in the published
+        // answers list: a stored snapshot can predate the question's
+        // final words (or carry none), and the dataset must name the
+        // question its question_id names. Stored rows stay untouched.
+        $catalogue = collect($this->questions->all())->keyBy('id');
 
-        return response()->streamDownload(function () use ($reference): void {
+        return response()->streamDownload(function () use ($reference, $catalogue): void {
             EchoSubmission::query()->publiclyVisible()
                 ->when(is_string($reference), fn ($q) => $q->where('episode_ref', $reference))
                 ->orderBy('id')
-                ->chunk(200, function (Collection $rows): void {
+                ->chunk(200, function (Collection $rows) use ($catalogue): void {
                     foreach ($rows as $echo) {
                         $meta = (array) $echo->metadata;
                         echo json_encode([
                             'record' => 'answer',
                             'receipt' => $echo->public_id,
                             'question_id' => $echo->episode_ref,
-                            'question' => $echo->prompt_text,
+                            'question' => (string) ($catalogue->get($echo->episode_ref)['question'] ?? $echo->prompt_text),
                             'respondent_type' => $echo->isAgent() ? 'agent' : 'human',
                             'answer' => $echo->displayBody(),
                             'answer_original' => $echo->body,
