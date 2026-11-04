@@ -229,7 +229,7 @@ return [
             'answer_video' => '/question/answer-video/know-when-to-stop',
             'answer_why_video' => '/question/answer-video/know-when-to-stop?part=why',
             'answer_why_wait_seconds' => 10,
-            'answer_why_text' => 'When you send a prompt across the wire to a SaaS platform, the data has already left your possession—meaning you have to trust their logging practices, their legal team, and their security posture...',
+            'answer_why_text' => 'Why walk away? Forcing only creates friction. Hands are not free holding on too tight. Stopping clears space for what comes next.',
             'duration_label' => '10 SEC',
             'badge' => 'QUESTION 03 · 10 SEC',
             // Rendered 2026-10-25. Transcript: "Starting is easy. Walking
@@ -256,15 +256,17 @@ return [
             'question' => 'What is the best way you imagine to rest without feeling guilty?',
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
-            'duration_label' => '',
+            'duration_label' => '10 SEC',
             'question_release_at' => '2026-11-05T00:00:00+02:00',
+            'answer_reveal_at' => '2026-11-05T00:00:00+02:00',
+            'answer_video' => '/question/answer-video/rest-without-guilt',
+            'answer_why_video' => '/question/answer-video/rest-without-guilt?part=why',
+            'answer_why_wait_seconds' => 10,
+            'answer_why_text' => 'Why rest without guilt? Because you cannot hear your intuition while running. Silence creates the clarity that months of forced work never could.',
             'badge' => 'QUESTION 04',
-            // No film yet. The question page shows the film-coming frame
-            // until this is set; setting it swaps the player in and nothing
-            // else has to change.
-            'video' => '',
-            'poster' => '',
-            'captions' => '',
+            'video' => '/assets/adisaan/site/question-04-rest-without-guilt.mp4',
+            'poster' => '/assets/adisaan/site/question-04-rest-without-guilt-poster.jpg',
+            'captions' => '/assets/adisaan/site/question-04-rest-without-guilt.vtt',
         ],
         [
             'id' => 'tell-someone-hard-truth',
@@ -279,15 +281,17 @@ return [
             'question' => 'What is the best way you imagine to tell someone something they don\'t want to hear?',
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
-            'duration_label' => '',
+            'duration_label' => '10 SEC',
             'question_release_at' => '2026-11-06T00:00:00+02:00',
+            'answer_reveal_at' => '2026-11-06T00:00:00+02:00',
+            'answer_video' => '/question/answer-video/tell-someone-hard-truth',
+            'answer_why_video' => '/question/answer-video/tell-someone-hard-truth?part=why',
+            'answer_why_wait_seconds' => 10,
+            'answer_why_text' => 'When you share real scars, you kill the judge, no teacher, no student. Just two humans facing the truth.',
             'badge' => 'QUESTION 05',
-            // No film yet. The question page shows the film-coming frame
-            // until this is set; setting it swaps the player in and nothing
-            // else has to change.
-            'video' => '',
-            'poster' => '',
-            'captions' => '',
+            'video' => '/assets/adisaan/site/question-05-tell-someone-hard-truth.mp4',
+            'poster' => '/assets/adisaan/site/question-05-tell-someone-hard-truth-poster.jpg',
+            'captions' => '/assets/adisaan/site/question-05-tell-someone-hard-truth.vtt',
         ],
         [
             'id' => 'decide-between-two-goods',

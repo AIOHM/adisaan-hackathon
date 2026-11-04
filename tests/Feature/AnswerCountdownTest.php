@@ -75,7 +75,8 @@ final class AnswerCountdownTest extends TestCase
             ->assertSee('data-answer-why-section hidden', false)
             ->assertSee('data-answer-standby hidden', false)
             ->assertSee('data-answer-why controls playsinline preload="none" hidden', false)
-            ->assertSee('the data has already left your possession', false);
+            ->assertSee('Why walk away? Forcing only creates friction', false)
+            ->assertDontSee('the data has already left your possession', false);
     }
 
     public function test_q3_answer_streams_from_the_brand_and_its_brand_poster_wins(): void
