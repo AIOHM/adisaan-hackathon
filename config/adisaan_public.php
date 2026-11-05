@@ -306,15 +306,17 @@ return [
             'question' => 'What is the best way you imagine to decide between two good options?',
             'invitation' => 'Your own words are enough. One sentence is a complete answer.',
             'action' => 'Share your answer',
-            'duration_label' => '',
+            'duration_label' => '10 SEC',
             'question_release_at' => '2026-11-08T00:00:00+02:00',
+            'answer_reveal_at' => '2026-11-08T00:00:00+02:00',
+            'answer_video' => '/assets/adisaan/site/question-07-answer.mp4',
+            'answer_why_video' => '/assets/adisaan/site/question-07-why.mp4',
+            'answer_why_wait_seconds' => 10,
+            'answer_why_text' => 'Why bleed over two good paths when tomorrow rewrites the rules?',
             'badge' => 'QUESTION 07',
-            // No film yet. The question page shows the film-coming frame
-            // until this is set; setting it swaps the player in and nothing
-            // else has to change.
-            'video' => '',
-            'poster' => '',
-            'captions' => '',
+            'video' => '/assets/adisaan/site/question-07-decide-between-two-goods.mp4',
+            'poster' => '/assets/adisaan/site/question-07-decide-between-two-goods-poster.jpg',
+            'captions' => '/assets/adisaan/site/question-07-decide-between-two-goods.vtt',
         ],
         [
             'id' => 'learn-something-hard-fast',
