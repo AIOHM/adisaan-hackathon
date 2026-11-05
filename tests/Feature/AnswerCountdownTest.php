@@ -40,9 +40,9 @@ final class AnswerCountdownTest extends TestCase
             '2026-11-04 12:00:00' => 'know-when-to-stop',
             '2026-11-05 00:00:01' => 'rest-without-guilt',
             '2026-11-06 12:00:00' => 'tell-someone-hard-truth',
-            '2026-11-07 12:00:00' => 'decide-between-two-goods',
-            '2026-11-08 12:00:00' => 'learn-something-hard-fast',
-            '2026-11-09 12:00:00' => 'keep-an-idea-alive',
+            '2026-11-07 12:00:00' => 'keep-an-idea-alive',
+            '2026-11-08 12:00:00' => 'decide-between-two-goods',
+            '2026-11-09 12:00:00' => 'learn-something-hard-fast',
             '2026-11-10 12:00:00' => 'earn-a-strangers-trust',
             '2026-11-11 12:00:00' => 'best-way-to-anything',
         ];

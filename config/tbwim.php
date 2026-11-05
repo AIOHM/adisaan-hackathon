@@ -89,6 +89,17 @@ return [
             'video' => '/assets/adisaan/site/question-05-tell-someone-hard-truth.mp4',
             'poster' => '/assets/adisaan/site/question-05-tell-someone-hard-truth-poster.jpg',
         ],
+        [
+            'id' => 'keep-an-idea-alive',
+            'number' => 6,
+            'question' => 'What is the best way you imagine to keep an idea alive when nobody else believes in it?',
+            'lead' => 'What is the best way you imagine to keep an idea alive when nobody else believes in it?',
+            'life_area' => 'meaning',
+            'tag' => '#AdiSaanQ06',
+            'opens_at' => null,
+            'video' => '/assets/adisaan/site/question-06-keep-an-idea-alive.mp4',
+            'poster' => '/assets/adisaan/site/question-06-keep-an-idea-alive-poster.jpg',
+        ],
     ],
 
     'answer_goal' => 1000000,
