@@ -163,4 +163,7 @@
   if (document.fonts?.ready) document.fonts.ready.then(sizeTrack).catch(() => {});
 
   render();
+  if (window.AdiSaanStage?.select) {
+    window.AdiSaanStage.select(index, false);
+  }
 })();

@@ -607,7 +607,9 @@
   const mainVideo = document.querySelector('#netflix-main-video');
   const epCards = Array.from(document.querySelectorAll('[data-ep-select]'));
   if (mainVideo && epCards.length) {
-    let activeIdx = 0;
+    const dataContainer = document.querySelector('.netflix-episode-data');
+    const initialStageIdx = parseInt(dataContainer?.dataset.initialIndex || '0', 10);
+    let activeIdx = (Number.isFinite(initialStageIdx) && initialStageIdx >= 0 && initialStageIdx < epCards.length) ? initialStageIdx : 0;
     const selectEpisode = (idx, autoPlay = true) => {
       const card = epCards[(idx + epCards.length) % epCards.length];
       if (!card) return;
@@ -678,6 +680,7 @@
     // The answer reel turns the same stage. One selector, so "which question
     // am I on" cannot be answered two different ways on the same page.
     window.AdiSaanStage = { select: selectEpisode, count: epCards.length };
+    selectEpisode(activeIdx, false);
     epCards.forEach((card, idx) => {
       card.addEventListener('click', () => selectEpisode(idx, true));
     });

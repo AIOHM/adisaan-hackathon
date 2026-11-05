@@ -129,8 +129,10 @@
                                             ? is_file(public_path(ltrim($story['answer_video'], '/')))
                                             : \Illuminate\Support\Facades\Storage::disk('local')->exists('question-answer-media/'.config('adisaan_public.tenant').'/'.$story['id'].'.mp4')));
                                 $slideNo = str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT);
+                                $slidePos = $i === ($featuredIndex ?? 0) ? 'active' : ($i === (($featuredIndex ?? 0) - 1 + count($publishedStories)) % count($publishedStories) ? 'prev' : ($i === (($featuredIndex ?? 0) + 1) % count($publishedStories) ? 'next' : 'far'));
                             @endphp
-                            <article class="qreel__slide" data-qreel-slide data-index="{{ $i }}" data-story-id="{{ $story['id'] }}"
+                            <article class="qreel__slide" data-qreel-slide data-pos="{{ $slidePos }}" data-index="{{ $i }}" data-story-id="{{ $story['id'] }}"
+                                     aria-hidden="{{ $i === ($featuredIndex ?? 0) ? 'false' : 'true' }}"
                                      aria-label="{{ __('site.ui.question_of', ['no' => $slideNo, 'total' => count($publishedStories)]) }}">
                                 @if($slideReady)
                                     <div class="question-answer-clock" data-answer-countdown data-story-id="{{ $story['id'] }}">
@@ -229,11 +231,11 @@
                 </button>
 
                 <div class="qreel__rail">
-                    <p class="qreel__count"><strong data-qreel-current>01</strong> / {{ str_pad((string) count($publishedStories), 2, '0', STR_PAD_LEFT) }}</p>
+                    <p class="qreel__count"><strong data-qreel-current>{{ str_pad((string) (($featuredIndex ?? 0) + 1), 2, '0', STR_PAD_LEFT) }}</strong> / {{ str_pad((string) count($publishedStories), 2, '0', STR_PAD_LEFT) }}</p>
                     <ol class="qreel__dots" role="tablist" aria-label="{{ __('site.ui.questions_aria') }}">
                         @foreach($publishedStories as $i => $story)
                             <li role="presentation"><button type="button" role="tab" class="qreel__dot" data-qreel-dot data-index="{{ $i }}"
-                                aria-selected="{{ $i === 0 ? 'true' : 'false' }}"
+                                aria-selected="{{ $i === ($featuredIndex ?? 0) ? 'true' : 'false' }}"
                                 aria-label="{{ __('site.ui.million_question') }} {{ str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT) }}"></button></li>
                         @endforeach
                     </ol>
@@ -244,10 +246,10 @@
                  the question it will answer. Ten buttons saying the same thing
                  in ten cards was the same ask repeated, and only one of them
                  was ever reachable. --}}
-            <a class="btn-primary question-page-v2__cta" data-stage-answer-link href="{{ $featuredStory['answer_url'] ?? route('adisaan.public.answer') }}"><span data-stage-action>{{ __('site.ui.share_answer') }}</span> <span class="btn-no" data-stage-no>01</span> <span aria-hidden="true">↗</span></a>
+            <a class="btn-primary question-page-v2__cta" data-stage-answer-link href="{{ $featuredStory['answer_url'] ?? route('adisaan.public.answer') }}"><span data-stage-action>{{ __('site.ui.share_answer') }}</span> <span class="btn-no" data-stage-no>{{ str_pad((string) (($featuredIndex ?? 0) + 1), 2, '0', STR_PAD_LEFT) }}</span> <span aria-hidden="true">↗</span></a>
         </div>
 
-        <div class="netflix-episode-data" hidden>
+        <div class="netflix-episode-data" data-initial-index="{{ $featuredIndex ?? 0 }}" hidden>
             @foreach($publishedStories as $idx => $ep)
                 <span data-ep-select
                       data-ep-index="{{ $idx }}"

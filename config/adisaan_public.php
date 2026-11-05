@@ -357,8 +357,8 @@ return [
             // 6th here); adisaan.com released Q06 on the 5th.
             'question_release_at' => '2026-11-07T00:00:00+02:00',
             'answer_reveal_at' => '2026-11-07T00:00:00+02:00',
-            'answer_video' => '/question/answer-video/keep-an-idea-alive',
-            'answer_why_video' => '/question/answer-video/keep-an-idea-alive?part=why',
+            'answer_video' => '/assets/adisaan/site/question-06-answer.mp4',
+            'answer_why_video' => '/assets/adisaan/site/question-06-why.mp4',
             'answer_why_wait_seconds' => 10,
             'answer_why_text' => 'Why build quietly? Because asking for belief starts a debate. Building creates proof. Either way, you earn something or you learn something.',
             'badge' => 'QUESTION 06',
